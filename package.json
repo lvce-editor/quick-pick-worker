@@ -1,0 +1,32 @@
+{
+  "name": "@lvce-editor/quick-pick-worker-monorepo",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "author": "Lvce Editor",
+  "type": "module",
+  "scripts": {
+    "build": "node packages/build/src/build.js",
+    "build:static": "node packages/build/src/build-static.js",
+    "build:watch": "./packages/build/node_modules/.bin/esbuild --format=esm --bundle --external:node:buffer --external:electron --external:ws --external:node:worker_threads --watch packages/quick-pick-worker/src/quickPickWorkerMain.ts --outfile=.tmp/dist/dist/quickPickWorkerMain.js",
+    "dev": "node packages/build/src/dev.js",
+    "format": "prettier --write .",
+    "postinstall": "lerna bootstrap --ci",
+    "lint": "eslint . && prettier --check .",
+    "test": "lerna run test",
+    "test-integration": "lerna run test-integration",
+    "type-check": "tsc -b"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 150
+  },
+  "devDependencies": {
+    "@lerna/legacy-package-management": "^8.2.4",
+    "@lvce-editor/eslint-config": "^7.3.0",
+    "eslint": "^9.39.3",
+    "lerna": "^8.2.4",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3"
+  }
+}
