@@ -46,7 +46,7 @@
     "@lvce-editor/i18n": "^2.1.0",
     "@lvce-editor/list": "^1.7.0",
     "@lvce-editor/rpc": "^6.4.0",
-    "@lvce-editor/rpc-registry": "^9.1.0",
+    "@lvce-editor/rpc-registry": "^9.4.0",
     "@lvce-editor/verror": "^1.7.0",
     "@lvce-editor/viewlet-registry": "^4.1.0",
     "@lvce-editor/virtual-dom-worker": "^8.9.0",
@@ -55,6 +55,6 @@
     "ts-jest": "^29.4.6"
   },
   "dependencies": {
-    "@lvce-editor/constants": "^4.0.0"
+    "@lvce-editor/constants": "^5.0.0"
   }
 }
