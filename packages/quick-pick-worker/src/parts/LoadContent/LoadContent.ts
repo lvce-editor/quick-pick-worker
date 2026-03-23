@@ -68,6 +68,7 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     focused: true,
     focusedIndex: 0,
     icons,
+    initial:false,
     inputSource: InputSource.Script,
     items,
     maxLineY,
@@ -76,7 +77,6 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     placeholder: '',
     providerId: id,
     state: QuickPickOpenState.Finished,
-    value: finalValue,
-    initial:false
+    value: finalValue
   }
 }

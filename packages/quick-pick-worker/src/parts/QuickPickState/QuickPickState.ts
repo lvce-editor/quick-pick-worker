@@ -10,10 +10,10 @@ export interface QuickPickState extends List<any> {
   readonly fileIconCache: FileIconCache
   readonly focused: boolean
   readonly focusedIndex: number
-  readonly initial: boolean
   readonly headerHeight: number
   readonly height: number
   readonly icons: readonly string[]
+  readonly initial: boolean
   readonly inputSource: number
   readonly itemHeight: number
   readonly items: readonly ProtoVisibleItem[]
