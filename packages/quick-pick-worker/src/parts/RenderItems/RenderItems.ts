@@ -1,9 +1,15 @@
 import { ViewletCommand } from '@lvce-editor/constants'
-import type { QuickPickViewModel } from '../QuickPickViewModel/QuickPickViewModel.ts'
+import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
+import * as CreateQuickPickViewModel from '../CreateQuickPickViewModel/CreateQuickPickViewModel.ts'
 import * as GetQuickPickVirtualDom from '../GetQuickPickVirtualDom/GetQuickPickVirtualDom.ts'
 
-export const renderItems = (newState: QuickPickViewModel): readonly unknown[] => {
-  const { scrollBarHeight, scrollBarTop, visibleItems } = newState
-  const dom = GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop)
+export const renderItemsDom = (state: QuickPickState): readonly unknown[] => {
+  const viewModel = CreateQuickPickViewModel.createQuickPickViewModel(state, state)
+  const { scrollBarHeight, scrollBarTop, visibleItems } = viewModel
+  return GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop)
+}
+
+export const renderItems = (_oldState: QuickPickState, newState: QuickPickState): readonly unknown[] => {
+  const dom = renderItemsDom(newState)
   return [ViewletCommand.SetDom2, dom]
 }
