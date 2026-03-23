@@ -19,6 +19,7 @@ export default [
   {
     rules: {
       '@cspell/spellchecker': 'off',
+      '@typescript-eslint/only-throw-error': 'off',
     },
   },
 ]
