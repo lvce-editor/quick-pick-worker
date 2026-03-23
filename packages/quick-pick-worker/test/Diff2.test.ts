@@ -97,7 +97,7 @@ test('diff2 returns RenderItems when items differ', () => {
   })
   QuickPickStates.set(uid, oldState, newState)
   const result = Diff2.diff2(uid)
-  expect(result).toContain(DiffType.RenderItems)
+  expect(result).toContain(DiffType.RenderIncremental)
 })
 
 test('diff2 returns Height when items length differs', () => {
