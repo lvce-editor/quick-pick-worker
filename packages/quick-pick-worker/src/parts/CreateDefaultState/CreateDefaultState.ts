@@ -19,6 +19,7 @@ export const createDefaultState = (): QuickPickState => {
     focused: false,
     height: 300,
     icons: [],
+    initial: false,
     inputSource: InputSource.User,
     maxVisibleItems: 10,
     picks: [],

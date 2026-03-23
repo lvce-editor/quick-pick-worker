@@ -23,6 +23,7 @@ export const create = (
     cursorOffset: 0,
     height: 300,
     icons: [],
+    initial: true,
     maxVisibleItems: 12,
     picks: [],
     recentPickIds: Object.create(null),
