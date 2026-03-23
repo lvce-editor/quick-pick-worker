@@ -2,7 +2,9 @@ import { expect, test } from '@jest/globals'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as RenderItems from '../src/parts/RenderItems/RenderItems.ts'
 
-const getItem = (label: string) => {
+const getItem = (
+  label: string,
+): { description: string; direntType: number; fileIcon: string; icon: string; label: string; matches: number[]; uri: string } => {
   return {
     description: `${label} description`,
     direntType: 0,

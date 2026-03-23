@@ -3,7 +3,9 @@ import { ViewletCommand } from '@lvce-editor/constants'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as RenderIncremental from '../src/parts/RenderIncremental/RenderIncremental.ts'
 
-const getItem = (label: string) => {
+const getItem = (
+  label: string,
+): { description: string; direntType: number; fileIcon: string; icon: string; label: string; matches: number[]; uri: string } => {
   return {
     description: `${label} description`,
     direntType: 0,
