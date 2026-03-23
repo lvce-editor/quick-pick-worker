@@ -77,5 +77,6 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     providerId: id,
     state: QuickPickOpenState.Finished,
     value: finalValue,
+    initial:false
   }
 }

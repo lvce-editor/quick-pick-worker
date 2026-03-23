@@ -14,6 +14,7 @@ export const createDefaultState = (): QuickPickState => {
     allowEmptyResult: false,
     args: [],
     assetDir: '',
+    initial: false,
     cursorOffset: 0,
     fileIconCache: Object.create(null),
     focused: false,

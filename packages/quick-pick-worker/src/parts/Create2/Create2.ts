@@ -22,6 +22,7 @@ export const create = (
     allowEmptyResult: false,
     cursorOffset: 0,
     height: 300,
+    initial: true,
     icons: [],
     maxVisibleItems: 12,
     picks: [],
