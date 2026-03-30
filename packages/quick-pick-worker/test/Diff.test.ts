@@ -68,7 +68,7 @@ test('diff returns RenderItems when items differ', () => {
     minLineY: 0,
   })
   const result = Diff.diff(oldState, newState)
-  expect(result).toContain(DiffType.RenderItems)
+  expect(result).toContain(DiffType.RenderIncremental)
 })
 
 test('diff returns RenderValue when value differs', () => {
@@ -141,5 +141,5 @@ test('diff returns Height and RenderItems when items length and content differ',
   })
   const result = Diff.diff(oldState, newState)
   expect(result).toContain(DiffType.Height)
-  expect(result).toContain(DiffType.RenderItems)
+  expect(result).toContain(DiffType.RenderIncremental)
 })

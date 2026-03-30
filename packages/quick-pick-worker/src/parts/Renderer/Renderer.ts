@@ -1,5 +1,5 @@
-import type { QuickPickViewModel } from '../QuickPickViewModel/QuickPickViewModel.ts'
+import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 
 export interface Renderer {
-  (model: QuickPickViewModel): readonly unknown[]
+  (oldState: QuickPickState, newState: QuickPickState): readonly unknown[]
 }

@@ -1,6 +1,6 @@
-import type { QuickPickViewModel } from '../QuickPickViewModel/QuickPickViewModel.ts'
+import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as RenderMethod from '../RenderMethod/RenderMethod.ts'
 
-export const renderCursorOffset = (newState: QuickPickViewModel): any => {
+export const renderCursorOffset = (_oldState: QuickPickState, newState: QuickPickState): any => {
   return ['Viewlet.send', newState.uid, /* method */ RenderMethod.SetCursorOffset, /* cursorOffset */ newState.cursorOffset]
 }
