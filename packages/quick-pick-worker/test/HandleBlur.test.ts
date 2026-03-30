@@ -1,15 +1,26 @@
 import { expect, test } from '@jest/globals'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
+import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleBlur from '../src/parts/HandleBlur/HandleBlur.ts'
 
 test('returns state unchanged', async () => {
-  const state = { ...CreateDefaultState.createDefaultState(), uid: 1, value: 'test' }
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = { ...CreateDefaultState.createDefaultState(), uid: 1, value: 'test' }
   const result = await HandleBlur.handleBlur(state)
   expect(result).toBe(state)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 1]])
 })
 
 test('returns state with different properties unchanged', async () => {
-  const state = {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = {
     ...CreateDefaultState.createDefaultState(),
     height: 500,
     uid: 42,
@@ -22,24 +33,39 @@ test('returns state with different properties unchanged', async () => {
   expect(result.uid).toBe(42)
   expect(result.value).toBe('some value')
   expect(result.width).toBe(800)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 42]])
 })
 
 test('returns state with focused property unchanged', async () => {
-  const state = { ...CreateDefaultState.createDefaultState(), focused: true }
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = { ...CreateDefaultState.createDefaultState(), focused: true }
   const result = await HandleBlur.handleBlur(state)
   expect(result).toBe(state)
   expect(result.focused).toBe(true)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', state.uid]])
 })
 
 test('returns state with focused false unchanged', async () => {
-  const state = { ...CreateDefaultState.createDefaultState(), focused: false }
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = { ...CreateDefaultState.createDefaultState(), focused: false }
   const result = await HandleBlur.handleBlur(state)
   expect(result).toBe(state)
   expect(result.focused).toBe(false)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', state.uid]])
 })
 
 test('returns state with items and focusedIndex unchanged', async () => {
-  const state = {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = {
     ...CreateDefaultState.createDefaultState(),
     focusedIndex: 2,
     items: [
@@ -53,10 +79,15 @@ test('returns state with items and focusedIndex unchanged', async () => {
   expect(result.focusedIndex).toBe(2)
   expect(result.items).toHaveLength(3)
   expect(result.items[0].label).toBe('item1')
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', state.uid]])
 })
 
 test('returns state with complex configuration unchanged', async () => {
-  const state = {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = {
     ...CreateDefaultState.createDefaultState(),
     cursorOffset: 5,
     focused: true,
@@ -77,4 +108,16 @@ test('returns state with complex configuration unchanged', async () => {
   expect(result.uid).toBe(999)
   expect(result.value).toBe('complex state')
   expect(result.width).toBe(1000)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 999]])
+})
+
+test('calls closeWidget with quick pick uid', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = { ...CreateDefaultState.createDefaultState(), uid: 123 }
+  await HandleBlur.handleBlur(state)
+
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123]])
 })
