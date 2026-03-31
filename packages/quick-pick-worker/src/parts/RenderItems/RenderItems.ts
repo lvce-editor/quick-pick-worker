@@ -5,6 +5,9 @@ import * as CreateQuickPickViewModel from '../CreateQuickPickViewModel/CreateQui
 import * as GetQuickPickVirtualDom from '../GetQuickPickVirtualDom/GetQuickPickVirtualDom.ts'
 
 export const renderItemsDom = (state: QuickPickState): readonly VirtualDomNode[] => {
+  if (state.initial) {
+    return []
+  }
   const viewModel = CreateQuickPickViewModel.createQuickPickViewModel(state, state)
   const { scrollBarHeight, scrollBarTop, visibleItems } = viewModel
   return GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop)

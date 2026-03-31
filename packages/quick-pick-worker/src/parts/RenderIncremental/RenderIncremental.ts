@@ -6,9 +6,6 @@ import { renderItemsDom } from '../RenderItems/RenderItems.ts'
 export const renderIncremental = (oldState: QuickPickState, newState: QuickPickState): readonly unknown[] => {
   const oldDom = renderItemsDom(oldState)
   const newDom = renderItemsDom(newState)
-  if (oldState.initial) {
-    return [ViewletCommand.SetDom2, newDom]
-  }
   const patches = diffTree(oldDom, newDom)
   return [ViewletCommand.SetPatches, newState.uid, patches]
 }
