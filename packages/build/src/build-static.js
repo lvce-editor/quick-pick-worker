@@ -1,4 +1,4 @@
-import { cp, readFile } from 'node:fs/promises'
+import { cp, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { root } from './root.js'
@@ -25,15 +25,14 @@ export const getRemoteUrl = (path) => {
 // @ts-ignore
 const content = await readFile(rendererWorkerPath, 'utf8')
 const workerPath = join(root, '.tmp/dist/dist/quickPickWorkerMain.js')
-// @ts-ignore
 const remoteUrl = getRemoteUrl(workerPath)
 
-// if (content.includes('// const fileSearchWorkerUrl = ')) {
-//   const occurrence = `// const fileSearchWorkerUrl = \`\${assetDir}/packages/quick-pick-worker/dist/quickPickWorkerMain.js\`
-//   const fileSearchWorkerUrl = \`${remoteUrl}\``
-//   const replacement = `const fileSearchWorkerUrl = \`\${assetDir}/packages/quick-pick-worker/dist/quickPickWorkerMain.js\``
-//   const newContent = content.replace(occurrence, replacement)
-//   await writeFile(rendererWorkerPath, newContent)
-// }
+if (content.includes('// const quickPickWorkerUrl = ')) {
+  const occurrence = `// const quickPickWorkerUrl = \`\${assetDir}/packages/quick-pick-worker/dist/quickPickWorkerMain.js\`
+const quickPickWorkerUrl = \`${remoteUrl}\``
+  const replacement = `const quickPickWorkerUrl = \`\${assetDir}/packages/quick-pick-worker/dist/quickPickWorkerMain.js\``
+  const newContent = content.replace(occurrence, replacement)
+  await writeFile(rendererWorkerPath, newContent)
+}
 
 await cp(join(root, 'dist'), join(root, '.tmp', 'static'), { recursive: true })
