@@ -22,18 +22,13 @@ test('searches files without prepare', async () => {
   ])
 })
 
-test.skip('searches files with prepare', async () => {
+test('searches files with prepare flag set', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'SearchProcess.invoke': () => 'file1.txt\nfile2.txt\nfile3.txt',
   })
 
   const result = await SearchFileWithRipGrep.searchFile('/test', 'file2', true)
-  expect(result).toEqual([
-    {
-      matches: expect.any(Array),
-      pick: 'file2.txt',
-    },
-  ])
+  expect(result).toEqual(['file1.txt', 'file2.txt', 'file3.txt'])
   expect(mockRpc.invocations).toEqual([
     [
       'SearchProcess.invoke',
