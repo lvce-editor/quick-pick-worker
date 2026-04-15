@@ -7,5 +7,7 @@ export const renderIncremental = (oldState: QuickPickState, newState: QuickPickS
   const oldDom = renderItemsDom(oldState)
   const newDom = renderItemsDom(newState)
   const patches = diffTree(oldDom, newDom)
+
+  console.log({ newDom, oldDom, patches })
   return [ViewletCommand.SetPatches, newState.uid, patches]
 }
