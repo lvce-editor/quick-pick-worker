@@ -18,16 +18,16 @@ test('getScrollBarVirtualDom with scrollbar', () => {
   const result = GetScrollBarVirtualDom.getScrollBarVirtualDom(scrollBarHeight, scrollBarTop)
   expect(result).toEqual([
     {
-    childCount: 1,
-    className: MergeClassNames.mergeClassNames(ClassNames.ScrollBar, ClassNames.ScrollBarSmall),
-    type: VirtualDomElements.Div,
+      childCount: 1,
+      className: MergeClassNames.mergeClassNames(ClassNames.ScrollBar, ClassNames.ScrollBarSmall),
+      type: VirtualDomElements.Div,
     },
     {
-    childCount: 0,
-    className: ClassNames.ScrollBarThumb,
-    height: Px.px(scrollBarHeight),
-    translate: Px.position(0, scrollBarTop),
-    type: VirtualDomElements.Div,
+      childCount: 0,
+      className: ClassNames.ScrollBarThumb,
+      height: Px.px(scrollBarHeight),
+      translate: Px.position(0, scrollBarTop),
+      type: VirtualDomElements.Div,
     },
   ])
 })
