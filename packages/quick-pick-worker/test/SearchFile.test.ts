@@ -7,7 +7,7 @@ test('searchFile forwards to file search worker', async () => {
   FileSearchWorker.set({
     invoke(method: string, ...params: readonly unknown[]) {
       invocations.push([method, ...params])
-      return Promise.resolve(['/test/file.txt'])
+      return ['/test/file.txt']
     },
   } as any)
 

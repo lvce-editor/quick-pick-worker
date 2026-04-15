@@ -3,12 +3,12 @@ import { FileSearchWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import * as DirentType from '../src/parts/DirentType/DirentType.ts'
 import * as GetPicksFile from '../src/parts/GetPicksFile/GetPicksFile.ts'
 
-const createMockFileSearchWorker = (response: readonly string[]) => {
+const createMockFileSearchWorker = (response: readonly string[]): { invocations: any[] } => {
   const invocations: any[] = []
   FileSearchWorker.set({
     invoke(method: string, ...params: readonly unknown[]) {
       invocations.push([method, ...params])
-      return Promise.resolve(response)
+      return response
     },
   } as any)
   return {
