@@ -8,5 +8,9 @@ import { registerCommands } from '../QuickPickStates/QuickPickStates.ts'
 export const listen = async (): Promise<void> => {
   Object.assign(commandMapRef, CommandMap.commandMap)
   registerCommands(CommandMap.commandMap)
+<<<<<<< HEAD
+=======
+  SearchFileModule.register(SearchModules.searchModules)
+>>>>>>> origin/main
   await Promise.all([initializeRendererWorker(), initializeEditorWorker(), initializeFileSearchWorker()])
 }
