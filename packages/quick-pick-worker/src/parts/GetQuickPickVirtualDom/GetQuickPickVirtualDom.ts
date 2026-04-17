@@ -21,7 +21,7 @@ const getRootNodeCount = (nodes: readonly VirtualDomNode[]): number => {
     if (remainingChildCounts.length === 0) {
       count++
     } else {
-      remainingChildCounts[remainingChildCounts.length - 1]--
+      remainingChildCounts.at(-1)--
     }
     remainingChildCounts.push(node.childCount)
   }
