@@ -20,8 +20,5 @@ const quickPickNoResultsDomNodes: readonly VirtualDomNode[] = [
 
 export const getQuickPickNoResultsVirtualDom = (): readonly VirtualDomNode[] => {
   const noResults = QuickPickStrings.noResults()
-  return [
-    ...quickPickNoResultsDomNodes,
-    text(noResults),
-  ]
+  return [...quickPickNoResultsDomNodes, text(noResults)]
 }
