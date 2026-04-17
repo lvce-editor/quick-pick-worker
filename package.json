@@ -13,7 +13,6 @@
     "postinstall": "lerna bootstrap --ci",
     "lint": "eslint . && prettier --check .",
     "test": "lerna run test",
-    "test-integration": "lerna run test-integration",
     "type-check": "tsc -b"
   },
   "prettier": {
