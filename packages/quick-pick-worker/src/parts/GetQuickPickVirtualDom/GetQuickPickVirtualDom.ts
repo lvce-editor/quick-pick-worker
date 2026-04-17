@@ -11,6 +11,23 @@ import * as GetScrollBarVirtualDom from '../GetScrollBarVirtualDom/GetScrollBarV
 import * as MergeClassNames from '../MergeClassNames/MergeClassNames.ts'
 import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 
+const getRootNodeCount = (nodes: readonly VirtualDomNode[]): number => {
+  let count = 0
+  const remainingChildCounts: number[] = []
+  for (const node of nodes) {
+    while (remainingChildCounts.length > 0 && remainingChildCounts.at(-1) === 0) {
+      remainingChildCounts.pop()
+    }
+    if (remainingChildCounts.length === 0) {
+      count++
+    } else {
+      remainingChildCounts[remainingChildCounts.length - 1]--
+    }
+    remainingChildCounts.push(node.childCount)
+  }
+  return count
+}
+
 export const getQuickPickVirtualDom = (
   visibleItems: readonly VisibleItem[],
   scrollBarHeight: number,
@@ -18,6 +35,8 @@ export const getQuickPickVirtualDom = (
 ): readonly VirtualDomNode[] => {
   const quickOpen = QuickPickStrings.quickOpen()
   const shouldShowScrollbar = scrollBarHeight > 0
+  const quickPickItemsDom = GetQuickPickItemsVirtualDom.getQuickPickItemsVirtualDom(visibleItems)
+  const listItemsChildCount = getRootNodeCount(quickPickItemsDom)
   return [
     {
       ariaLabel: quickOpen,
@@ -38,11 +57,11 @@ export const getQuickPickVirtualDom = (
       type: VirtualDomElements.Div,
     },
     {
-      childCount: visibleItems.length,
+      childCount: listItemsChildCount,
       className: MergeClassNames.mergeClassNames(ClassNames.ListItems, ClassNames.ContainContent),
       type: VirtualDomElements.Div,
     },
-    ...GetQuickPickItemsVirtualDom.getQuickPickItemsVirtualDom(visibleItems),
+    ...quickPickItemsDom,
     ...GetScrollBarVirtualDom.getScrollBarVirtualDom(scrollBarHeight, scrollBarTop),
   ]
 }

@@ -37,7 +37,7 @@ test('getQuickPickVirtualDom with empty items', () => {
       type: 4,
     },
     {
-      childCount: 0,
+      childCount: 1,
       className: 'ListItems ContainContent',
       type: 4,
     },
