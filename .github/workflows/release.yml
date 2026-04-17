@@ -63,7 +63,7 @@ jobs:
       - run: npm run build
       - run: npm run build:static
       - run: npm test
-      - run: npm run test-integration
+      - run: npm run test-integrationx
       - run: npm run type-check
       - run: npm run lint
       - name: install playwright dependencies
