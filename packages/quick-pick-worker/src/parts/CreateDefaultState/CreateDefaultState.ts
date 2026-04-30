@@ -28,6 +28,8 @@ export const createDefaultState = (): QuickPickState => {
     recentPickIds: Object.create(null),
     recentPicks: [],
     scrollBarActive: false,
+    scrollBarPointerId: -1,
+    scrollBarPointerOffsetY: 0,
     state: QuickPickOpenState.Default,
     top: 50,
     touchDifference: 0,
