@@ -3,7 +3,7 @@ import * as FocusPick from '../FocusPick/FocusPick.ts'
 import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFileIcons.ts'
 
 export const focusIndex = async (state: QuickPickState, index: number): Promise<QuickPickState> => {
-  const { fileIconCache, items, maxLineY, maxVisibleItems, minLineY, providerId } = state
+  const { fileIconCache, itemHeight, items, maxLineY, maxVisibleItems, minLineY, providerId } = state
   await FocusPick.focusPick(providerId, items[index])
 
   if (index < minLineY + 1) {
@@ -15,6 +15,7 @@ export const focusIndex = async (state: QuickPickState, index: number): Promise<
     // TODO need to scroll up
     return {
       ...state,
+      deltaY: minLineY * itemHeight,
       fileIconCache: newFileIconCache,
       focusedIndex: index,
       icons,
@@ -31,6 +32,7 @@ export const focusIndex = async (state: QuickPickState, index: number): Promise<
 
     return {
       ...state,
+      deltaY: minLineY * itemHeight,
       fileIconCache: newFileIconCache,
       focusedIndex: index,
       icons,
