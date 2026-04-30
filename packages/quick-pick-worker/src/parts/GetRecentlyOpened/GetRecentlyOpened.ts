@@ -1,5 +1,10 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 
-export const getRecentlyOpened = (): Promise<readonly string[]> => {
-  return RendererWorker.invoke(/* RecentlyOpened.getRecentlyOpened */ 'RecentlyOpened.getRecentlyOpened')
+const uniq = (array: readonly string[]): readonly string[] => {
+  return [...new Set(array)]
+}
+
+export const getRecentlyOpened = async (): Promise<readonly string[]> => {
+  const recentlyOpened = (await RendererWorker.invoke(/* RecentlyOpened.getRecentlyOpened */ 'RecentlyOpened.getRecentlyOpened')) as readonly string[]
+  return uniq(recentlyOpened)
 }

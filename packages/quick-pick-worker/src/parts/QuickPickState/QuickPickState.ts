@@ -27,6 +27,8 @@ export interface QuickPickState extends List<any> {
   readonly recentPicks: readonly unknown[]
   readonly scrollBarActive: boolean
   readonly scrollBarHeight: number
+  readonly scrollBarPointerId: number
+  readonly scrollBarPointerOffsetY: number
   readonly state: number
   readonly top: number
   readonly touchDifference: number
