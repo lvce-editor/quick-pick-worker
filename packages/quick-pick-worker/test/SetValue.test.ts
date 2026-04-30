@@ -1,8 +1,11 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
+import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
+import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
+import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
 test('returns same state when value is unchanged', async () => {
@@ -290,4 +293,31 @@ test('resets the virtual viewport when filtering shrinks the result set', async 
   expect(result.icons).toHaveLength(1)
   expect(result.deltaY).toBe(0)
   expect(mockRpc.invocations).toEqual(expect.any(Array))
+})
+
+test('supports go-to-column before loadContent initializes the widget', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': (editorId: number) => {
+      if (editorId === 1) {
+        return ['abc', 'def']
+      }
+      throw new Error(`unexpected editorId ${editorId}`)
+    },
+  })
+
+  const uid = 999
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], '', '')
+  const { newState } = QuickPickStates.get(uid)
+
+  const result = await SetValue.setValue(newState, '::2')
+
+  expect(result.items).toHaveLength(1)
+  expect(result.items[0].label).toBe("Press 'Enter' to go to line 0 column 2")
+  expect(result.providerId).toBe(newState.providerId)
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
 })

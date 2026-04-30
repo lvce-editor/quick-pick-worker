@@ -1,4 +1,5 @@
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
+import * as GetQuickPickProviderId from '../GetQuickPickProviderId/GetQuickPickProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as MinimumSliderSize from '../MinimumSliderSize/MinimumSliderSize.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
@@ -18,6 +19,7 @@ export const create = (
   workspaceUri: string,
   assetDir: string,
 ): void => {
+  const providerId = GetQuickPickProviderId.getQuickPickProviderId(uri)
   const state: QuickPickState = {
     allowEmptyResult: false,
     cursorOffset: 0,
@@ -48,6 +50,7 @@ export const create = (
     inputSource: InputSource.User,
     placeholder: '',
     platform,
+    providerId,
     value: '',
   }
   QuickPickStates.set(uid, state, state)
