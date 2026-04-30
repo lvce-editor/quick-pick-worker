@@ -1,6 +1,7 @@
 import { test, expect } from '@jest/globals'
 import { VirtualDomElements } from '@lvce-editor/virtual-dom-worker'
 import * as ClassNames from '../src/parts/ClassNames/ClassNames.ts'
+import * as DomEventListenerFunctions from '../src/parts/DomEventListenerFunctions/DomEventListenerFunctions.ts'
 import * as GetScrollBarVirtualDom from '../src/parts/GetScrollBarVirtualDom/GetScrollBarVirtualDom.ts'
 import * as MergeClassNames from '../src/parts/MergeClassNames/MergeClassNames.ts'
 import * as Px from '../src/parts/Px/Px.ts'
@@ -20,6 +21,7 @@ test('getScrollBarVirtualDom with scrollbar', () => {
     {
       childCount: 1,
       className: MergeClassNames.mergeClassNames(ClassNames.ScrollBar, ClassNames.ScrollBarSmall),
+      onPointerDown: DomEventListenerFunctions.HandleScrollbarPointerDown,
       type: VirtualDomElements.Div,
     },
     {
