@@ -11,12 +11,29 @@ test('returns empty array when diffResult is empty', () => {
   expect(result).toEqual([])
 })
 
-test('skips Height diff type', () => {
+test('calls renderer for RenderCss', () => {
   const oldState = CreateDefaultState.createDefaultState()
   const newState = CreateDefaultState.createDefaultState()
-  const diffResult: readonly number[] = [DiffType.Height]
+  const diffResult: readonly number[] = [DiffType.RenderCss]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toEqual([])
+  expect(result).toEqual([
+    [
+      'Viewlet.setCss',
+      1,
+      `.QuickPick {
+  --QuickPickItemsHeight: 300px;
+  --ScrollBarThumbHeight: 0px;
+  --ScrollBarThumbTop: 0px;
+}
+.QuickPick .QuickPickItems {
+  height: var(--QuickPickItemsHeight);
+}
+.QuickPick .ScrollBarThumb {
+  height: var(--ScrollBarThumbHeight);
+  translate: 0px var(--ScrollBarThumbTop);
+}`,
+    ],
+  ])
 })
 
 test('skips RenderFocusedIndex diff type', () => {
@@ -27,10 +44,10 @@ test('skips RenderFocusedIndex diff type', () => {
   expect(result).toEqual([])
 })
 
-test('skips both Height and RenderFocusedIndex', () => {
+test('skips RenderFocusedIndex', () => {
   const oldState = CreateDefaultState.createDefaultState()
   const newState = CreateDefaultState.createDefaultState()
-  const diffResult: readonly number[] = [DiffType.Height, DiffType.RenderFocusedIndex]
+  const diffResult: readonly number[] = [DiffType.RenderFocusedIndex]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
   expect(result).toEqual([])
 })
@@ -106,16 +123,17 @@ test('handles multiple diff types', () => {
   expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
 })
 
-test('skips Height and RenderFocusedIndex in mixed diff types', () => {
+test('handles RenderCss in mixed diff types', () => {
   const oldState = CreateDefaultState.createDefaultState()
   const newState = {
     ...CreateDefaultState.createDefaultState(),
     uid: 1,
     value: 'test',
   }
-  const diffResult: readonly number[] = [DiffType.Height, DiffType.RenderValue, DiffType.RenderFocusedIndex, DiffType.RenderFocus]
+  const diffResult: readonly number[] = [DiffType.RenderCss, DiffType.RenderValue, DiffType.RenderFocusedIndex, DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result.length).toBe(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
-  expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result.length).toBe(3)
+  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setCss')
+  expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
+  expect((result[2] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
 })
