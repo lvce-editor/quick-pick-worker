@@ -243,3 +243,51 @@ test('preserves other state properties', async () => {
   expect(Array.isArray(mockRpc.invocations)).toBe(true)
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
 })
+
+test('resets the virtual viewport when filtering shrinks the result set', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['match'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+    'QuickPickProvider.provide': () => [
+      {
+        description: '',
+        direntType: 1,
+        fileIcon: '',
+        icon: '',
+        label: 'match',
+        matches: [],
+        uri: '/match',
+      },
+    ],
+  })
+
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    icons: ['old-icon'],
+    items: Array.from({ length: 100 }, (_, index) => ({
+      description: '',
+      direntType: 1,
+      fileIcon: '',
+      icon: '',
+      label: `item-${index}`,
+      matches: [],
+      uri: `/item-${index}`,
+    })),
+    maxLineY: 60,
+    maxVisibleItems: 10,
+    minLineY: 50,
+    providerId: 0,
+    value: 'old',
+  }
+
+  const result = await SetValue.setValue(state, 'match')
+
+  expect(result.minLineY).toBe(0)
+  expect(result.maxLineY).toBe(1)
+  expect(result.focusedIndex).toBe(0)
+  expect(result.items).toHaveLength(1)
+  expect(result.icons).toHaveLength(1)
+  expect(result.deltaY).toBe(0)
+  expect(mockRpc.invocations).toEqual(expect.any(Array))
+})
