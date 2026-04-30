@@ -1,23 +1,11 @@
-import type { Dirent } from '../Dirent/Dirent.ts'
 import type { FileIconCache } from '../FileIconCache/FileIconCache.ts'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as GetFileIconsCached from '../GetFileIconsCached/GetFileIconsCached.ts'
+import * as GetPath from '../GetPath/GetPath.ts'
 import * as GetMissingIconRequests from '../GetMissingIconRequests/GetMissingIconRequests.ts'
 import * as RequestFileIcons from '../RequestFileIcons/RequestFileIcons.ts'
+import * as ToDirent from '../ToDirent/ToDirent.ts'
 import * as UpdateIconCache from '../UpdateIconCache/UpdateIconCache.ts'
-
-const getPath = (dirent: Dirent): string => {
-  return dirent.path
-}
-
-const toDirent = (pick: ProtoVisibleItem): Dirent => {
-  const dirent: Dirent = {
-    name: pick.label,
-    path: pick.uri,
-    type: pick.direntType,
-  }
-  return dirent
-}
 
 export const getQuickPickFileIcons = async (
   items: readonly ProtoVisibleItem[],
@@ -26,11 +14,11 @@ export const getQuickPickFileIcons = async (
   icons: readonly string[]
   newFileIconCache: FileIconCache
 }> => {
-  const dirents = items.map(toDirent)
+  const dirents = items.map(ToDirent.toDirent)
   const missingRequests = GetMissingIconRequests.getMissingIconRequests(dirents, fileIconCache)
   const newIcons = await RequestFileIcons.requestFileIcons(missingRequests)
   const newFileIconCache = UpdateIconCache.updateIconCache(fileIconCache, missingRequests, newIcons)
-  const paths = dirents.map(getPath)
+  const paths = dirents.map(GetPath.getPath)
   const icons = GetFileIconsCached.getIconsCached(paths, newFileIconCache)
   return {
     icons,
