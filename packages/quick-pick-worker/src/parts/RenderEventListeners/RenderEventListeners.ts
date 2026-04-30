@@ -14,6 +14,21 @@ export const renderEventListeners = (): readonly DomEventListener[] => {
       passive: true,
     },
     {
+      name: DomEventListenerFunctions.HandleScrollbarPointerDown,
+      params: ['handleScrollBarPointerDown', 'event.clientY', 'event.pointerId'],
+      preventDefault: true,
+    },
+    {
+      name: DomEventListenerFunctions.HandleScrollbarPointerMove,
+      params: ['handleScrollBarPointerMove', 'event.clientY', 'event.pointerId'],
+      preventDefault: true,
+    },
+    {
+      name: DomEventListenerFunctions.HandleScrollbarPointerUp,
+      params: ['handleScrollBarPointerUp', 'event.pointerId'],
+      preventDefault: true,
+    },
+    {
       name: DomEventListenerFunctions.HandleBlur,
       params: ['handleBlur'],
     },
