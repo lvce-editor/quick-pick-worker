@@ -54,5 +54,9 @@
     "@types/node": "^25.6.0",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9"
+  },
+  "dependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "lodash-es": "^4.18.1"
   }
 }
