@@ -1,8 +1,9 @@
 import { expect, test } from '@jest/globals'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import type { ProtoVisibleItem } from '../src/parts/ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as RenderCss from '../src/parts/RenderCss/RenderCss.ts'
 
-const createItems = (count: number) => {
+const createItems = (count: number): ProtoVisibleItem[] => {
   return Array.from({ length: count }, (_, index) => ({
     description: '',
     direntType: 1,
