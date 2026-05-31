@@ -16,6 +16,7 @@ test('getPicks returns custom items from args', async () => {
     label: 'Custom Item 1',
     matches: [],
     uri: '',
+    value: undefined,
   })
   expect(result[1].label).toBe('Custom Item 2')
   expect(result[2].label).toBe('Custom Item 3')

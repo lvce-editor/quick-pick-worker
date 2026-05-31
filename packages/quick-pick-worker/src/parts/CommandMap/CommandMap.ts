@@ -31,6 +31,7 @@ import * as SelectIndex from '../SelectIndex/SelectIndex.ts'
 import * as SelectItem from '../SelectItem/SelectItem.ts'
 import * as SetValue from '../SetValue/SetValue.ts'
 import { showQuickInput } from '../ShowQuickInput/ShowQuickInput.ts'
+import { showQuickPick } from '../ShowQuickPick/ShowQuickPick.ts'
 import * as VirtualList from '../VirtualList/VirtualList.ts'
 
 export const commandMap = {
@@ -67,4 +68,5 @@ export const commandMap = {
   'QuickPick.setDeltaY': WrapCommand.wrapCommand(VirtualList.setDeltaY),
   'QuickPick.setValue': WrapCommand.wrapCommand(SetValue.setValue),
   'QuickPick.showQuickInput': showQuickInput,
+  'QuickPick.showQuickPick': showQuickPick,
 }

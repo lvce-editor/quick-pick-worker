@@ -12,5 +12,6 @@ export const getPicks = (
   { assetDir, platform }: { assetDir: string; platform: number },
 ): Promise<readonly ProtoVisibleItem[]> => {
   const fn = QuickPickEntries.getPicks(id)
+  console.log({ getPicks: fn, id })
   return fn(searchValue, args, { assetDir, platform })
 }

@@ -2,20 +2,34 @@ import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as CloseWidget from '../CloseWidget/CloseWidget.ts'
 import * as GetPick from '../GetPick/GetPick.ts'
+import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
+import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as QuickPickEntries from '../QuickPickEntries/QuickPickEntries.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
+const createCustomPick = (value: string): ProtoVisibleItem => {
+  return {
+    description: '',
+    direntType: 0,
+    fileIcon: '',
+    icon: '',
+    label: value,
+    matches: [],
+    uri: '',
+  }
+}
+
 export const selectIndex = async (state: QuickPickState, index: number, button = /* left */ 0): Promise<QuickPickState> => {
   const { items, minLineY, providerId, value } = state
   const actualIndex = index + minLineY
-  const pick = GetPick.getPick(items, actualIndex)
+  const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
+  const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
+  const pick = GetPick.getPick(items, actualIndex) || (subId === QuickPickEntryId.Custom ? createCustomPick(value) : undefined)
   if (!pick) {
     return state
   }
-  const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
-  const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
   const fn = QuickPickEntries.getSelect(subId)
   const selectPickResult = await fn(pick, value)
   Assert.object(selectPickResult)

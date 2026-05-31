@@ -6,7 +6,7 @@ import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEven
 import * as InputName from '../InputName/InputName.ts'
 import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 
-export const getQuickPickInputVirtualDom = (): VirtualDomNode => {
+export const getQuickPickInputVirtualDom = (placeholder = ''): VirtualDomNode => {
   const ariaLabel = QuickPickStrings.typeNameofCommandToRun()
   return {
     ariaAutoComplete: 'list',
@@ -22,6 +22,7 @@ export const getQuickPickInputVirtualDom = (): VirtualDomNode => {
     onBlur: DomEventListenerFunctions.HandleBlur,
     onFocus: DomEventListenerFunctions.HandleFocus,
     onInput: DomEventListenerFunctions.HandleInput,
+    placeholder,
     role: AriaRoles.ComboBox,
     spellcheck: false,
     type: VirtualDomElements.Input,

@@ -17,6 +17,7 @@ import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts
 interface ParsedArgs {
   readonly ignoreFocusOut: boolean
   readonly initialValue: string
+  readonly placeholder: string
 }
 
 const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
@@ -24,6 +25,7 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
     return {
       ignoreFocusOut: false,
       initialValue: '',
+      placeholder: '',
     }
   }
   const last = args.at(-1)
@@ -31,13 +33,16 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
     return {
       ignoreFocusOut: false,
       initialValue: '',
+      placeholder: '',
     }
   }
   return {
     // @ts-ignore
     ignoreFocusOut: Boolean(last.ignoreFocusOut),
     // @ts-ignore
-    initialValue: String(last.initialValue),
+    initialValue: last.initialValue ? String(last.initialValue) : '',
+    // @ts-ignore
+    placeholder: last.placeholder ? String(last.placeholder) : '',
   }
 }
 
@@ -74,7 +79,7 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     maxLineY,
     minLineY,
     picks: newPicks,
-    placeholder: '',
+    placeholder: parsedArgs.placeholder,
     providerId: id,
     state: QuickPickOpenState.Finished,
     value: finalValue,
