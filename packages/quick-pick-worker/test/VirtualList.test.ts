@@ -449,7 +449,7 @@ test('setDeltaY handles headerHeight equal to height', () => {
     itemHeight: 30,
     items,
   }
-  const listHeight = 300 - 300
+  const listHeight = state.height - state.headerHeight
   const finalDeltaY = items.length * 30 - listHeight
   const result = VirtualList.setDeltaY(state, 30)
   expect(result.deltaY).toBe(Math.min(30, Math.max(finalDeltaY, 0)))

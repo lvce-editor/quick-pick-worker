@@ -45,7 +45,7 @@ test('returns position preview when value starts with "::" and has number', asyn
     },
   })
 
-  const result = await getPicksGoToColumn('::5')
+  const result = await getPicksGoToColumn(`::${5}`)
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     description: '',
@@ -74,7 +74,7 @@ test('returns position preview for multi-line text', async () => {
     },
   })
 
-  const result = await getPicksGoToColumn('::15')
+  const result = await getPicksGoToColumn(`::${15}`)
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
     description: '',
