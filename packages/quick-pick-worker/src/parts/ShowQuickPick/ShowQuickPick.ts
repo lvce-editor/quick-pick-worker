@@ -1,4 +1,5 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
+import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 
 export interface QuickPickItem {
   readonly description: string
@@ -12,8 +13,14 @@ export interface ShowQuickPickOptions {
 }
 
 export const showQuickPick = async ({ items, placeholder = '' }: ShowQuickPickOptions): Promise<unknown> => {
-  return RendererWorker.invoke('QuickPick.showCustom', items, {
-    mode: 'quickPick',
-    placeholder,
-  })
+  const customItemsId = CustomQuickPickItems.add(items)
+  try {
+    return await RendererWorker.invoke('QuickPick.showCustom', [], {
+      customItemsId,
+      mode: 'quickPick',
+      placeholder,
+    })
+  } finally {
+    CustomQuickPickItems.remove(customItemsId)
+  }
 }

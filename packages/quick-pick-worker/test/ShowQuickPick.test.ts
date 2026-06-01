@@ -24,8 +24,9 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
   expect(mockRpc.invocations).toEqual([
     [
       'QuickPick.showCustom',
-      items,
+      [],
       {
+        customItemsId: expect.any(Number),
         mode: 'quickPick',
         placeholder: 'Select branch',
       },
@@ -48,6 +49,7 @@ test('showQuickPick returns undefined when canceled', async () => {
       'QuickPick.showCustom',
       [],
       {
+        customItemsId: expect.any(Number),
         mode: 'quickPick',
         placeholder: '',
       },

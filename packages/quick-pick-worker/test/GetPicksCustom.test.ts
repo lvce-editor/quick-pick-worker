@@ -1,4 +1,5 @@
 import { expect, test } from '@jest/globals'
+import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/ExtensionHostWorker.ts'
 import * as GetPicksCustom from '../src/parts/GetPicksCustom/GetPicksCustom.ts'
 
 test('getPicks returns custom items from args', async () => {
@@ -48,4 +49,34 @@ test('getPicks handles items without label', async () => {
   expect(result[0].label).toBe('Item 1')
   expect(result[1].label).toBeUndefined()
   expect(result[2].label).toBe('Item 3')
+})
+
+test('getPicks renders quick input items from extension host', async () => {
+  using mockRpc = ExtensionHostWorker.registerMockRpc({
+    'ExtensionHostQuickPick.renderQuickInput': () => [{ label: 'Search result', value: 'search-result' }],
+  })
+  const args: readonly unknown[] = [
+    'custom',
+    [],
+    'resolve-id',
+    {
+      mode: 'quickInput',
+      quickInputId: 42,
+    },
+  ]
+
+  const result = await GetPicksCustom.getPicks('search', args)
+
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    description: '',
+    direntType: 0,
+    fileIcon: '',
+    icon: '',
+    label: 'Search result',
+    matches: [],
+    uri: '',
+    value: 'search-result',
+  })
+  expect(mockRpc.invocations).toEqual([['ExtensionHostQuickPick.renderQuickInput', 42, 'search']])
 })
