@@ -21,7 +21,9 @@ export const getPicks = async (searchValue: string, args: readonly unknown[]): P
   state.args = args
   const options = args.at(-1) as any
   const items = (options?.mode === 'quickInput'
-    ? await ExtensionHostWorker.invoke('ExtensionHostQuickPick.renderQuickInput', options.quickInputId, searchValue)
+    ? searchValue === '' && options?.customItemsId
+      ? CustomQuickPickItems.get(options.customItemsId)
+      : await ExtensionHostWorker.invoke('ExtensionHostQuickPick.renderQuickInput', options.quickInputId, searchValue)
     : options?.customItemsId
       ? CustomQuickPickItems.get(options.customItemsId)
       : (args[1] as readonly unknown[]) || []) as readonly unknown[]

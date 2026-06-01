@@ -26,6 +26,7 @@ test('showQuickInput opens custom quick input with render id', async () => {
       [],
       {
         ignoreFocusOut: false,
+        customItemsId: expect.any(Number),
         initialValue: 'test',
         mode: 'quickInput',
         quickInputId: 123,
