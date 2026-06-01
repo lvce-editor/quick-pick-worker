@@ -5,8 +5,8 @@ import * as ShowQuickPick from '../src/parts/ShowQuickPick/ShowQuickPick.ts'
 test('showQuickPick opens custom quick pick and returns selected value', async () => {
   const items = [
     {
-      label: 'branch 1',
       description: 'Local branch',
+      label: 'branch 1',
       value: 'branch-1',
     },
   ]
