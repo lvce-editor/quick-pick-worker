@@ -6,10 +6,13 @@ import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 
 const getCancelResult = (args: readonly unknown[]): unknown => {
   const last = args.at(-1)
-  if (last && typeof last === 'object' && // @ts-ignore
-    last.mode === 'quickPick') {
-      return undefined
-    }
+  if (
+    last &&
+    typeof last === 'object' && // @ts-ignore
+    last.mode === 'quickPick'
+  ) {
+    return undefined
+  }
   return {
     canceled: true,
     inputValue: '',
@@ -23,6 +26,9 @@ export const close = async (state: QuickPickState): Promise<QuickPickState> => {
     const options = args.at(-1) as any
     const result = getCancelResult(args)
     if (options?.callbackOwner === 'quickPickWorker') {
+      if (typeof resolveId !== 'number') {
+        throw new TypeError('expected resolve id to be a number')
+      }
       QuickPickCallbacks.executeCallback(resolveId, result)
     } else {
       await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)

@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../src/parts/ProtoVisibleItem/ProtoVisibleItem.ts'
+import * as QuickPickCallbacks from '../src/parts/QuickPickCallbacks/QuickPickCallbacks.ts'
 import { state } from '../src/parts/QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 import * as QuickPickReturnValue from '../src/parts/QuickPickReturnValue/QuickPickReturnValue.ts'
 import { selectPick } from '../src/parts/SelectPickCustom/SelectPickCustom.ts'
@@ -68,9 +69,10 @@ test('selectPick resolves worker-owned quick pick callback locally', async () =>
     },
   })
 
-  state.args = ['arg1', 'arg2', 1, { callbackOwner: 'quickPickWorker', mode: 'quickPick' }] as readonly unknown[]
+  const { id, promise } = QuickPickCallbacks.registerCallback()
 
-  const callbackPromise = RendererWorker.invoke('QuickPick.executeCallback', 1)
+  state.args = ['arg1', 'arg2', id, { callbackOwner: 'quickPickWorker', mode: 'quickPick' }] as readonly unknown[]
+
   const pick: ProtoVisibleItem = {
     description: '',
     direntType: 1,
@@ -84,7 +86,7 @@ test('selectPick resolves worker-owned quick pick callback locally', async () =>
 
   const result = await selectPick(pick, '')
 
-  await expect(callbackPromise).resolves.toBeUndefined()
+  await expect(promise).resolves.toBe('custom-value')
   expect(mockRpc.invocations).toEqual([])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })

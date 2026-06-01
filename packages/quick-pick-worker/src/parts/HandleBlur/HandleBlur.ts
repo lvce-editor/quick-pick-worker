@@ -5,10 +5,13 @@ import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 
 const getCancelResult = (args: readonly unknown[]): unknown => {
   const last = args.at(-1)
-  if (last && typeof last === 'object' && // @ts-ignore
-    last.mode === 'quickPick') {
-      return undefined
-    }
+  if (
+    last &&
+    typeof last === 'object' && // @ts-ignore
+    last.mode === 'quickPick'
+  ) {
+    return undefined
+  }
   return {
     canceled: true,
     inputValue: '',

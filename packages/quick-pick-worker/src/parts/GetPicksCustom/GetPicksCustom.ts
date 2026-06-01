@@ -20,13 +20,15 @@ const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
 export const getPicks = async (searchValue: string, args: readonly unknown[]): Promise<readonly ProtoVisibleItem[]> => {
   state.args = args
   const options = args.at(-1) as any
-  const items = (options?.mode === 'quickInput'
-    ? searchValue === '' && options?.customItemsId
-      ? CustomQuickPickItems.get(options.customItemsId)
-      : await ExtensionHostWorker.invoke('ExtensionHostQuickPick.renderQuickInput', options.quickInputId, searchValue)
-    : options?.customItemsId
-      ? CustomQuickPickItems.get(options.customItemsId)
-      : (args[1] as readonly unknown[]) || []) as readonly unknown[]
+  const items = (
+    options?.mode === 'quickInput'
+      ? searchValue === '' && options?.customItemsId
+        ? CustomQuickPickItems.get(options.customItemsId)
+        : await ExtensionHostWorker.invoke('ExtensionHostQuickPick.renderQuickInput', options.quickInputId, searchValue)
+      : options?.customItemsId
+        ? CustomQuickPickItems.get(options.customItemsId)
+        : (args[1] as readonly unknown[]) || []
+  ) as readonly unknown[]
   const mapped = items.map(toProtoVisibleItem)
   return mapped
 }

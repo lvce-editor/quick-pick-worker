@@ -25,6 +25,9 @@ export const selectPick = async (_pick: ProtoVisibleItem, value: string): Promis
           inputValue: value,
         }
   if (options.callbackOwner === 'quickPickWorker') {
+    if (typeof resolveId !== 'number') {
+      throw new TypeError('expected resolve id to be a number')
+    }
     QuickPickCallbacks.executeCallback(resolveId, result)
   } else {
     await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)

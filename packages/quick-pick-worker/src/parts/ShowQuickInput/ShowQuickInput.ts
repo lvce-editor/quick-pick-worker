@@ -3,7 +3,13 @@ import type { QuickInputOptions } from '../QuickInputOptions/QuickInputOptions.t
 import type { QuickInputResult } from '../QuickInputResult/QuickInputResult.ts'
 import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 
-export const showQuickInput = async ({ id, ignoreFocusOut, initialItems = [], initialValue, waitUntil }: QuickInputOptions): Promise<QuickInputResult> => {
+export const showQuickInput = async ({
+  id,
+  ignoreFocusOut,
+  initialItems = [],
+  initialValue,
+  waitUntil,
+}: QuickInputOptions): Promise<QuickInputResult> => {
   const customItemsId = CustomQuickPickItems.add(initialItems)
   const picks: readonly any[] = []
   try {

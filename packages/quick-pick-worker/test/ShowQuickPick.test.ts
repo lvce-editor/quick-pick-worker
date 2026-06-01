@@ -1,5 +1,6 @@
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
+import * as QuickPickCallbacks from '../src/parts/QuickPickCallbacks/QuickPickCallbacks.ts'
 import * as ShowQuickPick from '../src/parts/ShowQuickPick/ShowQuickPick.ts'
 
 test('showQuickPick opens custom quick pick and returns selected value', async () => {
@@ -12,8 +13,8 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
   ]
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'Viewlet.openWidget': async () => {
-      await RendererWorker.invoke('QuickPick.executeCallback', 1, 'branch-1')
+    'Viewlet.openWidget': (...args: readonly unknown[]) => {
+      QuickPickCallbacks.executeCallback(args[3] as number, 'branch-1')
     },
   })
 
@@ -42,8 +43,8 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
 
 test('showQuickPick returns undefined when canceled', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'Viewlet.openWidget': async () => {
-      await RendererWorker.invoke('QuickPick.executeCallback', 2, undefined)
+    'Viewlet.openWidget': (...args: readonly unknown[]) => {
+      QuickPickCallbacks.executeCallback(args[3] as number, undefined)
     },
   })
 

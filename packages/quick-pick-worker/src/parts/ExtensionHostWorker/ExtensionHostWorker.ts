@@ -8,7 +8,9 @@ export const invoke = (method: string, ...args: readonly unknown[]): Promise<unk
   return rpc.invoke(method, ...args)
 }
 
-export const registerMockRpc = (commandMap: Record<string, (...args: readonly any[]) => any>): { invocations: unknown[][]; [Symbol.dispose]: () => void } => {
+export const registerMockRpc = (
+  commandMap: Record<string, (...args: readonly any[]) => any>,
+): { invocations: unknown[][]; [Symbol.dispose]: () => void } => {
   const oldRpc = rpc
   const invocations: unknown[][] = []
   rpc = {
