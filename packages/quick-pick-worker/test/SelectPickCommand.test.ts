@@ -95,7 +95,7 @@ test('selectPickExtension calls ExtensionHost.executeCommand with id without ext
   const result = await selectPick(pick)
 
   expect(mockRpc.invocations).toEqual([['ExtensionHost.executeCommand', 'my-extension-command']])
-  expect(result.command).toBe(QuickPickReturnValue.Hide)
+  expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
 test('selectPickExtension handles errors and shows error dialog', async () => {

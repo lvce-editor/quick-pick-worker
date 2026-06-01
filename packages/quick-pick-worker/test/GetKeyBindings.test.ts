@@ -12,8 +12,7 @@ test('returns array of key bindings', () => {
 test('has correct escape key binding', () => {
   const keyBindings = GetKeyBindings.getKeyBindings()
   expect(keyBindings).toContainEqual({
-    args: ['QuickPick'],
-    command: 'Viewlet.closeWidget',
+    command: 'QuickPick.close',
     key: KeyCode.Escape,
     when: WhenExpression.FocusQuickPickInput,
   })

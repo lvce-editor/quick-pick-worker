@@ -25,9 +25,12 @@ const selectPickExtension = async (item: any): Promise<any> => {
   } catch (error) {
     await ErrorHandling.handleError(error, false)
     await ErrorHandling.showErrorDialog(error)
+    return {
+      command: QuickPickReturnValue.Hide,
+    }
   }
   return {
-    command: QuickPickReturnValue.Hide,
+    command: QuickPickReturnValue.KeepOpen,
   }
 }
 
