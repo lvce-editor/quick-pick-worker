@@ -22,6 +22,7 @@ import { initialize } from '../Initialize/Initialize.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as MenuEntriesState from '../MenuEntriesState/MenuEntriesState.ts'
 import { executeCallback } from '../QuickPickCallbacks/QuickPickCallbacks.ts'
+import { waitUntilVisible } from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 import * as WrapCommand from '../QuickPickStates/QuickPickStates.ts'
 import { getCommandIds } from '../QuickPickStates/QuickPickStates.ts'
 import * as Render2 from '../Render2/Render2.ts'
@@ -69,4 +70,5 @@ export const commandMap = {
   'QuickPick.setValue': WrapCommand.wrapCommand(SetValue.setValue),
   'QuickPick.showQuickInput': showQuickInput,
   'QuickPick.showQuickPick': showQuickPick,
+  'QuickPick.waitUntilVisible': waitUntilVisible,
 }

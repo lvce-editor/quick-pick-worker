@@ -13,6 +13,7 @@ import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuic
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickVisibleCallbacks from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
 interface ParsedArgs {
   readonly ignoreFocusOut: boolean
@@ -64,6 +65,7 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
   const finalDeltaY = GetFinalDeltaY.getFinalDeltaY(listHeight, itemHeight, items.length)
   const parsedArgs = parseArgs(subId, args)
   const finalValue = parsedArgs.initialValue || value
+  QuickPickVisibleCallbacks.notifyVisible()
   return {
     ...state,
     args,

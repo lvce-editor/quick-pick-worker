@@ -60,3 +60,31 @@ test('selectPick returns quick pick item value in quickPick mode', async () => {
   expect(mockRpc.invocations).toEqual([['QuickPick.executeCallback', 'another-resolve-id', 'custom-value']])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })
+
+test('selectPick resolves worker-owned quick pick callback locally', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'QuickPick.executeCallback': () => {
+      throw new Error('should not call renderer callback')
+    },
+  })
+
+  state.args = ['arg1', 'arg2', 1, { callbackOwner: 'quickPickWorker', mode: 'quickPick' }] as readonly unknown[]
+
+  const callbackPromise = RendererWorker.invoke('QuickPick.executeCallback', 1)
+  const pick: ProtoVisibleItem = {
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    label: 'custom-item',
+    matches: [],
+    uri: '',
+    value: 'custom-value',
+  }
+
+  const result = await selectPick(pick, '')
+
+  await expect(callbackPromise).resolves.toBeUndefined()
+  expect(mockRpc.invocations).toEqual([])
+  expect(result.command).toBe(QuickPickReturnValue.Hide)
+})

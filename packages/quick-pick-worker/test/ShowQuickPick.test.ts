@@ -12,7 +12,9 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
   ]
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'QuickPick.showCustom': () => 'branch-1',
+    'Viewlet.openWidget': async () => {
+      await RendererWorker.invoke('QuickPick.executeCallback', 1, 'branch-1')
+    },
   })
 
   const result = await ShowQuickPick.showQuickPick({
@@ -23,20 +25,26 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
   expect(result).toBe('branch-1')
   expect(mockRpc.invocations).toEqual([
     [
-      'QuickPick.showCustom',
+      'Viewlet.openWidget',
+      'QuickPick',
+      'custom',
       [],
-      {
+      1,
+      expect.objectContaining({
+        callbackOwner: 'quickPickWorker',
         customItemsId: expect.any(Number),
         mode: 'quickPick',
         placeholder: 'Select branch',
-      },
+      }),
     ],
   ])
 })
 
 test('showQuickPick returns undefined when canceled', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'QuickPick.showCustom': () => undefined,
+    'Viewlet.openWidget': async () => {
+      await RendererWorker.invoke('QuickPick.executeCallback', 2, undefined)
+    },
   })
 
   const result = await ShowQuickPick.showQuickPick({
@@ -46,13 +54,45 @@ test('showQuickPick returns undefined when canceled', async () => {
   expect(result).toBeUndefined()
   expect(mockRpc.invocations).toEqual([
     [
-      'QuickPick.showCustom',
+      'Viewlet.openWidget',
+      'QuickPick',
+      'custom',
       [],
-      {
+      2,
+      expect.objectContaining({
+        callbackOwner: 'quickPickWorker',
         customItemsId: expect.any(Number),
         mode: 'quickPick',
         placeholder: '',
-      },
+      }),
+    ],
+  ])
+})
+
+test('showQuickPick can wait only until visible', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.openWidget': () => undefined,
+  })
+
+  const result = await ShowQuickPick.showQuickPick({
+    items: [],
+    waitUntil: 'visible',
+  })
+
+  expect(result).toBeUndefined()
+  expect(mockRpc.invocations).toEqual([
+    [
+      'Viewlet.openWidget',
+      'QuickPick',
+      'custom',
+      [],
+      3,
+      expect.objectContaining({
+        callbackOwner: 'quickPickWorker',
+        customItemsId: expect.any(Number),
+        mode: 'quickPick',
+        placeholder: '',
+      }),
     ],
   ])
 })

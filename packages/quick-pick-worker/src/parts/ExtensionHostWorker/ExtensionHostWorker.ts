@@ -12,14 +12,14 @@ export const registerMockRpc = (commandMap: Record<string, (...args: readonly an
   const oldRpc = rpc
   const invocations: unknown[][] = []
   rpc = {
-    invoke(command: string, ...args: readonly unknown[]) {
+    invoke(command: string, ...args: readonly unknown[]): unknown {
       invocations.push([command, ...args])
       return commandMap[command](...args)
     },
   }
   return {
     invocations,
-    [Symbol.dispose]() {
+    [Symbol.dispose](): void {
       rpc = oldRpc
     },
   }

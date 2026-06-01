@@ -1,6 +1,7 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import type { SelectPickResult } from '../SelectPickRresult/SelectPickResult.ts'
+import * as QuickPickCallbacks from '../QuickPickCallbacks/QuickPickCallbacks.ts'
 import { state } from '../QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
@@ -23,7 +24,11 @@ export const selectPick = async (_pick: ProtoVisibleItem, value: string): Promis
           canceled: false,
           inputValue: value,
         }
-  await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)
+  if (options.callbackOwner === 'quickPickWorker') {
+    QuickPickCallbacks.executeCallback(resolveId, result)
+  } else {
+    await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)
+  }
   return {
     command: QuickPickReturnValue.Hide,
   }
