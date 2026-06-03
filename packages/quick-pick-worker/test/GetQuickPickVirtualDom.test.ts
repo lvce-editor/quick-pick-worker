@@ -22,6 +22,7 @@ test('getQuickPickVirtualDom with empty items', () => {
       onBlur: 'handleBlur',
       onFocus: 'handleFocus',
       onInput: 'handleInput',
+      placeholder: '',
       role: 'combobox',
       spellcheck: false,
       type: 6,

@@ -6,4 +6,5 @@ export interface ProtoVisibleItem {
   readonly label: string
   readonly matches: readonly number[]
   readonly uri: string
+  readonly value?: unknown
 }

@@ -23,8 +23,15 @@ test('getQuickPickInputVirtualDom', () => {
     onBlur: DomEventListenerFunctions.HandleBlur,
     onFocus: DomEventListenerFunctions.HandleFocus,
     onInput: DomEventListenerFunctions.HandleInput,
+    placeholder: '',
     role: AriaRoles.ComboBox,
     spellcheck: false,
     type: VirtualDomElements.Input,
   })
+})
+
+test('getQuickPickInputVirtualDom - placeholder', () => {
+  const result = GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom('Select branch')
+
+  expect(result.placeholder).toBe('Select branch')
 })
