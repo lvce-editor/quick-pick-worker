@@ -9,7 +9,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await Workspace.setPath(tmpDir)
   await Main.openUri(`${tmpDir}/a.txt`)
   await QuickPick.open()
-  await QuickPick.setValue('::2')
+  await QuickPick.setValue(`::${2}`)
   const label = Locator('.QuickPickItemLabel')
   await expect(label).toBeVisible()
   await expect(label).toHaveText(`Press 'Enter' to go to line 0 column 2`)

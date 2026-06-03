@@ -12,7 +12,7 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, QuickPick,
   await QuickPick.open()
 
   // act
-  await QuickPick.setValue('::99999')
+  await QuickPick.setValue(`::${99_999}`)
 
   // assert
   const label = Locator('.QuickPickItemLabel')
