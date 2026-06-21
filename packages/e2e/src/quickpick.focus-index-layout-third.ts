@@ -12,5 +12,5 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
 
   // assert
   const activeItem = Locator('.QuickPickItemActive')
-  await expect(activeItem).toHaveText('Layout: Toggle Activity Bar')
+  await expect(activeItem).toHaveText('Layout: Close Chat')
 }

@@ -6,5 +6,8 @@ export const parseGotoline = (value: string): number => {
   if (Number.isNaN(wantedLine)) {
     return -1
   }
+  if (wantedLine < 1) {
+    return -1
+  }
   return wantedLine
 }

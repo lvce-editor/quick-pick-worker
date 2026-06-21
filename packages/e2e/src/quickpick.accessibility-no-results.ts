@@ -7,7 +7,7 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
   await QuickPick.open()
 
   // act
-  await QuickPick.setValue('no matching item')
+  await QuickPick.setValue('> no matching item')
 
   // assert
   const noResultMessage = Locator('.QuickPickStatus')
