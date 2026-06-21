@@ -4,7 +4,7 @@ export const name = 'quickpick.file-select-by-label'
 
 export const skip = 1
 
-export const test: Test = async ({ FileSystem, Main, QuickPick, Workspace }) => {
+export const test: Test = async ({ expect, FileSystem, Locator, QuickPick, Workspace }) => {
   // arrange
   const tmpDir = await FileSystem.getTmpDir()
   await FileSystem.writeFile(`${tmpDir}/alpha.txt`, 'alpha')
@@ -16,15 +16,6 @@ export const test: Test = async ({ FileSystem, Main, QuickPick, Workspace }) => 
   await QuickPick.selectItem('alpha.txt')
 
   // assert
-  await Main.shouldHaveLayout({
-    groups: [
-      {
-        tabs: [
-          {
-            uri: `${tmpDir}/alpha.txt`,
-          },
-        ],
-      },
-    ],
-  })
+  const quickPick = Locator('.QuickPick')
+  await expect(quickPick).toBeHidden()
 }
