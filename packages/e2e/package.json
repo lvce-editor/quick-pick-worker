@@ -5,12 +5,16 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "#e2e:headless": "node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --headless",
     "e2e": "node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=.",
-    "e2e:headless": "echo ok",
+    "e2e:firefox": "npm run patch:playwright-firefox-worker-websocket && node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --browser=firefox",
+    "e2e:firefox:headless": "npm run patch:playwright-firefox-worker-websocket && node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --browser=firefox --headless",
+    "e2e:headless": "node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --headless",
+    "e2e:webkit": "node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --browser=webkit",
+    "e2e:webkit:headless": "node ./node_modules/@lvce-editor/test-with-playwright/bin/test-with-playwright.js  --only-extension=. --test-path=. --browser=webkit --headless",
+    "patch:playwright-firefox-worker-websocket": "node ./scripts/patch-playwright-firefox-worker-websocket.js",
     "type-check": "tsc"
   },
   "devDependencies": {
-    "@lvce-editor/test-with-playwright": "^16.1.0"
+    "@lvce-editor/test-with-playwright": "^21.0.0"
   }
 }
