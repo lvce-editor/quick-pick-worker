@@ -1,0 +1,20 @@
+import type { Test } from '@lvce-editor/test-with-playwright'
+
+export const name = 'quickpick.go-to-line-base-message'
+
+export const test: Test = async ({ expect, FileSystem, Locator, Main, QuickPick, Workspace }) => {
+  // arrange
+  const tmpDir = await FileSystem.getTmpDir()
+  await FileSystem.writeFile(`${tmpDir}/a.txt`, 'abc\ndef')
+  await Workspace.setPath(tmpDir)
+  await Main.openUri(`${tmpDir}/a.txt`)
+  await QuickPick.open()
+
+  // act
+  await QuickPick.setValue(':')
+
+  // assert
+  const label = Locator('.QuickPickItemLabel')
+  await expect(label).toBeVisible()
+  await expect(label).toHaveText(`Type a line number to go to (from 1 to 2)`)
+}
