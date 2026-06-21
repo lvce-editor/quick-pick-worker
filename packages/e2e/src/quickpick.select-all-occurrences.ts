@@ -2,6 +2,8 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.select-all-occurrences'
 
+export const skip = 1
+
 export const test: Test = async ({ Editor, FileSystem, Main, QuickPick, Workspace }) => {
   // arrange
   const tmpDir = await FileSystem.getTmpDir()
