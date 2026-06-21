@@ -51,7 +51,7 @@ export const getQuickPickVirtualDom = (
     {
       ariaActivedescendant: DomId.QuickPickItemActive,
       childCount: shouldShowScrollbar ? 2 : 1,
-      className: MergeClassNames.mergeClassNames(ClassNames.List, ClassNames.ContainContent),
+      className: MergeClassNames.mergeClassNames(ClassNames.List, ClassNames.ContainContent, ClassNames.QuickPickItems),
       id: DomId.QuickPickItems,
       onPointerDown: DomEventListenerFunctions.HandlePointerDown,
       onWheel: DomEventListenerFunctions.HandleWheel,

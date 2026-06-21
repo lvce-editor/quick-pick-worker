@@ -1,5 +1,6 @@
 import type { Renderer } from '../Renderer/Renderer.ts'
 import * as DiffType from '../DiffType/DiffType.ts'
+import * as RenderCss from '../RenderCss/RenderCss.ts'
 import * as RenderCursorOffset from '../RenderCursorOffset/RenderCursorOffset.ts'
 import * as RenderFocus from '../RenderFocus/RenderFocus.ts'
 import * as RenderFocusedIndex from '../RenderFocusedIndex/RenderFocusedIndex.ts'
@@ -12,6 +13,8 @@ export const getRenderer = (diffType: number): Renderer => {
   switch (diffType) {
     case DiffType.Height:
       return RenderHeight.renderHeight
+    case DiffType.RenderCss:
+      return RenderCss.renderCss
     case DiffType.RenderCursorOffset:
       return RenderCursorOffset.renderCursorOffset
     case DiffType.RenderFocus:

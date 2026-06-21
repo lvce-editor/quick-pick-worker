@@ -4,7 +4,6 @@ import * as ClassNames from '../src/parts/ClassNames/ClassNames.ts'
 import * as DomEventListenerFunctions from '../src/parts/DomEventListenerFunctions/DomEventListenerFunctions.ts'
 import * as GetScrollBarVirtualDom from '../src/parts/GetScrollBarVirtualDom/GetScrollBarVirtualDom.ts'
 import * as MergeClassNames from '../src/parts/MergeClassNames/MergeClassNames.ts'
-import * as Px from '../src/parts/Px/Px.ts'
 
 test('getScrollBarVirtualDom with no scrollbar needed', () => {
   const scrollBarHeight = 0
@@ -27,8 +26,6 @@ test('getScrollBarVirtualDom with scrollbar', () => {
     {
       childCount: 0,
       className: ClassNames.ScrollBarThumb,
-      height: Px.px(scrollBarHeight),
-      translate: Px.position(0, scrollBarTop),
       type: VirtualDomElements.Div,
     },
   ])
