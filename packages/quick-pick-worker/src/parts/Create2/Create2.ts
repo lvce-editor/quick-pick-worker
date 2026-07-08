@@ -15,6 +15,7 @@ export const create = (
   height: number,
   platform: number,
   args: any,
+  _renderAllItems: boolean,
   workspaceUri: string,
   assetDir: string,
 ): void => {
