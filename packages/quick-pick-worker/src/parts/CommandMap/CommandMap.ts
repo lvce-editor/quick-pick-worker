@@ -37,7 +37,7 @@ import * as VirtualList from '../VirtualList/VirtualList.ts'
 
 export const commandMap = {
   'QuickPick.addMenuEntries': MenuEntriesState.add,
-  'QuickPick.close': Close.close,
+  'QuickPick.close': WrapCommand.wrapCommand(Close.close),
   'QuickPick.create2': Create2.create,
   'QuickPick.diff2': Diff2.diff2,
   'QuickPick.dispose': Dispose.dispose,
