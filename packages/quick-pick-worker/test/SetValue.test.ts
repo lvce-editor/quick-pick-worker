@@ -3,6 +3,7 @@ import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
+import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
 test('returns same state when value is unchanged', async () => {
@@ -242,4 +243,44 @@ test('preserves other state properties', async () => {
   expect(result.providerId).toBe(0)
   expect(Array.isArray(mockRpc.invocations)).toBe(true)
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
+})
+
+test('keeps the newest value when provider requests finish out of order', async () => {
+  const { promise: firstResult, resolve: resolveFirstResult } = Promise.withResolvers<readonly string[]>()
+  const { promise: firstStarted, resolve: notifyFirstStarted } = Promise.withResolvers<void>()
+  const { promise: secondResult, resolve: resolveSecondResult } = Promise.withResolvers<readonly string[]>()
+  const { promise: secondStarted, resolve: notifySecondStarted } = Promise.withResolvers<void>()
+  let requestCount = 0
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames'(): Promise<readonly string[]> {
+      requestCount++
+      if (requestCount === 1) {
+        notifyFirstStarted()
+        return firstResult
+      }
+      notifySecondStarted()
+      return secondResult
+    },
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    uid: 1,
+    value: 'old',
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+
+  const firstCommand = setValueCommand(state.uid, 'first')
+  await firstStarted
+  const secondCommand = setValueCommand(state.uid, 'second')
+  await secondStarted
+  resolveSecondResult(['second theme'])
+  await secondCommand
+  resolveFirstResult(['first theme'])
+  await firstCommand
+
+  const { newState } = QuickPickStates.get(state.uid)
+  expect(newState.value).toBe('second')
+  expect(newState.picks[0].label).toBe('second theme')
+  expect(mockRpc.invocations).toHaveLength(2)
 })

@@ -1,3 +1,4 @@
+import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
 import * as GetFilterValue from '../GetFilterValue/GetFilterValue.ts'
@@ -8,6 +9,9 @@ import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFil
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
+
+const requestVersions = new Map<number, number>()
+const requestVersionGenerator = { value: 0 }
 
 const isQuickInput = (args: readonly unknown[]): boolean => {
   const options = args.at(-1) as any
@@ -42,5 +46,34 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
     items,
     picks: newPicks,
     value: newValue,
+  }
+}
+
+export const setValueWithContext = async (context: AsyncCommandContext<QuickPickState>, newValue: string): Promise<void> => {
+  const state = context.getState()
+  if (state.value === newValue) {
+    return
+  }
+  const requestVersion = ++requestVersionGenerator.value
+  requestVersions.set(state.uid, requestVersion)
+  const result = await setValue(state, newValue)
+  await context.updateState((latestState) => {
+    if (requestVersions.get(latestState.uid) !== requestVersion) {
+      return latestState
+    }
+    return {
+      ...latestState,
+      fileIconCache: result.fileIconCache,
+      finalDeltaY: result.finalDeltaY,
+      focusedIndex: result.focusedIndex,
+      icons: result.icons,
+      inputSource: result.inputSource,
+      items: result.items,
+      picks: result.picks,
+      value: result.value,
+    }
+  })
+  if (requestVersions.get(state.uid) === requestVersion) {
+    requestVersions.delete(state.uid)
   }
 }

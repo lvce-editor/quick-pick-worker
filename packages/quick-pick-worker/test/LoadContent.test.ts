@@ -3,9 +3,11 @@ import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
-import { loadContent } from '../src/parts/LoadContent/LoadContent.ts'
+import { loadContent, loadContentWithContext } from '../src/parts/LoadContent/LoadContent.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
+import { waitUntilVisible } from '../src/parts/QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
 let consoleErrorSpy: ReturnType<typeof jest.spyOn>
 
@@ -476,4 +478,31 @@ test('loadContent handles Recent URI', async () => {
 
   expect(result.providerId).toBeDefined()
   expect(result.picks).toBeDefined()
+})
+
+test('loadContent commits state before notifying that the quick pick is visible', async () => {
+  RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [null, [{ label: 'file1.txt' }]],
+    initial: true,
+    uid: 1,
+    uri: QuickPickEntryUri.Custom,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+  let stateWhenVisible: QuickPickState | undefined
+  const visible = waitUntilVisible().then(() => {
+    stateWhenVisible = QuickPickStates.get(state.uid).newState
+  })
+
+  await loadCommand(state.uid)
+  await visible
+
+  expect(stateWhenVisible?.initial).toBe(false)
+  expect(stateWhenVisible?.items).toHaveLength(1)
+  expect(stateWhenVisible?.state).toBe(QuickPickOpenState.Finished)
 })
