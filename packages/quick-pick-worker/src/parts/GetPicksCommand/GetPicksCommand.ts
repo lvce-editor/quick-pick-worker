@@ -1,5 +1,6 @@
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
+import * as CollectWarnings from '../CollectWarnings/CollectWarnings.ts'
 import * as ErrorHandling from '../ErrorHandling/ErrorHandling.ts'
 import * as MenuEntriesState from '../MenuEntriesState/MenuEntriesState.ts'
 
@@ -10,12 +11,6 @@ const getBuiltinPicks = async (): Promise<readonly unknown[]> => {
 }
 
 const prefixIdWithExt = (item: any): any => {
-  if (!item.label) {
-    ErrorHandling.warn('[QuickPick] item has missing label', item)
-  }
-  if (!item.id) {
-    ErrorHandling.warn('[QuickPick] item has missing id', item)
-  }
   return {
     ...item,
     id: `ext.${item.id}`,
@@ -33,6 +28,10 @@ const getExtensionPicks = async (assetDir: string, platform: number): Promise<re
     const extensionPicks = await RendererWorker.invoke('ExtensionHost.getCommands', assetDir, platform)
     if (!extensionPicks) {
       return []
+    }
+    const warnings = CollectWarnings.collectWarnings(extensionPicks)
+    for (const warning of warnings) {
+      ErrorHandling.warn(`[QuickPick] ${warning}`)
     }
     const mappedPicks = extensionPicks.map(prefixIdWithExt)
     return mappedPicks
