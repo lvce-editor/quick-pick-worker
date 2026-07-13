@@ -1,3 +1,4 @@
+import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
@@ -47,7 +48,7 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
   }
 }
 
-export const loadContent = async (state: QuickPickState): Promise<QuickPickState> => {
+const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> => {
   const { args, assetDir, fileIconCache, height, itemHeight, maxVisibleItems, platform, uri } = state
   const id = GetQuickPickProviderId.getQuickPickProviderId(uri)
   const value = GetDefaultValue.getDefaultValue(id)
@@ -65,7 +66,6 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
   const finalDeltaY = GetFinalDeltaY.getFinalDeltaY(listHeight, itemHeight, items.length)
   const parsedArgs = parseArgs(subId, args)
   const finalValue = parsedArgs.initialValue || value
-  QuickPickVisibleCallbacks.notifyVisible()
   return {
     ...state,
     args,
@@ -86,4 +86,35 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     state: QuickPickOpenState.Finished,
     value: finalValue,
   }
+}
+
+export const loadContent = async (state: QuickPickState): Promise<QuickPickState> => {
+  const newState = await getLoadedState(state)
+  QuickPickVisibleCallbacks.notifyVisible()
+  return newState
+}
+
+export const loadContentWithContext = async (context: AsyncCommandContext<QuickPickState>): Promise<void> => {
+  const state = context.getState()
+  const loadedState = await getLoadedState(state)
+  await context.updateState((latestState) => ({
+    ...latestState,
+    cursorOffset: loadedState.cursorOffset,
+    fileIconCache: loadedState.fileIconCache,
+    finalDeltaY: loadedState.finalDeltaY,
+    focused: loadedState.focused,
+    focusedIndex: loadedState.focusedIndex,
+    icons: loadedState.icons,
+    initial: loadedState.initial,
+    inputSource: loadedState.inputSource,
+    items: loadedState.items,
+    maxLineY: loadedState.maxLineY,
+    minLineY: loadedState.minLineY,
+    picks: loadedState.picks,
+    placeholder: loadedState.placeholder,
+    providerId: loadedState.providerId,
+    state: loadedState.state,
+    value: loadedState.value,
+  }))
+  QuickPickVisibleCallbacks.notifyVisible()
 }
