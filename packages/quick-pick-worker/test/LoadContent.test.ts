@@ -495,9 +495,10 @@ test('loadContent commits state before notifying that the quick pick is visible'
   QuickPickStates.set(state.uid, state, state)
   const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
   let stateWhenVisible: QuickPickState | undefined
-  const visible = waitUntilVisible().then(() => {
+  const visible = (async (): Promise<void> => {
+    await waitUntilVisible()
     stateWhenVisible = QuickPickStates.get(state.uid).newState
-  })
+  })()
 
   await loadCommand(state.uid)
   await visible
