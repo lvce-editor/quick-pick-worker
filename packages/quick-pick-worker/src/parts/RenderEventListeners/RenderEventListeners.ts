@@ -33,10 +33,6 @@ export const renderEventListeners = (): readonly DomEventListener[] => {
       params: ['handleBlur'],
     },
     {
-      name: DomEventListenerFunctions.HandleBeforeInput,
-      params: ['handleBeforeInput'],
-    },
-    {
       name: DomEventListenerFunctions.HandleInput,
       params: ['handleInput', 'event.target.value'],
     },

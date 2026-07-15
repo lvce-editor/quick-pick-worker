@@ -18,7 +18,6 @@ export const getQuickPickInputVirtualDom = (placeholder = ''): VirtualDomNode =>
     className: ClassNames.InputBox,
     inputType: 'text',
     name: InputName.QuickPickInput,
-    onBeforeInput: DomEventListenerFunctions.HandleBeforeInput,
     onBlur: DomEventListenerFunctions.HandleBlur,
     onFocus: DomEventListenerFunctions.HandleFocus,
     onInput: DomEventListenerFunctions.HandleInput,
