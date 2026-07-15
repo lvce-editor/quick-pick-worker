@@ -480,6 +480,19 @@ test('loadContent handles Recent URI', async () => {
   expect(result.picks).toBeDefined()
 })
 
+test('loadContent initializes workspace symbols with #', async () => {
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.WorkspaceSymbol,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe('#')
+  expect(result.cursorOffset).toBe(1)
+})
+
 test('loadContent commits state before notifying that the quick pick is visible', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
