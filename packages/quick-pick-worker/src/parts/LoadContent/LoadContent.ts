@@ -51,7 +51,7 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
 const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> => {
   const { args, assetDir, fileIconCache, height, itemHeight, maxVisibleItems, platform, uri } = state
   const id = GetQuickPickProviderId.getQuickPickProviderId(uri)
-  const value = GetDefaultValue.getDefaultValue(id)
+  const value = GetDefaultValue.getDefaultValue(id, uri)
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
   const newPicks = await GetPicks.getPicks(subId, value, args, { assetDir, platform })
