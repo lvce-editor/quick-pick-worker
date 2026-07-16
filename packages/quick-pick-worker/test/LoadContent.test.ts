@@ -47,7 +47,7 @@ test('loadContent returns state with loaded content', async () => {
   expect(result.fileIconCache).toBeDefined()
 })
 
-test('loadContent handles empty picks', async () => {
+test('loadContent handles builtin command only', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
     'IconTheme.getFolderIcon': () => 'icon',
@@ -61,12 +61,17 @@ test('loadContent handles empty picks', async () => {
 
   const result = await loadContent(state)
 
-  expect(result.picks).toEqual([])
-  expect(result.items).toEqual([])
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      id: 'QuickPick.changeLanguageMode',
+      label: 'Change Language Mode',
+    }),
+  ])
+  expect(result.items).toHaveLength(1)
   expect(result.focused).toBe(true)
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
-  expect(result.maxLineY).toBe(0)
+  expect(result.maxLineY).toBe(1)
 })
 
 test('loadContent handles many picks', async () => {

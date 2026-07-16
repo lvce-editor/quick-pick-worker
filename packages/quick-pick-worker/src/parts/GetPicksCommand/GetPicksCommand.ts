@@ -4,10 +4,15 @@ import * as CollectWarnings from '../CollectWarnings/CollectWarnings.ts'
 import * as ErrorHandling from '../ErrorHandling/ErrorHandling.ts'
 import * as MenuEntriesState from '../MenuEntriesState/MenuEntriesState.ts'
 
+const changeLanguageModePick = {
+  id: 'QuickPick.changeLanguageMode',
+  label: 'Change Language Mode',
+}
+
 // TODO combine Ajax with cache (specify strategy: cacheFirst, networkFirst)
 const getBuiltinPicks = async (): Promise<readonly unknown[]> => {
   const builtinPicks = await MenuEntriesState.getAll()
-  return builtinPicks
+  return [...builtinPicks, changeLanguageModePick]
 }
 
 const prefixIdWithExt = (item: any): any => {

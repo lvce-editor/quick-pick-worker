@@ -32,6 +32,23 @@ test('selectPickBuiltin calls RendererWorker.invoke with item id and args', asyn
   expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
+test('selectPickBuiltin opens the language mode provider', async () => {
+  const pick: ProtoVisibleItem = {
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    id: 'QuickPick.changeLanguageMode',
+    label: 'Change Language Mode',
+    matches: [],
+    uri: '',
+  } as CommandItem
+
+  const result = await selectPick(pick)
+
+  expect(result.command).toBe(QuickPickReturnValue.OpenLanguageMode)
+})
+
 test('selectPickBuiltin returns Hide when shouldHide returns true', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'test-command': () => {},
