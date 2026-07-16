@@ -5,6 +5,11 @@ import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnVa
 import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
 const selectPickBuiltin = async (item: any): Promise<any> => {
+  if (item.id === 'QuickPick.changeLanguageMode') {
+    return {
+      command: QuickPickReturnValue.OpenLanguageMode,
+    }
+  }
   const args = item.args || []
   // TODO ids should be all numbers for efficiency -> also directly can call command
   await RendererWorker.invoke(item.id, ...args)

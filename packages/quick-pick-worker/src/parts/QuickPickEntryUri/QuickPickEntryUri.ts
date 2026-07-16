@@ -10,6 +10,8 @@ export const Recent = 'quickPick://recent'
 
 export const ColorTheme = 'quickPick://color-theme'
 
+export const LanguageMode = 'quickPick://language-mode'
+
 export const Symbol = 'quickPick://symbol'
 
 export const View = 'quickPick://view'

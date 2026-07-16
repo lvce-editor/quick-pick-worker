@@ -9,6 +9,10 @@ export const selectColorTheme = (): string => {
   return I18NString.i18nString(UiStrings.SelectColorTheme)
 }
 
+export const selectLanguageMode = (): string => {
+  return I18NString.i18nString(UiStrings.SelectLanguageMode)
+}
+
 export const pressEnterToGoToLine = (row: number, column: number): string => {
   return I18NString.i18nString(UiStrings.PressEnterToGoToLine, {
     PH1: row,

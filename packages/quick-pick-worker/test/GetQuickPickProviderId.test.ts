@@ -8,6 +8,11 @@ test('returns ColorTheme when prefix is ColorTheme', () => {
   expect(result).toBe(QuickPickEntryId.ColorTheme)
 })
 
+test('returns LanguageMode when prefix is LanguageMode', () => {
+  const result = GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.LanguageMode)
+  expect(result).toBe(QuickPickEntryId.LanguageMode)
+})
+
 test('returns EveryThing when prefix is Commands', () => {
   const result = GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.Commands)
   expect(result).toBe(QuickPickEntryId.EveryThing)

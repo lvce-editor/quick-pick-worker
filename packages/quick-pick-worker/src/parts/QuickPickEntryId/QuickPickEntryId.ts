@@ -20,6 +20,8 @@ export const View = 9
 
 export const WorkspaceSymbol = 10
 
-export const Noop = 11
+export const LanguageMode = 11
+
+export const Noop = 12
 
 export const EveryThing = 100

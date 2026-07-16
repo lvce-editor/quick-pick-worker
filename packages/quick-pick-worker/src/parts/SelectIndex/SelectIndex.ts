@@ -5,8 +5,10 @@ import * as CloseWidget from '../CloseWidget/CloseWidget.ts'
 import * as GetPick from '../GetPick/GetPick.ts'
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
+import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as QuickPickEntries from '../QuickPickEntries/QuickPickEntries.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
+import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
 const createCustomPick = (value: string): ProtoVisibleItem => {
@@ -39,6 +41,13 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
     case QuickPickReturnValue.Hide:
       await CloseWidget.closeWidget(state.uid)
       return state
+    case QuickPickReturnValue.OpenLanguageMode:
+      return LoadContent.loadContent({
+        ...state,
+        args: [],
+        uri: QuickPickEntryUri.LanguageMode,
+        value: '',
+      })
     default:
       return state
   }

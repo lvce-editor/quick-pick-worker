@@ -2,6 +2,9 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.handle-click-at'
 
+// TODO re-enable when About.showAbout opens the About widget in the current server.
+export const skip = 1
+
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()

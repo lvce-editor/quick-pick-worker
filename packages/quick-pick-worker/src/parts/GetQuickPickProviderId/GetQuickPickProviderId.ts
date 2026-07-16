@@ -15,6 +15,8 @@ export const getQuickPickProviderId = (prefix: string): number => {
       return QuickPickEntryId.EveryThing
     case QuickPickEntryUri.Custom:
       return QuickPickEntryId.Custom
+    case QuickPickEntryUri.LanguageMode:
+      return QuickPickEntryId.LanguageMode
     case QuickPickEntryUri.Recent:
       return QuickPickEntryId.Recent
     default:
