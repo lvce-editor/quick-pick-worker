@@ -85,20 +85,22 @@ test('getPicks combines builtin and extension picks', async () => {
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
 
-test('getPicks handles missing label in extension picks', async () => {
+test('getPicks prints one warning for missing labels in extension picks', async () => {
   const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-  const extensionPicks = [{ id: 'command1' }]
+  const extensionPicks = [{ id: 'git.openFile' }, { id: 'git.stage' }, { id: 'git.unstage' }]
   using mockRpc = RendererWorker.registerMockRpc({
     'ExtensionHost.getCommands': () => extensionPicks,
     'Layout.getAllQuickPickMenuEntries': () => [],
   })
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
-  consoleWarnSpy.mockRestore()
 
-  expect(result).toHaveLength(1)
-  expect(result[0].label).toBe('command1')
+  expect(result).toHaveLength(3)
+  expect(result[0].label).toBe('git.openFile')
+  expect(consoleWarnSpy).toHaveBeenCalledTimes(1)
+  expect(consoleWarnSpy).toHaveBeenCalledWith('[QuickPick] command git.openFile and 2 other commands have missing label')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  consoleWarnSpy.mockRestore()
 })
 
 test('getPicks handles missing id in extension picks', async () => {
@@ -110,12 +112,14 @@ test('getPicks handles missing id in extension picks', async () => {
   })
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
-  consoleWarnSpy.mockRestore()
 
   expect(result).toHaveLength(1)
   expect((result[0] as CommandItem).id).toBe('ext.undefined')
   expect(result[0].label).toBe('Command without id')
+  expect(consoleWarnSpy).toHaveBeenCalledTimes(1)
+  expect(consoleWarnSpy).toHaveBeenCalledWith('[QuickPick] command Command without id has missing id')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  consoleWarnSpy.mockRestore()
 })
 
 test('getPicks handles extension picks error', async () => {
