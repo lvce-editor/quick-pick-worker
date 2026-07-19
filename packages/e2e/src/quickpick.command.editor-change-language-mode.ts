@@ -15,7 +15,7 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, QuickPick,
   await QuickPick.selectItem('Change Language Mode', {
     waitUntil: 'quickPick',
   })
-  await QuickPick.setValue('xyz')
+  await QuickPick.handleInput('xyz')
 
   // assert
   const firstItem = Locator('.QuickPickItem').nth(0)

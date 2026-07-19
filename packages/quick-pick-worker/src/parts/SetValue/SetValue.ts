@@ -9,6 +9,7 @@ import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFil
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
+import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 
 const requestVersions = new Map<number, number>()
 const requestVersionGenerator = { value: 0 }
@@ -26,7 +27,7 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   }
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
-  const newPicks = await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
+  const newPicks = subId === QuickPickEntryId.LanguageMode ? state.picks : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
   const filterValue = isQuickInput(args) ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
   const focusedIndex = items.length === 0 ? -1 : 0

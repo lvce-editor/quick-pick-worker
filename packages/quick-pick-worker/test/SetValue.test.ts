@@ -3,6 +3,7 @@ import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
+import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
@@ -186,6 +187,24 @@ test('filters items based on filterValue', async () => {
   expect(result.items.length).toBeGreaterThanOrEqual(0)
   expect(Array.isArray(mockRpc.invocations)).toBe(true)
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
+})
+
+test('filters cached language mode picks', async () => {
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    picks: [
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'java', matches: [], uri: '' },
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'javascript', matches: [], uri: '' },
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'plaintext', matches: [], uri: '' },
+    ],
+    providerId: QuickPickEntryId.LanguageMode,
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'java')
+
+  expect(result.picks).toBe(state.picks)
+  expect(result.items.map((item) => item.label)).toEqual(['java', 'javascript'])
 })
 
 test('handles empty string value', async () => {
