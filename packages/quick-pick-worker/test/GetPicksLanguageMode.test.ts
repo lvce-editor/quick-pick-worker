@@ -5,8 +5,8 @@ import { getPicks } from '../src/parts/GetPicksLanguageMode/GetPicksLanguageMode
 test('getPicks returns unique contributed language ids sorted by id', async () => {
   using mockRpc = ExtensionManagementWorker.registerMockRpc({
     'Extensions.getLanguages': () => [
-      { id: 'xyz', tokenize: '/extensions/test/tokenizeXyz.js' },
-      { id: 'plaintext' },
+      { extensions: ['xyz'], id: 'xyz', tokenize: '/extensions/test/tokenizeXyz.js' },
+      { extensions: ['.txt'], id: 'plaintext' },
       { id: 'xyz', tokenize: '/extensions/other/tokenizeXyz.js' },
       null,
       { id: 42 },
@@ -21,12 +21,13 @@ test('getPicks returns unique contributed language ids sorted by id', async () =
   expect(result).toEqual([
     {
       description: '',
-      direntType: 0,
+      direntType: 7,
       fileIcon: '',
       icon: '',
+      iconName: 'file.txt',
       label: 'plaintext',
       matches: [],
-      uri: '',
+      uri: 'file.txt',
       value: {
         languageId: 'plaintext',
         tokenizePath: '',
@@ -34,12 +35,13 @@ test('getPicks returns unique contributed language ids sorted by id', async () =
     },
     {
       description: '',
-      direntType: 0,
+      direntType: 7,
       fileIcon: '',
       icon: '',
+      iconName: 'file.xyz',
       label: 'xyz',
       matches: [],
-      uri: '',
+      uri: 'file.xyz',
       value: {
         languageId: 'xyz',
         tokenizePath: '/extensions/test/tokenizeXyz.js',
@@ -47,6 +49,38 @@ test('getPicks returns unique contributed language ids sorted by id', async () =
     },
   ])
   expect(mockRpc.invocations).toEqual([['Extensions.getLanguages', 1, '/assets']])
+})
+
+test('getPicks uses a contributed file name for the icon', async () => {
+  using mockRpc = ExtensionManagementWorker.registerMockRpc({
+    'Extensions.getLanguages': () => [{ extensions: ['.dockerfile'], fileNames: ['Dockerfile'], id: 'dockerfile' }],
+  })
+
+  const result = await getPicks('')
+
+  expect(result[0]).toMatchObject({
+    direntType: 7,
+    iconName: 'Dockerfile',
+    label: 'dockerfile',
+    uri: 'Dockerfile',
+  })
+  expect(mockRpc.invocations).toEqual([['Extensions.getLanguages', 0, '']])
+})
+
+test('getPicks omits the file icon request when a language has no file name', async () => {
+  using mockRpc = ExtensionManagementWorker.registerMockRpc({
+    'Extensions.getLanguages': () => [{ id: 'custom' }],
+  })
+
+  const result = await getPicks('')
+
+  expect(result[0]).toMatchObject({
+    direntType: 0,
+    iconName: '',
+    label: 'custom',
+    uri: '',
+  })
+  expect(mockRpc.invocations).toEqual([['Extensions.getLanguages', 0, '']])
 })
 
 test('getPicks returns an empty array when no languages are contributed', async () => {
