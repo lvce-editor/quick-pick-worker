@@ -3,6 +3,7 @@ export interface ProtoVisibleItem {
   readonly direntType: number
   readonly fileIcon: string
   readonly icon: string
+  readonly iconName?: string
   readonly label: string
   readonly matches: readonly number[]
   readonly uri: string

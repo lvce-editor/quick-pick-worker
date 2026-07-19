@@ -37,3 +37,26 @@ test('getQuickPickFileIcons with all icons cached', async () => {
   expect(newFileIconCache).toEqual(fileIconCache)
   expect(mockRpc.invocations).toEqual([])
 })
+
+test('getQuickPickFileIcons uses a separate icon name', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': ({ name }: { name: string }) => `icon-for-${name}`,
+  })
+
+  const items = [
+    {
+      description: '',
+      direntType: DirentType.File,
+      fileIcon: '',
+      icon: '',
+      iconName: 'file.ts',
+      label: 'typescript',
+      matches: [],
+      uri: 'file.ts',
+    },
+  ]
+  const { icons } = await getQuickPickFileIcons(items, {})
+
+  expect(icons).toEqual(['icon-for-file.ts'])
+  expect(mockRpc.invocations).toEqual([['IconTheme.getFileIcon', { name: 'file.ts' }]])
+})
