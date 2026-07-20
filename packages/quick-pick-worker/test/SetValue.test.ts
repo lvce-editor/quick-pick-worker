@@ -4,6 +4,7 @@ import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
+import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
@@ -302,4 +303,63 @@ test('keeps the newest value when provider requests finish out of order', async 
   expect(newState.value).toBe('second')
   expect(newState.picks[0].label).toBe('second theme')
   expect(mockRpc.invocations).toHaveLength(2)
+})
+
+test('does not apply command results after the view is reopened with a custom picker', async () => {
+  const { promise: commandResult, resolve: resolveCommandResult } = Promise.withResolvers<readonly unknown[]>()
+  const { promise: commandRequestStarted, resolve: notifyCommandRequestStarted } = Promise.withResolvers<void>()
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.getCommands'(): Promise<readonly unknown[]> {
+      notifyCommandRequestStarted()
+      return commandResult
+    },
+    'Layout.getAllQuickPickMenuEntries': () => [],
+  })
+  const commandPickerState: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    providerId: QuickPickEntryId.EveryThing,
+    uid: 1,
+    uri: QuickPickEntryUri.EveryThing,
+    value: '',
+  }
+  QuickPickStates.set(commandPickerState.uid, commandPickerState, commandPickerState)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+
+  const pendingCommandRequest = setValueCommand(commandPickerState.uid, '>')
+  await commandRequestStarted
+
+  const branchPick = {
+    description: 'Local branch',
+    direntType: 0,
+    fileIcon: '',
+    icon: 'git-branch',
+    label: 'main',
+    matches: [],
+    uri: '',
+    value: 'main',
+  }
+  const customPickerState: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [null, [branchPick]],
+    items: [branchPick],
+    picks: [branchPick],
+    providerId: QuickPickEntryId.Custom,
+    uid: commandPickerState.uid,
+    uri: QuickPickEntryUri.Custom,
+    value: '',
+  }
+  QuickPickStates.set(customPickerState.uid, customPickerState, customPickerState)
+
+  resolveCommandResult([{ id: 'workspace.command', label: 'Workspace Command' }])
+  await pendingCommandRequest
+
+  const { newState } = QuickPickStates.get(customPickerState.uid)
+  expect(newState.providerId).toBe(QuickPickEntryId.Custom)
+  expect(newState.value).toBe('')
+  expect(newState.picks).toEqual([branchPick])
+  expect(newState.items).toEqual([branchPick])
+  expect(mockRpc.invocations).toEqual([
+    ['Layout.getAllQuickPickMenuEntries'],
+    ['ExtensionHost.getCommands', '', 0],
+  ])
 })
