@@ -14,6 +14,10 @@ import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 const requestVersions = new Map<number, number>()
 const requestVersionGenerator = { value: 0 }
 
+const isSamePicker = (state: QuickPickState, latestState: QuickPickState): boolean => {
+  return latestState.uri === state.uri && latestState.args === state.args
+}
+
 const isQuickInput = (args: readonly unknown[]): boolean => {
   const options = args.at(-1) as any
   return options?.mode === 'quickInput'
@@ -59,7 +63,7 @@ export const setValueWithContext = async (context: AsyncCommandContext<QuickPick
   requestVersions.set(state.uid, requestVersion)
   const result = await setValue(state, newValue)
   await context.updateState((latestState) => {
-    if (requestVersions.get(latestState.uid) !== requestVersion) {
+    if (requestVersions.get(latestState.uid) !== requestVersion || !isSamePicker(state, latestState)) {
       return latestState
     }
     return {
