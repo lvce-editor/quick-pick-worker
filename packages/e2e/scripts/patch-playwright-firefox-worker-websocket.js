@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const file = join(import.meta.dirname, '..', 'node_modules', 'playwright-core', 'lib', 'coreBundle.js')
+const file = join(import.meta.dirname, '..', '..', '..', 'node_modules', 'playwright-core', 'lib', 'coreBundle.js')
 
 const before = `      _onWebSocketOpened(event) {
         const request2 = this._webSocketRequests.get(event.requestId);
