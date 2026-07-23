@@ -35,7 +35,7 @@ const selectPickExtension = async (item: any): Promise<any> => {
     }
   }
   return {
-    command: QuickPickReturnValue.KeepOpen,
+    command: QuickPickReturnValue.Hide,
   }
 }
 

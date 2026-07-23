@@ -93,7 +93,7 @@ test('selectPickBuiltin handles item without args', async () => {
   expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
-test('selectPickExtension calls ExtensionHost.executeCommand with id without ext. prefix', async () => {
+test('selectPickExtension calls ExtensionHost.executeCommand and hides the quick pick', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'ExtensionHost.executeCommand': () => {},
   })
@@ -112,7 +112,7 @@ test('selectPickExtension calls ExtensionHost.executeCommand with id without ext
   const result = await selectPick(pick)
 
   expect(mockRpc.invocations).toEqual([['ExtensionHost.executeCommand', 'my-extension-command']])
-  expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
+  expect(result.command).toBe(QuickPickReturnValue.Hide)
 })
 
 test('selectPickExtension handles errors and shows error dialog', async () => {
