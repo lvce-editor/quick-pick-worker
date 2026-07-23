@@ -20,4 +20,4 @@ export const ShowAndRunCommands = 'Show And Run Commands'
 export const TypeNameOfCommandToRun = 'Type the name of a command to run.'
 export const TypeTheNameOfACommandToRun = 'Type the name of a command to run.'
 export const TypeTheNameOfAViewToOpen = 'Type the name of a view, output channel or terminal to open.'
-export const PressEnterToGoToLine = `Press 'Enter' to go to line {PH1} column {PH2}`
+export const PressEnterToGoToLine = "Press 'Enter' to go to line {PH1} column {PH2}"

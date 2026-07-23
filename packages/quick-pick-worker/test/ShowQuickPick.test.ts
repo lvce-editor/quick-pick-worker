@@ -44,7 +44,7 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
 test('showQuickPick returns undefined when canceled', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'Viewlet.openWidget': (...args: readonly unknown[]) => {
-      QuickPickCallbacks.executeCallback(args[3] as number, undefined)
+      QuickPickCallbacks.executeCallback(args[3] as number)
     },
   })
 

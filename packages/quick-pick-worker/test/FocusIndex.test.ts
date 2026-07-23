@@ -31,7 +31,7 @@ test('focusIndex updates focusedIndex when index is within visible range', async
   expect(result.focusedIndex).toBe(1)
   expect(result.minLineY).toBe(0)
   expect(result.maxLineY).toBe(3)
-  expect(result.icons.length).toBe(3)
+  expect(result.icons).toHaveLength(3)
   expect(mockRpc.invocations.length).toBeGreaterThan(0)
 })
 
@@ -64,7 +64,7 @@ test('focusIndex scrolls up when index is before minLineY', async () => {
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
   expect(result.maxLineY).toBe(3)
-  expect(result.icons.length).toBe(3)
+  expect(result.icons).toHaveLength(3)
   expect(mockRpc.invocations.length).toBeGreaterThan(0)
 })
 
@@ -97,7 +97,7 @@ test('focusIndex scrolls down when index is at or after maxLineY', async () => {
   expect(result.focusedIndex).toBe(4)
   expect(result.minLineY).toBe(2)
   expect(result.maxLineY).toBe(5)
-  expect(result.icons.length).toBe(3)
+  expect(result.icons).toHaveLength(3)
   expect(mockRpc.invocations.length).toBeGreaterThan(0)
 })
 

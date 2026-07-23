@@ -22,11 +22,10 @@ export const getHighlights = (sections: readonly HighlightSection[], label: stri
     nodes.push(text(label))
   } else {
     for (const section of sections) {
+      labelDom.childCount++
       if (section.highlighted) {
-        labelDom.childCount++
         nodes.push(quickPickHighlight, text(section.text))
       } else {
-        labelDom.childCount++
         nodes.push(text(section.text))
       }
     }
