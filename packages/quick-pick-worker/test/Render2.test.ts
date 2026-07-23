@@ -45,7 +45,7 @@ test('render2 updates QuickPickStates and returns commands when states differ', 
   QuickPickStates.set(uid, oldState, newState)
   const diffResult: readonly number[] = [DiffType.RenderFocus]
   const result = Render2.render2(uid, diffResult)
-  expect(result.length).toBe(1)
+  expect(result).toHaveLength(1)
   expect(result[0]).toHaveLength(2)
   expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)
@@ -65,7 +65,7 @@ test('render2 handles multiple diff types when states differ', () => {
   QuickPickStates.set(uid, oldState, newState)
   const diffResult: readonly number[] = [DiffType.RenderValue, DiffType.RenderFocus]
   const result = Render2.render2(uid, diffResult)
-  expect(result.length).toBe(2)
+  expect(result).toHaveLength(2)
   expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
   expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)

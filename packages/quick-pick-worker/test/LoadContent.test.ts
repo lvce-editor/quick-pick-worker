@@ -9,14 +9,14 @@ import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOp
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import { waitUntilVisible } from '../src/parts/QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
-let consoleErrorSpy: ReturnType<typeof jest.spyOn>
+const testState: { consoleErrorSpy?: ReturnType<typeof jest.spyOn> } = {}
 
 beforeEach(() => {
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  testState.consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
 afterEach(() => {
-  consoleErrorSpy.mockRestore()
+  testState.consoleErrorSpy?.mockRestore()
 })
 
 test('loadContent returns state with loaded content', async () => {
@@ -513,9 +513,10 @@ test('loadContent commits state before notifying that the quick pick is visible'
   QuickPickStates.set(state.uid, state, state)
   const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
   let stateWhenVisible: QuickPickState | undefined
-  const visible = waitUntilVisible().then(() => {
+  const visible = (async (): Promise<void> => {
+    await waitUntilVisible()
     stateWhenVisible = QuickPickStates.get(state.uid).newState
-  })
+  })()
 
   await loadCommand(state.uid)
   await visible

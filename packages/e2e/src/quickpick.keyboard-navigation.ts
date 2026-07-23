@@ -17,31 +17,34 @@ export const test: Test = async ({ expect, FileSystem, Locator, QuickPick, Works
   const quickPick = Locator('#QuickPick')
   await expect(quickPick).toBeVisible()
   const quickPickItems = Locator('.QuickPickItem')
-  await expect(quickPickItems.nth(0)).toHaveId('QuickPickItemActive')
+  const firstQuickPickItem = quickPickItems.nth(0)
+  const secondQuickPickItem = quickPickItems.nth(1)
+  const tenthQuickPickItem = quickPickItems.nth(9)
+  await expect(firstQuickPickItem).toHaveId('QuickPickItemActive')
 
   // act
   await QuickPick.focusNext()
 
   // assert
-  await expect(quickPickItems.nth(0)).toHaveId('')
-  await expect(quickPickItems.nth(1)).toHaveId('QuickPickItemActive')
+  await expect(firstQuickPickItem).toHaveId('')
+  await expect(secondQuickPickItem).toHaveId('QuickPickItemActive')
 
   // act
   await QuickPick.focusPrevious()
 
   // assert
-  await expect(quickPickItems.nth(0)).toHaveId('QuickPickItemActive')
-  await expect(quickPickItems.nth(1)).toHaveId('')
+  await expect(firstQuickPickItem).toHaveId('QuickPickItemActive')
+  await expect(secondQuickPickItem).toHaveId('')
 
   // act
   await QuickPick.focusIndex(9)
 
   // assert
-  await expect(quickPickItems.nth(9)).toHaveId('QuickPickItemActive')
+  await expect(tenthQuickPickItem).toHaveId('QuickPickItemActive')
 
   // act
   await QuickPick.focusNext()
-  await expect(quickPickItems.nth(9)).toHaveId('QuickPickItemActive')
+  await expect(tenthQuickPickItem).toHaveId('QuickPickItemActive')
 
   // act
   await QuickPick.setValue('')

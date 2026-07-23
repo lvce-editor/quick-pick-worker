@@ -159,7 +159,7 @@ test('rounds scroll bar top position', () => {
     scrollBarHeight: 40,
   }
   const viewModel = CreateQuickPickViewModel.createQuickPickViewModel(oldState, newState)
-  expect(Number.isInteger(viewModel.scrollBarTop)).toBe(true)
+  expect(Number.isSafeInteger(viewModel.scrollBarTop)).toBe(true)
 })
 
 test('preserves state properties in view model', () => {

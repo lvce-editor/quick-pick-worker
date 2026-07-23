@@ -23,7 +23,8 @@ const getIconName = (language: Language): string => {
   if (!extension) {
     return ''
   }
-  return `file${extension.startsWith('.') ? extension : `.${extension}`}`
+  const normalizedExtension = extension.startsWith('.') ? extension : `.${extension}`
+  return `file${normalizedExtension}`
 }
 
 const toProtoVisibleItem = (language: Language): ProtoVisibleItem => {

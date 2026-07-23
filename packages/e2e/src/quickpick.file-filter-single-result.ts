@@ -7,8 +7,10 @@ export const skip = 1
 export const test: Test = async ({ expect, FileSystem, Locator, QuickPick, Workspace }) => {
   // arrange
   const tmpDir = await FileSystem.getTmpDir()
-  await FileSystem.writeFile(`${tmpDir}/alpha.txt`, 'alpha')
-  await FileSystem.writeFile(`${tmpDir}/beta.txt`, 'beta')
+  await FileSystem.setFiles([
+    { content: 'alpha', uri: `${tmpDir}/alpha.txt` },
+    { content: 'beta', uri: `${tmpDir}/beta.txt` },
+  ])
   await Workspace.setPath(tmpDir)
   await QuickPick.open()
 

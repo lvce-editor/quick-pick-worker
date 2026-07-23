@@ -1,9 +1,11 @@
 import { state } from '../QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 
-let id = 0
+const idState = {
+  value: 0,
+}
 
 export const add = (items: readonly unknown[]): number => {
-  const nextId = ++id
+  const nextId = ++idState.value
   state.items[nextId] = items
   return nextId
 }
