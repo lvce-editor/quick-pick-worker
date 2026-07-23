@@ -100,7 +100,7 @@ test('diff2 returns RenderItems when items differ', () => {
   expect(result).toContain(DiffType.RenderIncremental)
 })
 
-test('diff2 returns Height when items length differs', () => {
+test('diff2 returns RenderCss when items length differs', () => {
   const uid = 6
   const oldState = createState({
     items: [createItem('item1')],
@@ -110,7 +110,20 @@ test('diff2 returns Height when items length differs', () => {
   })
   QuickPickStates.set(uid, oldState, newState)
   const result = Diff2.diff2(uid)
-  expect(result).toContain(DiffType.Height)
+  expect(result).toContain(DiffType.RenderCss)
+})
+
+test('diff2 returns RenderCss when deltaY differs', () => {
+  const uid = 8
+  const oldState = createState({
+    deltaY: 0,
+  })
+  const newState = createState({
+    deltaY: 5,
+  })
+  QuickPickStates.set(uid, oldState, newState)
+  const result = Diff2.diff2(uid)
+  expect(result).toContain(DiffType.RenderCss)
 })
 
 test('diff2 returns multiple diff types when multiple properties differ', () => {
