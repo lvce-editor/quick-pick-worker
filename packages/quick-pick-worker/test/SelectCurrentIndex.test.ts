@@ -53,9 +53,9 @@ test('selectCurrentIndex accepts input when custom quick pick has no items', asy
   ])
 })
 
-test('selectCurrentIndex closes the command palette before executing an extension command', async () => {
+test('selectCurrentIndex closes the command palette without awaiting the extension command', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'ExtensionHost.executeCommand': () => {},
+    'ExtensionHost.executeCommand': () => new Promise(() => {}),
     'Viewlet.closeWidget': () => {},
   })
 
