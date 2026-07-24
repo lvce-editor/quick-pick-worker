@@ -40,20 +40,19 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   if (!pick) {
     return state
   }
-  const closed = shouldCloseBeforeSelect(subId, pick)
-  if (closed) {
-    await CloseWidget.closeWidget(state.uid)
-  }
   const fn = QuickPickEntries.getSelect(subId)
+  if (shouldCloseBeforeSelect(subId, pick)) {
+    await CloseWidget.closeWidget(state.uid)
+    void fn(pick, value)
+    return state
+  }
   const selectPickResult = await fn(pick, value)
   Assert.object(selectPickResult)
   Assert.string(selectPickResult.command)
   const { command } = selectPickResult
   switch (command) {
     case QuickPickReturnValue.Hide:
-      if (!closed) {
-        await CloseWidget.closeWidget(state.uid)
-      }
+      await CloseWidget.closeWidget(state.uid)
       return state
     case QuickPickReturnValue.OpenLanguageMode:
       return LoadContent.loadContent({
