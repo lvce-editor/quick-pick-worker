@@ -36,7 +36,7 @@ test('selectCurrentIndex accepts input when custom quick pick has no items', asy
   customQuickPickState.args = ['arg1', 'arg2', 'resolve-id', { acceptInput: true, mode: 'quickPick' }]
   const state: QuickPickState = {
     ...CreateDefaultState.createDefaultState(),
-    focusedIndex: 0,
+    focusedIndex: -1,
     items: [],
     minLineY: 0,
     providerId: QuickPickEntryId.Custom,
@@ -50,6 +50,43 @@ test('selectCurrentIndex accepts input when custom quick pick has no items', asy
   expect(mockRpc.invocations).toEqual([
     ['QuickPick.executeCallback', 'resolve-id', 'feature/new-branch'],
     ['Viewlet.closeWidget', 123],
+  ])
+})
+
+test('selectCurrentIndex closes the command palette before executing an extension command', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.executeCommand': () => {},
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const items: ProtoVisibleItem[] = [
+    {
+      description: '',
+      direntType: 1,
+      fileIcon: '',
+      icon: '',
+      id: 'ext.test-extension-command',
+      label: 'Test Extension Command',
+      matches: [],
+      uri: '',
+    } as CommandItem,
+  ]
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    focusedIndex: 0,
+    items,
+    minLineY: 0,
+    providerId: QuickPickEntryId.Commands,
+    uid: 123,
+    value: '>',
+  }
+
+  const result = await selectCurrentIndex(state)
+
+  expect(result).toBe(state)
+  expect(mockRpc.invocations).toEqual([
+    ['Viewlet.closeWidget', 123],
+    ['ExtensionHost.executeCommand', 'test-extension-command'],
   ])
 })
 

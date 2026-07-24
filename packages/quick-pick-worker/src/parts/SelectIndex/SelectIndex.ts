@@ -23,6 +23,14 @@ const createCustomPick = (value: string): ProtoVisibleItem => {
   }
 }
 
+const shouldCloseBeforeSelect = (subId: number, pick: ProtoVisibleItem): boolean => {
+  if (subId !== QuickPickEntryId.Commands) {
+    return false
+  }
+  const { id } = pick as ProtoVisibleItem & { readonly id?: unknown }
+  return typeof id === 'string' && id.startsWith('ext.')
+}
+
 export const selectIndex = async (state: QuickPickState, index: number, button = /* left */ 0): Promise<QuickPickState> => {
   const { items, minLineY, providerId, value } = state
   const actualIndex = index + minLineY
@@ -32,6 +40,10 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   if (!pick) {
     return state
   }
+  const closed = shouldCloseBeforeSelect(subId, pick)
+  if (closed) {
+    await CloseWidget.closeWidget(state.uid)
+  }
   const fn = QuickPickEntries.getSelect(subId)
   const selectPickResult = await fn(pick, value)
   Assert.object(selectPickResult)
@@ -39,7 +51,9 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   const { command } = selectPickResult
   switch (command) {
     case QuickPickReturnValue.Hide:
-      await CloseWidget.closeWidget(state.uid)
+      if (!closed) {
+        await CloseWidget.closeWidget(state.uid)
+      }
       return state
     case QuickPickReturnValue.OpenLanguageMode:
       return LoadContent.loadContent({
