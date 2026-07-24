@@ -62,6 +62,29 @@ test('selectPick returns quick pick item value in quickPick mode', async () => {
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })
 
+test('selectPick returns typed value when quickPick accepts input', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'QuickPick.executeCallback': () => {},
+  })
+
+  state.args = ['arg1', 'arg2', 'accept-input-resolve-id', { acceptInput: true, mode: 'quickPick' }] as readonly unknown[]
+
+  const pick: ProtoVisibleItem = {
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    label: 'feature/new-branch',
+    matches: [],
+    uri: '',
+  }
+
+  const result = await selectPick(pick, 'feature/new-branch')
+
+  expect(mockRpc.invocations).toEqual([['QuickPick.executeCallback', 'accept-input-resolve-id', 'feature/new-branch']])
+  expect(result.command).toBe(QuickPickReturnValue.Hide)
+})
+
 test('selectPick resolves worker-owned quick pick callback locally', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'QuickPick.executeCallback': () => {

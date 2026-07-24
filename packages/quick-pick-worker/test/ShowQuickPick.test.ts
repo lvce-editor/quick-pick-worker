@@ -32,6 +32,7 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
       [],
       1,
       expect.objectContaining({
+        acceptInput: false,
         callbackOwner: 'quickPickWorker',
         customItemsId: expect.any(Number),
         mode: 'quickPick',
@@ -61,10 +62,41 @@ test('showQuickPick returns undefined when canceled', async () => {
       [],
       2,
       expect.objectContaining({
+        acceptInput: false,
         callbackOwner: 'quickPickWorker',
         customItemsId: expect.any(Number),
         mode: 'quickPick',
         placeholder: '',
+      }),
+    ],
+  ])
+})
+
+test('showQuickPick allows accepting custom input', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.openWidget': (...args: readonly unknown[]) => {
+      QuickPickCallbacks.executeCallback(args[3] as number, 'feature/new-branch')
+    },
+  })
+
+  const result = await ShowQuickPick.showQuickPick({
+    acceptInput: true,
+    items: [],
+  })
+
+  expect(result).toBe('feature/new-branch')
+  expect(mockRpc.invocations).toEqual([
+    [
+      'Viewlet.openWidget',
+      'QuickPick',
+      'custom',
+      [],
+      3,
+      expect.objectContaining({
+        acceptInput: true,
+        callbackOwner: 'quickPickWorker',
+        customItemsId: expect.any(Number),
+        mode: 'quickPick',
       }),
     ],
   ])
@@ -87,8 +119,9 @@ test('showQuickPick can wait only until visible', async () => {
       'QuickPick',
       'custom',
       [],
-      3,
+      4,
       expect.objectContaining({
+        acceptInput: false,
         callbackOwner: 'quickPickWorker',
         customItemsId: expect.any(Number),
         mode: 'quickPick',

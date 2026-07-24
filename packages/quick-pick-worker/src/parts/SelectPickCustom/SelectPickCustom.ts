@@ -17,13 +17,15 @@ export const selectPick = async (_pick: ProtoVisibleItem, value: string): Promis
   const { args } = state
   const options = getOptions(args)
   const resolveId = args[2]
-  const result =
-    options.mode === 'quickPick'
-      ? _pick.value
-      : {
-          canceled: false,
-          inputValue: value,
-        }
+  let result
+  if (options.mode === 'quickPick') {
+    result = options.acceptInput && _pick.value === undefined ? value : _pick.value
+  } else {
+    result = {
+      canceled: false,
+      inputValue: value,
+    }
+  }
   if (options.callbackOwner === 'quickPickWorker') {
     if (typeof resolveId !== 'number') {
       throw new TypeError('expected resolve id to be a number')
