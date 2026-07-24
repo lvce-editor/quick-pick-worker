@@ -19,7 +19,9 @@ export const selectPick = async (_pick: ProtoVisibleItem, value: string): Promis
   const resolveId = args[2]
   const result =
     options.mode === 'quickPick'
-      ? _pick.value
+      ? options.acceptInput && _pick.value === undefined
+        ? value
+        : _pick.value
       : {
           canceled: false,
           inputValue: value,
