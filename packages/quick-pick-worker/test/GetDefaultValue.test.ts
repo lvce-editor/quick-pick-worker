@@ -11,6 +11,10 @@ test('returns # for quickPick://workspace-symbol', () => {
   expect(GetDefaultValue.getDefaultValue(QuickPickEntryId.EveryThing, QuickPickEntryUri.WorkspaceSymbol)).toBe('#')
 })
 
+test('returns : for quickPick://go-to-line', () => {
+  expect(GetDefaultValue.getDefaultValue(QuickPickEntryId.EveryThing, QuickPickEntryUri.GoToLine)).toBe(':')
+})
+
 test('returns empty string for unknown uri', () => {
   expect(GetDefaultValue.getDefaultValue(999)).toBe('')
 })
