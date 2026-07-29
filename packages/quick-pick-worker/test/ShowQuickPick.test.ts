@@ -7,6 +7,7 @@ test('showQuickPick opens custom quick pick and returns selected value', async (
   const items = [
     {
       description: 'Local branch',
+      icon: 'SourceControl',
       label: 'branch 1',
       value: 'branch-1',
     },

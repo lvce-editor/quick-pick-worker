@@ -3,7 +3,7 @@ import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/Extension
 import * as GetPicksCustom from '../src/parts/GetPicksCustom/GetPicksCustom.ts'
 
 test('getPicks returns custom items from args', async () => {
-  const customItems = [{ label: 'Custom Item 1' }, { label: 'Custom Item 2' }, { label: 'Custom Item 3' }]
+  const customItems = [{ icon: 'Cloud', label: 'Custom Item 1' }, { label: 'Custom Item 2' }, { label: 'Custom Item 3' }]
   const args: readonly unknown[] = ['search', customItems]
 
   const result = await GetPicksCustom.getPicks('search', args)
@@ -13,7 +13,7 @@ test('getPicks returns custom items from args', async () => {
     description: '',
     direntType: 0,
     fileIcon: '',
-    icon: '',
+    icon: 'Cloud',
     label: 'Custom Item 1',
     matches: [],
     uri: '',

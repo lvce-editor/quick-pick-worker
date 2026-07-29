@@ -5,6 +5,7 @@ import * as ViewletModuleId from '../ViewletModuleId/ViewletModuleId.ts'
 
 export interface QuickPickItem {
   readonly description: string
+  readonly icon?: string
   readonly label: string
   readonly value: unknown
 }
