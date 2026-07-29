@@ -1,3 +1,4 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
@@ -53,6 +54,9 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   switch (command) {
     case QuickPickReturnValue.Hide:
       await CloseWidget.closeWidget(state.uid)
+      if (selectPickResult.itemCommand) {
+        await RendererWorker.invoke(selectPickResult.itemCommand, ...(selectPickResult.itemCommandArgs || []))
+      }
       return state
     case QuickPickReturnValue.OpenLanguageMode:
       return LoadContent.loadContent({

@@ -3,13 +3,19 @@ import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/Extension
 import * as GetPicksCustom from '../src/parts/GetPicksCustom/GetPicksCustom.ts'
 
 test('getPicks returns custom items from args', async () => {
-  const customItems = [{ icon: 'Cloud', label: 'Custom Item 1' }, { label: 'Custom Item 2' }, { label: 'Custom Item 3' }]
+  const customItems = [
+    { args: ['Search'], command: 'Layout.openSideBarViewlet', icon: 'Cloud', label: 'Custom Item 1' },
+    { label: 'Custom Item 2' },
+    { label: 'Custom Item 3' },
+  ]
   const args: readonly unknown[] = ['search', customItems]
 
   const result = await GetPicksCustom.getPicks('search', args)
 
   expect(result).toHaveLength(3)
   expect(result[0]).toEqual({
+    args: ['Search'],
+    command: 'Layout.openSideBarViewlet',
     description: '',
     direntType: 0,
     fileIcon: '',
@@ -69,6 +75,8 @@ test('getPicks renders quick input items from extension host', async () => {
 
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
+    args: undefined,
+    command: undefined,
     description: '',
     direntType: 0,
     fileIcon: '',
