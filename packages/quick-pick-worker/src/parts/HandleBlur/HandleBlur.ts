@@ -21,8 +21,11 @@ const getCancelResult = (args: readonly unknown[]): unknown => {
 export const handleBlur = async (state: QuickPickState): Promise<QuickPickState> => {
   const { args, providerId } = state
   if (providerId === QuickPickEntryId.Custom) {
-    const resolveId = args[2]
-    await RendererWorker.invoke('QuickPick.executeCallback', resolveId, getCancelResult(args))
+    const options = args.at(-1) as any
+    if (!options?.executeItemCommand) {
+      const resolveId = args[2]
+      await RendererWorker.invoke('QuickPick.executeCallback', resolveId, getCancelResult(args))
+    }
   }
   await CloseWidget.closeWidget(state.uid)
   return state

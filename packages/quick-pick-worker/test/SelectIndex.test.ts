@@ -13,6 +13,7 @@ afterEach(() => {
 import type { ProtoVisibleItem } from '../src/parts/ProtoVisibleItem/ProtoVisibleItem.ts'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import { state as customQuickPickState } from '../src/parts/QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import { selectIndex } from '../src/parts/SelectIndex/SelectIndex.ts'
 
@@ -192,4 +193,42 @@ test('selectIndex calculates actualIndex correctly with minLineY', async () => {
   expect(closeWidgetCalled).toBe(true)
   expect(result).toBe(state)
   expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+})
+
+test('selectIndex closes a custom quick pick before executing its item command', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Layout.openSideBarViewlet': () => {},
+    'Viewlet.closeWidget': () => {},
+  })
+
+  customQuickPickState.args = ['custom', [], undefined, { executeItemCommand: true, mode: 'quickPick' }]
+  const items: ProtoVisibleItem[] = [
+    {
+      args: ['Search'],
+      command: 'Layout.openSideBarViewlet',
+      description: '',
+      direntType: 0,
+      fileIcon: '',
+      icon: '',
+      label: 'Search for Text',
+      matches: [],
+      uri: '',
+    },
+  ]
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    items,
+    minLineY: 0,
+    providerId: QuickPickEntryId.Custom,
+    uid: 123,
+    value: '',
+  }
+
+  const result = await selectIndex(state, 0)
+
+  expect(result).toBe(state)
+  expect(mockRpc.invocations).toEqual([
+    ['Viewlet.closeWidget', 123],
+    ['Layout.openSideBarViewlet', 'Search'],
+  ])
 })
