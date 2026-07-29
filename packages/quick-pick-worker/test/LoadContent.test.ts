@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
@@ -496,6 +496,32 @@ test('loadContent initializes workspace symbols with #', async () => {
 
   expect(result.value).toBe('#')
   expect(result.cursorOffset).toBe(1)
+})
+
+test('loadContent initializes go to line with :', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': () => ['line 1', 'line 2'],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.GoToLine,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe(':')
+  expect(result.cursorOffset).toBe(1)
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      label: 'Type a line number to go to (from 1 to 2)',
+    }),
+  ])
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
 })
 
 test('loadContent commits state before notifying that the quick pick is visible', async () => {

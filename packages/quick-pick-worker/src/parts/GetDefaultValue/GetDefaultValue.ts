@@ -3,6 +3,9 @@ import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickPrefix from '../QuickPickPrefix/QuickPickPrefix.ts'
 
 export const getDefaultValue = (id: number, uri = ''): string => {
+  if (uri === QuickPickEntryUri.GoToLine) {
+    return QuickPickPrefix.GoToLine
+  }
   if (uri === QuickPickEntryUri.WorkspaceSymbol) {
     return QuickPickPrefix.WorkspaceSymbol
   }
