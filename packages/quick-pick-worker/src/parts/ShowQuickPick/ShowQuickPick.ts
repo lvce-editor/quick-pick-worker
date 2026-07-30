@@ -3,7 +3,7 @@ import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickIt
 import * as QuickPickCallbacks from '../QuickPickCallbacks/QuickPickCallbacks.ts'
 import * as ViewletModuleId from '../ViewletModuleId/ViewletModuleId.ts'
 
-export interface QuickPickItem {
+interface QuickPickItem {
   readonly description: string
   readonly icon?: string
   readonly label: string

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "project": ["*.js"]
+    },
+    "packages/build": {
+      "project": ["src/**/*.js", "src/**/*.ts"],
+      "ignoreDependencies": ["@lvce-editor/verror", "esbuild"]
+    },
+    "packages/e2e": {
+      "entry": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js"],
+      "project": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js"]
+    },
+    "packages/quick-pick-worker": {
+      "entry": ["src/quickPickWorkerMain.ts", "test/**/*.test.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "packages/server": {
+      "project": ["src/**/*.js"]
+    }
+  }
+}
