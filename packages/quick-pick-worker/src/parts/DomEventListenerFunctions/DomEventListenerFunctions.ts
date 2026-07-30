@@ -1,6 +1,5 @@
 export const HandleWheel = 'handleWheel'
 export const HandlePointerDown = 'handlePointerDown'
-export const HandleBeforeInput = 'handleBeforeInput'
 export const HandleBlur = 'handleBlur'
 export const HandleFocus = 'handleFocus'
 export const HandleInput = 'handleInput'
