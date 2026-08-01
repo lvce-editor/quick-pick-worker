@@ -1,11 +1,11 @@
-import config from '@lvce-editor/eslint-config'
-import actions from '@lvce-editor/eslint-plugin-github-actions'
+import { defineConfig } from 'eslint/config'
+import config, { recommendedActions } from '@lvce-editor/eslint-config'
 import recommendedVirtualDom from '@lvce-editor/eslint-plugin-virtual-dom'
 
-export default [
+export default defineConfig([
   ...config,
   ...recommendedVirtualDom,
-  ...actions,
+  ...recommendedActions,
   {
     ignores: ['packages/quick-pick-worker/test/GetJson.test.ts'],
   },
@@ -41,4 +41,4 @@ export default [
       'virtual-dom/prefer-merge-class-names': 'off',
     },
   },
-]
+])
