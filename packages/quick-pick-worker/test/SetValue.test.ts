@@ -2,6 +2,7 @@ import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/ExtensionHostWorker.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
@@ -19,6 +20,43 @@ test('returns same state when value is unchanged', async () => {
 
   expect(result).toBe(state)
   expect(mockRpc.invocations).toEqual([])
+})
+
+test('updates quick input value without requesting picks', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({})
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [{ mode: 'quickInput' }],
+    picks: [],
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'user@example.com')
+
+  expect(result.value).toBe('user@example.com')
+  expect(result.picks).toBe(state.picks)
+  expect(result.items).toEqual([])
+  expect(mockRpc.invocations).toEqual([])
+})
+
+test('requests picks for a dynamic quick input', async () => {
+  using extensionHostRpc = ExtensionHostWorker.registerMockRpc({
+    'ExtensionHostQuickPick.renderQuickInput': () => [],
+  })
+  using rendererRpc = RendererWorker.registerMockRpc({})
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [{ mode: 'quickInput', quickInputId: 42 }],
+    picks: [],
+    providerId: QuickPickEntryId.Custom,
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'search')
+
+  expect(result.value).toBe('search')
+  expect(extensionHostRpc.invocations).toEqual([['ExtensionHostQuickPick.renderQuickInput', 42, 'search']])
+  expect(rendererRpc.invocations).toEqual([])
 })
 
 test('updates value and processes picks', async () => {

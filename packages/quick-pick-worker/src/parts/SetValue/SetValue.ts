@@ -23,6 +23,11 @@ const isQuickInput = (args: readonly unknown[]): boolean => {
   return options?.mode === 'quickInput'
 }
 
+const isStaticQuickInput = (args: readonly unknown[]): boolean => {
+  const options = args.at(-1) as any
+  return options?.mode === 'quickInput' && options.quickInputId === undefined
+}
+
 // TODO when user types letters -> no need to query provider again -> just filter existing results
 export const setValue = async (state: QuickPickState, newValue: string): Promise<QuickPickState> => {
   const { args, assetDir, fileIconCache, height, itemHeight, maxLineY, minLineY, platform, providerId, value } = state
@@ -31,8 +36,12 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   }
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
-  const newPicks = subId === QuickPickEntryId.LanguageMode ? state.picks : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
-  const filterValue = isQuickInput(args) ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
+  const quickInput = isQuickInput(args)
+  const newPicks =
+    isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode
+      ? state.picks
+      : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
+  const filterValue = quickInput ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
   const focusedIndex = items.length === 0 ? -1 : 0
   const sliced = items.slice(minLineY, maxLineY)
