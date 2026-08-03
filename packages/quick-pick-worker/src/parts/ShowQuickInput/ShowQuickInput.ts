@@ -8,6 +8,7 @@ export const showQuickInput = async ({
   ignoreFocusOut,
   initialItems = [],
   initialValue,
+  placeholder,
   waitUntil,
 }: QuickInputOptions): Promise<QuickInputResult> => {
   const customItemsId = CustomQuickPickItems.add(initialItems)
@@ -18,6 +19,7 @@ export const showQuickInput = async ({
       ignoreFocusOut,
       initialValue,
       mode: 'quickInput',
+      placeholder,
       quickInputId: id,
       waitUntil,
     })) as QuickInputResult | undefined
