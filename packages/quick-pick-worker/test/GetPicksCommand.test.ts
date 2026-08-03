@@ -23,7 +23,7 @@ test('getPicks returns builtin picks', async () => {
   const result = await GetPicksCommand.getPicks('', ['', 0])
   consoleErrorSpy.mockRestore()
 
-  expect(result).toHaveLength(2)
+  expect(result).toHaveLength(3)
   expect(result[0]).toEqual({
     args: undefined,
     description: '',
@@ -37,6 +37,10 @@ test('getPicks returns builtin picks', async () => {
   })
   expect((result[1] as CommandItem).id).toBe('command2')
   expect(result[1].label).toBe('Command 2')
+  expect(result[2]).toMatchObject({
+    id: 'QuickPick.changeLanguageMode',
+    label: 'Change Language Mode',
+  })
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
 
@@ -52,8 +56,8 @@ test('getPicks returns extension picks with ext prefix', async () => {
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
 
-  expect(result).toHaveLength(2)
-  expect(result[0]).toEqual({
+  expect(result).toHaveLength(3)
+  expect(result[1]).toEqual({
     args: undefined,
     description: '',
     direntType: 0,
@@ -64,8 +68,8 @@ test('getPicks returns extension picks with ext prefix', async () => {
     matches: [],
     uri: '',
   })
-  expect((result[1] as CommandItem).id).toBe('ext.ext.command2')
-  expect((result[1] as CommandItem).args).toEqual(['arg1'])
+  expect((result[2] as CommandItem).id).toBe('ext.ext.command2')
+  expect((result[2] as CommandItem).args).toEqual(['arg1'])
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
 
@@ -79,26 +83,28 @@ test('getPicks combines builtin and extension picks', async () => {
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
 
-  expect(result).toHaveLength(2)
+  expect(result).toHaveLength(3)
   expect((result[0] as CommandItem).id).toBe('builtin1')
-  expect((result[1] as CommandItem).id).toBe('ext.ext1')
+  expect((result[2] as CommandItem).id).toBe('ext.ext1')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
 
-test('getPicks handles missing label in extension picks', async () => {
+test('getPicks prints one warning for missing labels in extension picks', async () => {
   const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-  const extensionPicks = [{ id: 'command1' }]
+  const extensionPicks = [{ id: 'git.openFile' }, { id: 'git.stage' }, { id: 'git.unstage' }]
   using mockRpc = RendererWorker.registerMockRpc({
     'ExtensionHost.getCommands': () => extensionPicks,
     'Layout.getAllQuickPickMenuEntries': () => [],
   })
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
-  consoleWarnSpy.mockRestore()
 
-  expect(result).toHaveLength(1)
-  expect(result[0].label).toBe('command1')
+  expect(result).toHaveLength(4)
+  expect(result[1].label).toBe('git.openFile')
+  expect(consoleWarnSpy).toHaveBeenCalledTimes(1)
+  expect(consoleWarnSpy).toHaveBeenCalledWith('[QuickPick] command git.openFile and 2 other commands have missing label')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  consoleWarnSpy.mockRestore()
 })
 
 test('getPicks handles missing id in extension picks', async () => {
@@ -110,12 +116,14 @@ test('getPicks handles missing id in extension picks', async () => {
   })
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
-  consoleWarnSpy.mockRestore()
 
-  expect(result).toHaveLength(1)
-  expect((result[0] as CommandItem).id).toBe('ext.undefined')
-  expect(result[0].label).toBe('Command without id')
+  expect(result).toHaveLength(2)
+  expect((result[1] as CommandItem).id).toBe('ext.undefined')
+  expect(result[1].label).toBe('Command without id')
+  expect(consoleWarnSpy).toHaveBeenCalledTimes(1)
+  expect(consoleWarnSpy).toHaveBeenCalledWith('[QuickPick] command Command without id has missing id')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  consoleWarnSpy.mockRestore()
 })
 
 test('getPicks handles extension picks error', async () => {
@@ -131,7 +139,7 @@ test('getPicks handles extension picks error', async () => {
   const result = await GetPicksCommand.getPicks('', ['', 0])
   consoleErrorSpy.mockRestore()
 
-  expect(result).toHaveLength(1)
+  expect(result).toHaveLength(2)
   expect((result[0] as CommandItem).id).toBe('builtin1')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
@@ -145,7 +153,7 @@ test('getPicks handles null extension picks', async () => {
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
 
-  expect(result).toHaveLength(1)
+  expect(result).toHaveLength(2)
   expect((result[0] as CommandItem).id).toBe('builtin1')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
@@ -162,7 +170,7 @@ test('getPicks uses MenuEntriesState when Layout.getAllQuickPickMenuEntries fail
 
   const result = await GetPicksCommand.getPicks('', ['', 0])
 
-  expect(result).toHaveLength(1)
+  expect(result).toHaveLength(2)
   expect((result[0] as CommandItem).id).toBe('state1')
   expect(result[0].label).toBe('State 1')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])

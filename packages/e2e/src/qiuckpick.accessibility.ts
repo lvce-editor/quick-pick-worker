@@ -26,16 +26,18 @@ export const test = async ({ expect, Locator, QuickPick }): Promise<void> => {
   // assert
   const quickPickInput = Locator('#QuickPick .InputBox')
   const quickPickItems = Locator('.QuickPickItem')
+  const firstQuickPickItem = quickPickItems.nth(0)
+  const secondQuickPickItem = quickPickItems.nth(1)
   await expect(quickPickInput).toHaveAttribute('role', 'combobox')
   await expect(quickPickInput).toHaveAttribute('aria-activedescendant', 'QuickPickItemActive')
-  await expect(quickPickItems.nth(0)).toHaveAttribute('id', 'QuickPickItemActive')
+  await expect(firstQuickPickItem).toHaveAttribute('id', 'QuickPickItemActive')
 
   // act
   await QuickPick.focusNext()
 
   // assert
   // TODO add toHaveId method to test framework
-  await expect(quickPickItems.nth(1)).toHaveAttribute('id', 'QuickPickItemActive')
+  await expect(secondQuickPickItem).toHaveAttribute('id', 'QuickPickItemActive')
   await expect(quickPickInput).toHaveAttribute('aria-activedescendant', 'QuickPickItemActive')
 
   // act

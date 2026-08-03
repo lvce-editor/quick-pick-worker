@@ -3,7 +3,7 @@ import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 
 export const toDirent = (pick: ProtoVisibleItem): Dirent => {
   const dirent: Dirent = {
-    name: pick.label,
+    name: pick.iconName || pick.label,
     path: pick.uri,
     type: pick.direntType,
   }

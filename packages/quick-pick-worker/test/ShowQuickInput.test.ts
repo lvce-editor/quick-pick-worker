@@ -14,6 +14,7 @@ test('showQuickInput opens custom quick input with render id', async () => {
     id: 123,
     ignoreFocusOut: false,
     initialValue: 'test',
+    placeholder: 'Enter a value',
   })
 
   expect(result).toEqual({
@@ -29,6 +30,7 @@ test('showQuickInput opens custom quick input with render id', async () => {
         ignoreFocusOut: false,
         initialValue: 'test',
         mode: 'quickInput',
+        placeholder: 'Enter a value',
         quickInputId: 123,
         waitUntil: undefined,
       },

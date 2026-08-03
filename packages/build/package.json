@@ -19,6 +19,7 @@
     "@types/node": "^24.1.0",
     "esbuild": "^0.28.0",
     "execa": "^9.6.1",
+    "playwright": "^1.61.1",
     "rollup": "^4.46.2"
   }
 }

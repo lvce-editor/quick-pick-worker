@@ -7,6 +7,7 @@ import * as GetPicksFile from '../GetPicksFile/GetPicksFile.ts'
 import * as GetPicksGoToColumn from '../GetPicksGoToColumn/GetPicksGoToColumn.ts'
 import * as GetPicksGoToLine from '../GetPicksGoToLine/GetPicksGoToLine.ts'
 import * as GetPicksHelp from '../GetPicksHelp/GetPicksHelp.ts'
+import * as GetPicksLanguageMode from '../GetPicksLanguageMode/GetPicksLanguageMode.ts'
 import * as GetPicksOpenRecent from '../GetPicksOpenRecent/GetPicksOpenRecent.ts'
 import * as GetPicksSymbol from '../GetPicksSymbol/GetPicksSymbol.ts'
 import * as GetPicksView from '../GetPicksView/GetPicksView.ts'
@@ -18,6 +19,7 @@ import * as SelectPickFile from '../SelectPickFile/SelectPickFile.ts'
 import * as SelectPickGoToColumn from '../SelectPickGoToColumn/SelectPickGoToColumn.ts'
 import * as SelectPickGoToLine from '../SelectPickGoToLine/SelectPickGoToLine.ts'
 import * as SelectPickHelp from '../SelectPickHelp/SelectPickHelp.ts'
+import * as SelectPickLanguageMode from '../SelectPickLanguageMode/SelectPickLanguageMode.ts'
 import * as SelectPickRecent from '../SelectPickRecent/SelectPickRecent.ts'
 import * as SelectPickSymbol from '../SelectPickSymbol/SelectPickSymbol.ts'
 import * as SelectPickView from '../SelectPickView/SelectPickView.ts'
@@ -35,6 +37,7 @@ export const selectPicks: readonly SelectPick[] = [
   SelectPickSymbol.selectPick,
   SelectPickView.selectPick,
   SelectPickWorkspaceSymbol.selectPick,
+  SelectPickLanguageMode.selectPick,
 ]
 
 export const getPicks: readonly IGetPicks[] = [
@@ -49,4 +52,5 @@ export const getPicks: readonly IGetPicks[] = [
   GetPicksSymbol.getPicks,
   GetPicksView.getPicks,
   GetPicksWorkspaceSymbol.getPicks,
+  GetPicksLanguageMode.getPicks,
 ]

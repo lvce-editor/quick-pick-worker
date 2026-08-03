@@ -18,7 +18,6 @@ test('getQuickPickVirtualDom with empty items', () => {
       className: 'InputBox',
       inputType: 'text',
       name: 'QuickPickInput',
-      onBeforeInput: 'handleBeforeInput',
       onBlur: 'handleBlur',
       onFocus: 'handleFocus',
       onInput: 'handleInput',

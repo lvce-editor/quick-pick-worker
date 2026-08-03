@@ -7,7 +7,8 @@ export const waitUntilVisible = (): Promise<void> => {
 }
 
 export const notifyVisible = (): void => {
-  const pendingCallbacks = callbacks.splice(0)
+  const pendingCallbacks = [...callbacks]
+  callbacks.length = 0
   for (const callback of pendingCallbacks) {
     callback()
   }

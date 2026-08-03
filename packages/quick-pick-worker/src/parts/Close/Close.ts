@@ -22,16 +22,18 @@ const getCancelResult = (args: readonly unknown[]): unknown => {
 export const close = async (state: QuickPickState): Promise<QuickPickState> => {
   const { args, providerId } = state
   if (providerId === QuickPickEntryId.Custom) {
-    const resolveId = args[2]
     const options = args.at(-1) as any
-    const result = getCancelResult(args)
-    if (options?.callbackOwner === 'quickPickWorker') {
-      if (typeof resolveId !== 'number') {
-        throw new TypeError('expected resolve id to be a number')
+    if (!options?.executeItemCommand) {
+      const resolveId = args[2]
+      const result = getCancelResult(args)
+      if (options?.callbackOwner === 'quickPickWorker') {
+        if (typeof resolveId !== 'number') {
+          throw new TypeError('expected resolve id to be a number')
+        }
+        QuickPickCallbacks.executeCallback(resolveId, result)
+      } else {
+        await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)
       }
-      QuickPickCallbacks.executeCallback(resolveId, result)
-    } else {
-      await RendererWorker.invoke('QuickPick.executeCallback', resolveId, result)
     }
   }
   await CloseWidget.closeWidget(state.uid)

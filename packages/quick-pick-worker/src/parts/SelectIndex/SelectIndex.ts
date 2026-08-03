@@ -1,3 +1,4 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
@@ -5,8 +6,10 @@ import * as CloseWidget from '../CloseWidget/CloseWidget.ts'
 import * as GetPick from '../GetPick/GetPick.ts'
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
+import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as QuickPickEntries from '../QuickPickEntries/QuickPickEntries.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
+import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
 const createCustomPick = (value: string): ProtoVisibleItem => {
@@ -21,6 +24,14 @@ const createCustomPick = (value: string): ProtoVisibleItem => {
   }
 }
 
+const shouldCloseBeforeSelect = (subId: number, pick: ProtoVisibleItem): boolean => {
+  if (subId !== QuickPickEntryId.Commands) {
+    return false
+  }
+  const { id } = pick as ProtoVisibleItem & { readonly id?: unknown }
+  return typeof id === 'string' && id.startsWith('ext.')
+}
+
 export const selectIndex = async (state: QuickPickState, index: number, button = /* left */ 0): Promise<QuickPickState> => {
   const { items, minLineY, providerId, value } = state
   const actualIndex = index + minLineY
@@ -31,6 +42,11 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
     return state
   }
   const fn = QuickPickEntries.getSelect(subId)
+  if (shouldCloseBeforeSelect(subId, pick)) {
+    await CloseWidget.closeWidget(state.uid)
+    void fn(pick, value)
+    return state
+  }
   const selectPickResult = await fn(pick, value)
   Assert.object(selectPickResult)
   Assert.string(selectPickResult.command)
@@ -38,7 +54,17 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   switch (command) {
     case QuickPickReturnValue.Hide:
       await CloseWidget.closeWidget(state.uid)
+      if (selectPickResult.itemCommand) {
+        await RendererWorker.invoke(selectPickResult.itemCommand, ...(selectPickResult.itemCommandArgs || []))
+      }
       return state
+    case QuickPickReturnValue.OpenLanguageMode:
+      return LoadContent.loadContent({
+        ...state,
+        args: [],
+        uri: QuickPickEntryUri.LanguageMode,
+        value: '',
+      })
     default:
       return state
   }

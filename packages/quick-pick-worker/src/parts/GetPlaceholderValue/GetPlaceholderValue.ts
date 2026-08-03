@@ -7,6 +7,8 @@ export const getPlaceholderValue = (providerId: number): string => {
       return QuickPickStrings.selectColorTheme()
     case QuickPickEntryId.Commands:
       return QuickPickStrings.typeNameofCommandToRun()
+    case QuickPickEntryId.LanguageMode:
+      return QuickPickStrings.selectLanguageMode()
     case QuickPickEntryId.Recent:
       return QuickPickStrings.selectToOpen()
     case QuickPickEntryId.View:

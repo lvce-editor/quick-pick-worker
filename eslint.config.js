@@ -1,9 +1,11 @@
-import config from '@lvce-editor/eslint-config'
-import actions from '@lvce-editor/eslint-plugin-github-actions'
+import { defineConfig } from 'eslint/config'
+import config, { recommendedActions } from '@lvce-editor/eslint-config'
+import recommendedVirtualDom from '@lvce-editor/eslint-plugin-virtual-dom'
 
-export default [
+export default defineConfig([
   ...config,
-  ...actions,
+  ...recommendedVirtualDom,
+  ...recommendedActions,
   {
     ignores: ['packages/quick-pick-worker/test/GetJson.test.ts'],
   },
@@ -22,4 +24,21 @@ export default [
       '@typescript-eslint/only-throw-error': 'off',
     },
   },
-]
+  {
+    files: [
+      'packages/quick-pick-worker/src/parts/GetQuickPickItemVirtualDom/GetQuickPickItemVirtualDom.ts',
+      'packages/quick-pick-worker/src/parts/GetQuickPickNoResultsVirtualDom/GetQuickPickNoResultsVirtualDom.ts',
+    ],
+    rules: {
+      'virtual-dom/valid-child-count': 'off',
+    },
+  },
+  {
+    files: ['packages/quick-pick-worker/test/**/*.ts'],
+    rules: {
+      'virtual-dom/no-inline-event-handlers': 'off',
+      'virtual-dom/prefer-constants': 'off',
+      'virtual-dom/prefer-merge-class-names': 'off',
+    },
+  },
+])
