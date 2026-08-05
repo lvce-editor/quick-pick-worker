@@ -10,6 +10,6 @@ export const getQuickPickHeaderVirtualDom = (placeholder = ''): readonly Virtual
       className: ClassNames.QuickPickHeader,
       type: VirtualDomElements.Div,
     },
-    GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom(placeholder),
+    ...GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom(placeholder),
   ]
 }

@@ -8,6 +8,7 @@ test('getQuickPickVirtualDom with empty items', () => {
   expect(result).toEqual([
     { ariaLabel: 'Quick open', childCount: 2, className: 'Viewlet QuickPick', id: 'QuickPick', type: 4 },
     { childCount: 1, className: 'QuickPickHeader', type: 4 },
+    { childCount: 1, className: 'QuickPickInputWrapper', type: 4 },
     {
       ariaAutoComplete: 'list',
       ariaExpanded: true,
