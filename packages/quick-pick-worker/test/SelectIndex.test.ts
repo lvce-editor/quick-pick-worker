@@ -15,6 +15,7 @@ import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import { state as customQuickPickState } from '../src/parts/QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
+import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import { selectIndex } from '../src/parts/SelectIndex/SelectIndex.ts'
 
 interface CommandItem extends ProtoVisibleItem {
@@ -106,6 +107,42 @@ test('selectIndex handles default command case', async () => {
 
   expect(result).toBe(state)
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
+})
+
+test('selectIndex opens the color theme provider from the command palette', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['atom-one-dark', 'ayu'],
+  })
+
+  const items: ProtoVisibleItem[] = [
+    {
+      description: '',
+      direntType: 1,
+      fileIcon: '',
+      icon: '',
+      id: 'QuickPick.showColorTheme',
+      label: 'Preferences: Color Theme',
+      matches: [],
+      uri: '',
+    } as CommandItem,
+  ]
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    items,
+    minLineY: 0,
+    providerId: QuickPickEntryId.Commands,
+    uid: 123,
+    value: '>Color Theme',
+  }
+
+  const result = await selectIndex(state, 0)
+
+  expect(result).not.toBe(state)
+  expect(result.providerId).toBe(QuickPickEntryId.ColorTheme)
+  expect(result.uri).toBe(QuickPickEntryUri.ColorTheme)
+  expect(result.value).toBe('')
+  expect(result.items.map((item) => item.label)).toEqual(['atom-one-dark', 'ayu'])
+  expect(mockRpc.invocations).toEqual([['ColorTheme.getColorThemeNames', '', 0]])
 })
 
 test('selectIndex calculates actualIndex correctly with minLineY', async () => {

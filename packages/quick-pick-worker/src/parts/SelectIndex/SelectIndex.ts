@@ -58,6 +58,13 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
         await RendererWorker.invoke(selectPickResult.itemCommand, ...(selectPickResult.itemCommandArgs || []))
       }
       return state
+    case QuickPickReturnValue.OpenColorTheme:
+      return LoadContent.loadContent({
+        ...state,
+        args: [],
+        uri: QuickPickEntryUri.ColorTheme,
+        value: '',
+      })
     case QuickPickReturnValue.OpenLanguageMode:
       return LoadContent.loadContent({
         ...state,
