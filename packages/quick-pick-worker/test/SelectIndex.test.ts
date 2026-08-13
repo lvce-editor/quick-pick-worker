@@ -269,3 +269,38 @@ test('selectIndex closes a custom quick pick before executing its item command',
     ['Layout.openSideBarViewlet', 'Search'],
   ])
 })
+
+test('selectIndex closes an open recent quick pick without awaiting the workspace change', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Viewlet.closeWidget': () => {},
+    'Workspace.setPath': () => new Promise(() => {}),
+  })
+
+  const items: ProtoVisibleItem[] = [
+    {
+      description: '/home/user',
+      direntType: 2,
+      fileIcon: '',
+      icon: '',
+      label: 'project',
+      matches: [],
+      uri: '/home/user/project',
+    },
+  ]
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    items,
+    minLineY: 0,
+    providerId: QuickPickEntryId.Recent,
+    uid: 123,
+    value: '',
+  }
+
+  const result = await selectIndex(state, 0)
+
+  expect(result).toBe(state)
+  expect(mockRpc.invocations).toEqual([
+    ['Viewlet.closeWidget', 123],
+    ['Workspace.setPath', '/home/user/project'],
+  ])
+})
