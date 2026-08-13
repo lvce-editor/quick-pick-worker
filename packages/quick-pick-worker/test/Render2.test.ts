@@ -47,9 +47,7 @@ test('render2 updates QuickPickStates and returns commands when states differ', 
   QuickPickStates.set(uid, oldState, newState)
   const diffResult: readonly number[] = [DiffType.RenderFocus]
   const result = await Render2.render2(uid, diffResult)
-  expect(result).toHaveLength(1)
-  expect(result[0]).toHaveLength(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result).toEqual([['Viewlet.focusElementByName', uid, 'QuickPickInput']])
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)
   expect(updatedOldState).toBe(newState)
   expect(updatedNewState).toBe(newState)
@@ -67,9 +65,10 @@ test('render2 handles multiple diff types when states differ', async () => {
   QuickPickStates.set(uid, oldState, newState)
   const diffResult: readonly number[] = [DiffType.RenderValue, DiffType.RenderFocus]
   const result = await Render2.render2(uid, diffResult)
-  expect(result).toHaveLength(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
-  expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result).toEqual([
+    ['Viewlet.setValueByName', uid, 'QuickPickInput', 'test-value'],
+    ['Viewlet.focusElementByName', uid, 'QuickPickInput'],
+  ])
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)
   expect(updatedOldState).toBe(newState)
   expect(updatedNewState).toBe(newState)
@@ -89,6 +88,6 @@ test('render2 queues renderer commands and returns a lightweight commit marker',
 
   const result = await Render2.render2(uid, [DiffType.RenderValue])
 
-  expect(queueCommands).toHaveBeenCalledWith(uid, [['Viewlet.setValueByName', 'QuickPickInput', 'test-value']])
+  expect(queueCommands).toHaveBeenCalledWith(uid, [['Viewlet.setValueByName', uid, 'QuickPickInput', 'test-value']])
   expect(result).toEqual([['Viewlet.commitPending', uid, 17]])
 })
