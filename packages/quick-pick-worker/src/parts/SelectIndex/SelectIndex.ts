@@ -25,6 +25,9 @@ const createCustomPick = (value: string): ProtoVisibleItem => {
 }
 
 const shouldCloseBeforeSelect = (subId: number, pick: ProtoVisibleItem): boolean => {
+  if (subId === QuickPickEntryId.Recent) {
+    return true
+  }
   if (subId !== QuickPickEntryId.Commands) {
     return false
   }
