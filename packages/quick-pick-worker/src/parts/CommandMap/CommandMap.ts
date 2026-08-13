@@ -14,6 +14,7 @@ import * as HandleClickAt from '../HandleClickAt/HandleClickAt.ts'
 import * as HandleFocus from '../HandleFocus/HandleFocus.ts'
 import * as HandleInput from '../HandleInput/HandleInput.ts'
 import { handleMessagePort } from '../HandleMessagePort/HandleMessagePort.ts'
+import { handleRendererProcessMessagePort } from '../HandleRendererProcessMessagePort/HandleRendererProcessMessagePort.ts'
 import * as HandleScrollbarPointerDown from '../HandleScrollbarPointerDown/HandleScrollbarPointerDown.ts'
 import * as HandleScrollbarPointerMove from '../HandleScrollbarPointerMove/HandleScrollbarPointerMove.ts'
 import * as HandleScrollbarPointerUp from '../HandleScrollbarPointerUp/HandleScrollbarPointerUp.ts'
@@ -55,6 +56,7 @@ export const commandMap = {
   'QuickPick.handleFocus': WrapCommand.wrapCommand(HandleFocus.handleFocus),
   'QuickPick.handleInput': WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext),
   'QuickPick.handleMessagePort': handleMessagePort,
+  'QuickPick.handleRendererProcessMessagePort': handleRendererProcessMessagePort,
   'QuickPick.handleScrollBarPointerDown': WrapCommand.wrapCommand(HandleScrollbarPointerDown.handleScrollBarPointerDown),
   'QuickPick.handleScrollBarPointerMove': WrapCommand.wrapCommand(HandleScrollbarPointerMove.handleScrollBarPointerMove),
   'QuickPick.handleScrollBarPointerUp': WrapCommand.wrapCommand(HandleScrollbarPointerUp.handleScrollBarPointerUp),
