@@ -41,3 +41,9 @@ test('getQuickPickInputVirtualDom - placeholder', () => {
 
   expect(result[1].placeholder).toBe('Select branch')
 })
+
+test('getQuickPickInputVirtualDom - aria label', () => {
+  const result = GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom('', 'Go to File')
+
+  expect(result[1].ariaLabel).toBe('Go to File')
+})

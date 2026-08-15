@@ -6,8 +6,7 @@ import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEven
 import * as InputName from '../InputName/InputName.ts'
 import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 
-export const getQuickPickInputVirtualDom = (placeholder = ''): readonly VirtualDomNode[] => {
-  const ariaLabel = QuickPickStrings.typeNameofCommandToRun()
+export const getQuickPickInputVirtualDom = (placeholder = '', ariaLabel = QuickPickStrings.typeNameofCommandToRun()): readonly VirtualDomNode[] => {
   return [
     {
       childCount: 1,
