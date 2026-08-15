@@ -66,3 +66,9 @@ test('getQuickPickVirtualDom with scrollbar', () => {
   const result = GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop)
   expect(result).toBeDefined()
 })
+
+test('getQuickPickVirtualDom with input aria label', () => {
+  const result = GetQuickPickVirtualDom.getQuickPickVirtualDom([], 0, 0, '', 'Go to Line / Column')
+
+  expect(result[3].ariaLabel).toBe('Go to Line / Column')
+})
