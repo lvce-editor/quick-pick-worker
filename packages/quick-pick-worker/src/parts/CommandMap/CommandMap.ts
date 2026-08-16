@@ -36,6 +36,8 @@ import { showQuickInput } from '../ShowQuickInput/ShowQuickInput.ts'
 import { showQuickPick } from '../ShowQuickPick/ShowQuickPick.ts'
 import * as VirtualList from '../VirtualList/VirtualList.ts'
 
+const handleDirectMessagePort = (port: MessagePort): Promise<void> => handleRendererProcessMessagePort(port, commandMap)
+
 export const commandMap = {
   'QuickPick.addMenuEntries': MenuEntriesState.add,
   'QuickPick.close': WrapCommand.wrapCommand(Close.close),
@@ -56,7 +58,7 @@ export const commandMap = {
   'QuickPick.handleFocus': WrapCommand.wrapCommand(HandleFocus.handleFocus),
   'QuickPick.handleInput': WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext),
   'QuickPick.handleMessagePort': handleMessagePort,
-  'QuickPick.handleRendererProcessMessagePort': handleRendererProcessMessagePort,
+  'QuickPick.handleRendererProcessMessagePort': handleDirectMessagePort,
   'QuickPick.handleScrollBarPointerDown': WrapCommand.wrapCommand(HandleScrollbarPointerDown.handleScrollBarPointerDown),
   'QuickPick.handleScrollBarPointerMove': WrapCommand.wrapCommand(HandleScrollbarPointerMove.handleScrollBarPointerMove),
   'QuickPick.handleScrollBarPointerUp': WrapCommand.wrapCommand(HandleScrollbarPointerUp.handleScrollBarPointerUp),
