@@ -36,7 +36,8 @@ import { showQuickInput } from '../ShowQuickInput/ShowQuickInput.ts'
 import { showQuickPick } from '../ShowQuickPick/ShowQuickPick.ts'
 import * as VirtualList from '../VirtualList/VirtualList.ts'
 
-const handleDirectMessagePort = (port: MessagePort): Promise<void> => handleRendererProcessMessagePort(port, commandMap)
+const handleDirectMessagePort = (port: MessagePort, setAsRendererProcess = true): Promise<void> =>
+  handleRendererProcessMessagePort(port, commandMap, setAsRendererProcess)
 
 export const commandMap = {
   'QuickPick.addMenuEntries': MenuEntriesState.add,
