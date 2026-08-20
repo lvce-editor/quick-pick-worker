@@ -5,7 +5,12 @@ import * as Workspace from '../Workspace/Workspace.ts'
 
 const getPath = (uri: string): string => {
   if (uri.startsWith('file://')) {
-    return uri.slice('file://'.length)
+    const path = uri.slice('file://'.length)
+    try {
+      return decodeURIComponent(path)
+    } catch {
+      return path
+    }
   }
   return uri
 }
