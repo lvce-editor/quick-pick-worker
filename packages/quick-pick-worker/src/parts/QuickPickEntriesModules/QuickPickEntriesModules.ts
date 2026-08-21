@@ -3,10 +3,12 @@ import type { SelectPick } from '../SelectPick/SelectPick.ts'
 import * as GetPicksColorTheme from '../GetPicksColorTheme/GetPicksColorTheme.ts'
 import * as GetPicksCommand from '../GetPicksCommand/GetPicksCommand.ts'
 import * as GetPicksCustom from '../GetPicksCustom/GetPicksCustom.ts'
+import * as GetPicksEndOfLine from '../GetPicksEndOfLine/GetPicksEndOfLine.ts'
 import * as GetPicksFile from '../GetPicksFile/GetPicksFile.ts'
 import * as GetPicksGoToColumn from '../GetPicksGoToColumn/GetPicksGoToColumn.ts'
 import * as GetPicksGoToLine from '../GetPicksGoToLine/GetPicksGoToLine.ts'
 import * as GetPicksHelp from '../GetPicksHelp/GetPicksHelp.ts'
+import * as GetPicksIndentation from '../GetPicksIndentation/GetPicksIndentation.ts'
 import * as GetPicksLanguageMode from '../GetPicksLanguageMode/GetPicksLanguageMode.ts'
 import * as GetPicksOpenRecent from '../GetPicksOpenRecent/GetPicksOpenRecent.ts'
 import * as GetPicksSymbol from '../GetPicksSymbol/GetPicksSymbol.ts'
@@ -15,10 +17,12 @@ import * as GetPicksWorkspaceSymbol from '../GetPicksWorkspaceSymbol/GetPicksWor
 import * as SelectPickColorTheme from '../SelectPickColorTheme/SelectPickColorTheme.ts'
 import * as SelectPickCommand from '../SelectPickCommand/SelectPickCommand.ts'
 import * as SelectPickCustom from '../SelectPickCustom/SelectPickCustom.ts'
+import * as SelectPickEndOfLine from '../SelectPickEndOfLine/SelectPickEndOfLine.ts'
 import * as SelectPickFile from '../SelectPickFile/SelectPickFile.ts'
 import * as SelectPickGoToColumn from '../SelectPickGoToColumn/SelectPickGoToColumn.ts'
 import * as SelectPickGoToLine from '../SelectPickGoToLine/SelectPickGoToLine.ts'
 import * as SelectPickHelp from '../SelectPickHelp/SelectPickHelp.ts'
+import * as SelectPickIndentation from '../SelectPickIndentation/SelectPickIndentation.ts'
 import * as SelectPickLanguageMode from '../SelectPickLanguageMode/SelectPickLanguageMode.ts'
 import * as SelectPickRecent from '../SelectPickRecent/SelectPickRecent.ts'
 import * as SelectPickSymbol from '../SelectPickSymbol/SelectPickSymbol.ts'
@@ -38,6 +42,8 @@ export const selectPicks: readonly SelectPick[] = [
   SelectPickView.selectPick,
   SelectPickWorkspaceSymbol.selectPick,
   SelectPickLanguageMode.selectPick,
+  SelectPickEndOfLine.selectPick,
+  SelectPickIndentation.selectPick,
 ]
 
 export const getPicks: readonly IGetPicks[] = [
@@ -53,4 +59,6 @@ export const getPicks: readonly IGetPicks[] = [
   GetPicksView.getPicks,
   GetPicksWorkspaceSymbol.getPicks,
   GetPicksLanguageMode.getPicks,
+  GetPicksEndOfLine.getPicks,
+  GetPicksIndentation.getPicks,
 ]
