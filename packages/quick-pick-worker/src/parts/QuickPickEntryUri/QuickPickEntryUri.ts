@@ -24,4 +24,8 @@ export const Custom = 'quickPick://custom'
 
 export const GoToLine = 'quickPick://go-to-line'
 
+export const EndOfLine = 'quickPick://end-of-line'
+
+export const Indentation = 'quickPick://indentation'
+
 export const Noop = 'quickPick://noop'

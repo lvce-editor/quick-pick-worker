@@ -7,6 +7,10 @@ export const getPlaceholderValue = (providerId: number): string => {
       return QuickPickStrings.selectColorTheme()
     case QuickPickEntryId.Commands:
       return QuickPickStrings.typeNameofCommandToRun()
+    case QuickPickEntryId.EndOfLine:
+      return 'Select End of Line Sequence'
+    case QuickPickEntryId.Indentation:
+      return 'Select Indentation'
     case QuickPickEntryId.LanguageMode:
       return QuickPickStrings.selectLanguageMode()
     case QuickPickEntryId.Recent:
