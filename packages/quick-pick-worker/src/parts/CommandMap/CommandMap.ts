@@ -31,6 +31,7 @@ import * as RenderEventListeners from '../RenderEventListeners/RenderEventListen
 import * as SelectCurrentIndex from '../SelectCurrentIndex/SelectCurrentIndex.ts'
 import * as SelectIndex from '../SelectIndex/SelectIndex.ts'
 import * as SelectItem from '../SelectItem/SelectItem.ts'
+import * as SerializeCommand from '../SerializeCommand/SerializeCommand.ts'
 import * as SetValue from '../SetValue/SetValue.ts'
 import { showQuickInput } from '../ShowQuickInput/ShowQuickInput.ts'
 import { showQuickPick } from '../ShowQuickPick/ShowQuickPick.ts'
@@ -57,7 +58,7 @@ export const commandMap = {
   'QuickPick.handleBlur': WrapCommand.wrapCommand(HandleBlur.handleBlur),
   'QuickPick.handleClickAt': WrapCommand.wrapCommand(HandleClickAt.handleClickAt),
   'QuickPick.handleFocus': WrapCommand.wrapCommand(HandleFocus.handleFocus),
-  'QuickPick.handleInput': WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext),
+  'QuickPick.handleInput': SerializeCommand.serialize(WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext)),
   'QuickPick.handleMessagePort': handleMessagePort,
   'QuickPick.handleRendererProcessMessagePort': handleDirectMessagePort,
   'QuickPick.handleScrollBarPointerDown': WrapCommand.wrapCommand(HandleScrollbarPointerDown.handleScrollBarPointerDown),
@@ -68,7 +69,7 @@ export const commandMap = {
   'QuickPick.loadContent': WrapCommand.wrapAsyncCommand(LoadContent.loadContentWithContext),
   'QuickPick.render2': Render2.render2,
   'QuickPick.renderEventListeners': RenderEventListeners.renderEventListeners,
-  'QuickPick.selectCurrentIndex': WrapCommand.wrapCommand(SelectCurrentIndex.selectCurrentIndex),
+  'QuickPick.selectCurrentIndex': SerializeCommand.serialize(WrapCommand.wrapCommand(SelectCurrentIndex.selectCurrentIndex)),
   'QuickPick.selectIndex': WrapCommand.wrapCommand(SelectIndex.selectIndex),
   'QuickPick.selectItem': WrapCommand.wrapCommand(SelectItem.selectItem),
   'QuickPick.setDeltaY': WrapCommand.wrapCommand(VirtualList.setDeltaY),
