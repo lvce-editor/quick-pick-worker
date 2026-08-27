@@ -19,7 +19,7 @@
     "e2e:webkit": "npm run e2e:webkit --workspace=packages/e2e",
     "e2e:webkit:headless": "npm run e2e:webkit:headless --workspace=packages/e2e",
     "format": "prettier --write .",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . && prettier --check . && knip --no-config-hints",
     "test": "npm test --workspaces --if-present",
     "type-check": "tsc -b"
   },
@@ -29,10 +29,11 @@
     "printWidth": 150
   },
   "devDependencies": {
-    "@lvce-editor/eslint-config": "^17.5.0",
-    "@lvce-editor/eslint-plugin-virtual-dom": "^17.5.0",
-    "eslint": "^10.8.0",
+    "@lvce-editor/eslint-config": "^18.4.0",
+    "@lvce-editor/eslint-plugin-virtual-dom": "^13.7.0",
+    "eslint": "^10.8.1",
+    "knip": "^6.29.0",
     "prettier": "^3.9.6",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3"
   }
 }

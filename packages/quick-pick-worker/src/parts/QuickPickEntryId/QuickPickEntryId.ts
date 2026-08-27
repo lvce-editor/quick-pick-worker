@@ -22,6 +22,10 @@ export const WorkspaceSymbol = 10
 
 export const LanguageMode = 11
 
-export const Noop = 12
+export const EndOfLine = 12
+
+export const Indentation = 13
+
+export const Noop = 14
 
 export const EveryThing = 100

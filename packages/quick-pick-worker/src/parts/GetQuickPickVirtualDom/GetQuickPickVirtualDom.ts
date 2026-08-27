@@ -34,6 +34,7 @@ export const getQuickPickVirtualDom = (
   scrollBarHeight: number,
   scrollBarTop: number,
   placeholder = '',
+  inputAriaLabel?: string,
 ): readonly VirtualDomNode[] => {
   const quickOpen = QuickPickStrings.quickOpen()
   const shouldShowScrollbar = scrollBarHeight > 0
@@ -47,7 +48,7 @@ export const getQuickPickVirtualDom = (
       id: DomId.QuickPick,
       type: VirtualDomElements.Div,
     },
-    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder),
+    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder, inputAriaLabel),
     {
       ariaActivedescendant: DomId.QuickPickItemActive,
       childCount: shouldShowScrollbar ? 2 : 1,

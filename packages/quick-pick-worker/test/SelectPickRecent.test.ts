@@ -47,7 +47,7 @@ test('selectPick returns Hide command after opening workspace folder', async () 
 
 test('selectPick handles different uri formats', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'Workspace.setPath': () => {},
+    'Workspace.setUri': () => {},
   })
 
   const pick = {
@@ -62,6 +62,6 @@ test('selectPick handles different uri formats', async () => {
 
   const result = await SelectPickRecent.selectPick(pick)
 
-  expect(mockRpc.invocations).toEqual([['Workspace.setPath', 'file:///home/user/project']])
+  expect(mockRpc.invocations).toEqual([['Workspace.setUri', 'file:///home/user/project']])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })

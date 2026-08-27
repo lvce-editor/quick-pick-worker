@@ -5,6 +5,11 @@ import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnVa
 import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
 const selectPickBuiltin = async (item: any): Promise<any> => {
+  if (item.id === 'QuickPick.showColorTheme') {
+    return {
+      command: QuickPickReturnValue.OpenColorTheme,
+    }
+  }
   if (item.id === 'QuickPick.changeLanguageMode') {
     return {
       command: QuickPickReturnValue.OpenLanguageMode,

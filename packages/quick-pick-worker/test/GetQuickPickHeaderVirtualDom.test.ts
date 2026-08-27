@@ -13,6 +13,6 @@ test('getQuickPickHeaderVirtualDom', () => {
       className: ClassNames.QuickPickHeader,
       type: VirtualDomElements.Div,
     },
-    GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom(),
+    ...GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom(),
   ])
 })

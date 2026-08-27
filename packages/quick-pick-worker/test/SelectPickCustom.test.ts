@@ -113,3 +113,34 @@ test('selectPick resolves worker-owned quick pick callback locally', async () =>
   expect(mockRpc.invocations).toEqual([])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })
+
+test('selectPick returns an executable item command without resolving a callback', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'QuickPick.executeCallback': () => {
+      throw new Error('should not call renderer callback')
+    },
+  })
+
+  state.args = ['custom', [], undefined, { executeItemCommand: true, mode: 'quickPick' }] as readonly unknown[]
+
+  const pick: ProtoVisibleItem = {
+    args: ['Search'],
+    command: 'Layout.openSideBarViewlet',
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    label: 'Search for Text',
+    matches: [],
+    uri: '',
+  }
+
+  const result = await selectPick(pick, '')
+
+  expect(mockRpc.invocations).toEqual([])
+  expect(result).toEqual({
+    command: QuickPickReturnValue.Hide,
+    itemCommand: 'Layout.openSideBarViewlet',
+    itemCommandArgs: ['Search'],
+  })
+})

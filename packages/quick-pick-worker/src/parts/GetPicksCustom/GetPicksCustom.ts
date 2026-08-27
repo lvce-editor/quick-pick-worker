@@ -4,12 +4,14 @@ import * as ExtensionHostWorker from '../ExtensionHostWorker/ExtensionHostWorker
 import { state } from '../QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 
 const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
-  const { description = '', label, value } = item
+  const { args, command, description = '', icon = '', label, value } = item
   return {
+    args,
+    command,
     description,
     direntType: 0,
     fileIcon: '',
-    icon: '',
+    icon,
     label,
     matches: [],
     uri: '',

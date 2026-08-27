@@ -136,7 +136,7 @@ test('goToSymbolInEditor returns specific string', () => {
 })
 
 test('goToSymbolInWorkspace returns specific string', () => {
-  expect(QuickPickStrings.goToSymbolInWorkspace()).toBe('Go to Symbol in Editor')
+  expect(QuickPickStrings.goToSymbolInWorkspace()).toBe('Go to Symbol in Workspace')
 })
 
 test('searchForText returns specific string', () => {

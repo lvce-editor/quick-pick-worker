@@ -12,7 +12,7 @@ test('renderFocus', () => {
 
   const result = RenderFocus.renderFocus(oldState, newState)
 
-  expect(result).toEqual(['Viewlet.focusElementByName', InputName.QuickPickInput])
+  expect(result).toEqual(['Viewlet.focusElementByName', newState.uid, InputName.QuickPickInput])
 })
 
 test('renders focus when focused is true', () => {
@@ -24,7 +24,7 @@ test('renders focus when focused is true', () => {
 
   const result = RenderFocus.renderFocus(oldState, newState)
 
-  expect(result).toEqual(['Viewlet.focusElementByName', InputName.QuickPickInput])
+  expect(result).toEqual(['Viewlet.focusElementByName', newState.uid, InputName.QuickPickInput])
 })
 
 test('renders focus when focused is false', () => {
@@ -36,7 +36,7 @@ test('renders focus when focused is false', () => {
 
   const result = RenderFocus.renderFocus(oldState, newState)
 
-  expect(result).toEqual(['Viewlet.focusElementByName', InputName.QuickPickInput])
+  expect(result).toEqual(['Viewlet.focusElementByName', newState.uid, InputName.QuickPickInput])
 })
 
 test('handles different uid', () => {
@@ -49,5 +49,5 @@ test('handles different uid', () => {
 
   const result = RenderFocus.renderFocus(oldState, newState)
 
-  expect(result).toEqual(['Viewlet.focusElementByName', InputName.QuickPickInput])
+  expect(result).toEqual(['Viewlet.focusElementByName', newState.uid, InputName.QuickPickInput])
 })

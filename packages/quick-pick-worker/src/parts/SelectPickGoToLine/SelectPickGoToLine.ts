@@ -1,15 +1,15 @@
 import type { SelectPickResult } from '../SelectPickRresult/SelectPickResult.ts'
 import { goToPositionAndFocus } from '../GoToPositionAndFocus/GoToPositionAndFocus.ts'
+import { parseGoToLinePosition } from '../ParseGoToLinePosition/ParseGoToLinePosition.ts'
 import * as QuickPickPrefix from '../QuickPickPrefix/QuickPickPrefix.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
 export const selectPick = async (item: any, value: string): Promise<SelectPickResult> => {
   if (value.startsWith(QuickPickPrefix.GoToLine)) {
-    const lineString = value.slice(QuickPickPrefix.GoToLine.length)
-    const wantedLine = Number(lineString)
-    const rowIndex = wantedLine - 1
-    const columnIndex = 0
-    await goToPositionAndFocus(rowIndex, columnIndex)
+    const position = parseGoToLinePosition(value)
+    if (position) {
+      await goToPositionAndFocus(position.rowIndex, position.columnIndex)
+    }
     return {
       command: QuickPickReturnValue.Hide,
     }

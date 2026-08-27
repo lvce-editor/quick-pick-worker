@@ -24,6 +24,27 @@ test('getPicks uses folder name as label and full path as description for file u
   expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened']])
 })
 
+test('getPicks decodes file uri paths for display while keeping the original uri', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'RecentlyOpened.getRecentlyOpened': () => ['file:///test/projects/workspace%20%E2%80%93%20%C3%BC'],
+  })
+
+  const result = await GetPicksOpenRecent.getPicks()
+
+  expect(result).toEqual([
+    {
+      description: '/test/projects',
+      direntType: DirentType.Directory,
+      fileIcon: '',
+      icon: '',
+      label: 'workspace – ü',
+      matches: [],
+      uri: 'file:///test/projects/workspace%20%E2%80%93%20%C3%BC',
+    },
+  ])
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened']])
+})
+
 test('getPicks keeps non-file uris as label when no filesystem folder name can be derived', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'RecentlyOpened.getRecentlyOpened': () => ['vscode-remote://ssh-remote+dev/test/project'],

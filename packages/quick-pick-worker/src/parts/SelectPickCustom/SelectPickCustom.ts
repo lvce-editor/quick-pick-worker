@@ -16,6 +16,13 @@ const getOptions = (args: readonly unknown[]): any => {
 export const selectPick = async (_pick: ProtoVisibleItem, value: string): Promise<SelectPickResult> => {
   const { args } = state
   const options = getOptions(args)
+  if (options.executeItemCommand && _pick.command) {
+    return {
+      command: QuickPickReturnValue.Hide,
+      itemCommand: _pick.command,
+      itemCommandArgs: _pick.args || [],
+    }
+  }
   const resolveId = args[2]
   let result
   if (options.mode === 'quickPick') {

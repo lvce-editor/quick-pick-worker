@@ -58,9 +58,7 @@ test('calls renderer for RenderValue', () => {
   }
   const diffResult: readonly number[] = [DiffType.RenderValue]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toHaveLength(1)
-  expect(result[0]).toHaveLength(3)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
+  expect(result).toEqual([['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test-value']])
 })
 
 test('calls renderer for RenderFocus', () => {
@@ -72,9 +70,7 @@ test('calls renderer for RenderFocus', () => {
   }
   const diffResult: readonly number[] = [DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toHaveLength(1)
-  expect(result[0]).toHaveLength(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result).toEqual([['Viewlet.focusElementByName', newState.uid, 'QuickPickInput']])
 })
 
 test('calls renderer for RenderCursorOffset', () => {
@@ -101,9 +97,10 @@ test('handles multiple diff types', () => {
   }
   const diffResult: readonly number[] = [DiffType.RenderValue, DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toHaveLength(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
-  expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result).toEqual([
+    ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
+  ])
 })
 
 test('skips Height and RenderFocusedIndex in mixed diff types', () => {
@@ -115,7 +112,8 @@ test('skips Height and RenderFocusedIndex in mixed diff types', () => {
   }
   const diffResult: readonly number[] = [DiffType.Height, DiffType.RenderValue, DiffType.RenderFocusedIndex, DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toHaveLength(2)
-  expect((result[0] as readonly unknown[])[0]).toBe('Viewlet.setValueByName')
-  expect((result[1] as readonly unknown[])[0]).toBe('Viewlet.focusElementByName')
+  expect(result).toEqual([
+    ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
+  ])
 })

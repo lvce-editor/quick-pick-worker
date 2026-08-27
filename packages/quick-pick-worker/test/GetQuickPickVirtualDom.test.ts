@@ -8,6 +8,7 @@ test('getQuickPickVirtualDom with empty items', () => {
   expect(result).toEqual([
     { ariaLabel: 'Quick open', childCount: 2, className: 'Viewlet QuickPick', id: 'QuickPick', type: 4 },
     { childCount: 1, className: 'QuickPickHeader', type: 4 },
+    { childCount: 1, className: 'QuickPickInputWrapper', type: 4 },
     {
       ariaAutoComplete: 'list',
       ariaExpanded: true,
@@ -64,4 +65,10 @@ test('getQuickPickVirtualDom with scrollbar', () => {
   const scrollBarTop = 0
   const result = GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop)
   expect(result).toBeDefined()
+})
+
+test('getQuickPickVirtualDom with input aria label', () => {
+  const result = GetQuickPickVirtualDom.getQuickPickVirtualDom([], 0, 0, '', 'Go to Line / Column')
+
+  expect(result[3].ariaLabel).toBe('Go to Line / Column')
 })

@@ -1,3 +1,4 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
@@ -24,6 +25,9 @@ const createCustomPick = (value: string): ProtoVisibleItem => {
 }
 
 const shouldCloseBeforeSelect = (subId: number, pick: ProtoVisibleItem): boolean => {
+  if (subId === QuickPickEntryId.Recent) {
+    return true
+  }
   if (subId !== QuickPickEntryId.Commands) {
     return false
   }
@@ -53,7 +57,17 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   switch (command) {
     case QuickPickReturnValue.Hide:
       await CloseWidget.closeWidget(state.uid)
+      if (selectPickResult.itemCommand) {
+        await RendererWorker.invoke(selectPickResult.itemCommand, ...(selectPickResult.itemCommandArgs || []))
+      }
       return state
+    case QuickPickReturnValue.OpenColorTheme:
+      return LoadContent.loadContent({
+        ...state,
+        args: [],
+        uri: QuickPickEntryUri.ColorTheme,
+        value: '',
+      })
     case QuickPickReturnValue.OpenLanguageMode:
       return LoadContent.loadContent({
         ...state,
