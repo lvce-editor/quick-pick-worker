@@ -304,3 +304,36 @@ test('selectIndex closes an open recent quick pick without awaiting the workspac
     ['Workspace.setPath', '/home/user/project'],
   ])
 })
+
+test('selectIndex closes the command palette before opening keybindings', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Main.openKeyBindings': () => new Promise(() => {}),
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const items: ProtoVisibleItem[] = [
+    {
+      description: '',
+      direntType: 1,
+      fileIcon: '',
+      icon: '',
+      id: 'Main.openKeyBindings',
+      label: 'Preferences: Open Default Key Bindings',
+      matches: [],
+      uri: '',
+    } as CommandItem,
+  ]
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    items,
+    minLineY: 0,
+    providerId: QuickPickEntryId.Commands,
+    uid: 123,
+    value: '>Preferences: Open Default Key Bindings',
+  }
+
+  const result = await selectIndex(state, 0)
+
+  expect(result).toBe(state)
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['Main.openKeyBindings']])
+})
