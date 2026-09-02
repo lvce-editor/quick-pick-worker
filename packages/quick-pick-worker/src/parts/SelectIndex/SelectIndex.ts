@@ -32,7 +32,7 @@ const shouldCloseBeforeSelect = (subId: number, pick: ProtoVisibleItem): boolean
     return false
   }
   const { id } = pick as ProtoVisibleItem & { readonly id?: unknown }
-  return typeof id === 'string' && id.startsWith('ext.')
+  return typeof id === 'string' && (id.startsWith('ext.') || id === 'Main.openKeyBindings')
 }
 
 export const selectIndex = async (state: QuickPickState, index: number, button = /* left */ 0): Promise<QuickPickState> => {
