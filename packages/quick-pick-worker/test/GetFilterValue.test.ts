@@ -109,6 +109,11 @@ test('returns value as-is when id is File', () => {
   expect(result).toBe('test value')
 })
 
+test('returns empty string when id is File, subId is Commands, and value is just >', () => {
+  const result = GetFilterValue.getFilterValue(QuickPickEntryId.File, QuickPickEntryId.Commands, '>')
+  expect(result).toBe('')
+})
+
 test('returns value as-is when id is Help', () => {
   const result = GetFilterValue.getFilterValue(QuickPickEntryId.Help, QuickPickEntryId.Noop, 'test value')
   expect(result).toBe('test value')
