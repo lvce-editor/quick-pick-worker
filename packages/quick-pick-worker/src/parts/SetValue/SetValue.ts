@@ -1,3 +1,4 @@
+import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
 import * as GetFilterValue from '../GetFilterValue/GetFilterValue.ts'
@@ -8,6 +9,24 @@ import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFil
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
+import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
+
+const requestVersions = new Map<number, number>()
+const requestVersionGenerator = { value: 0 }
+
+const isSamePicker = (state: QuickPickState, latestState: QuickPickState): boolean => {
+  return latestState.uri === state.uri && latestState.args === state.args
+}
+
+const isQuickInput = (args: readonly unknown[]): boolean => {
+  const options = args.at(-1) as any
+  return options?.mode === 'quickInput'
+}
+
+const isStaticQuickInput = (args: readonly unknown[]): boolean => {
+  const options = args.at(-1) as any
+  return options?.mode === 'quickInput' && options.quickInputId === undefined
+}
 
 // TODO when user types letters -> no need to query provider again -> just filter existing results
 export const setValue = async (state: QuickPickState, newValue: string): Promise<QuickPickState> => {
@@ -17,8 +36,12 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   }
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
-  const newPicks = await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
-  const filterValue = GetFilterValue.getFilterValue(providerId, subId, newValue)
+  const quickInput = isQuickInput(args)
+  const newPicks =
+    isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode
+      ? state.picks
+      : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
+  const filterValue = quickInput ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
   const focusedIndex = items.length === 0 ? -1 : 0
   const sliced = items.slice(minLineY, maxLineY)
@@ -37,5 +60,34 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
     items,
     picks: newPicks,
     value: newValue,
+  }
+}
+
+export const setValueWithContext = async (context: AsyncCommandContext<QuickPickState>, newValue: string): Promise<void> => {
+  const state = context.getState()
+  if (state.value === newValue) {
+    return
+  }
+  const requestVersion = ++requestVersionGenerator.value
+  requestVersions.set(state.uid, requestVersion)
+  const result = await setValue(state, newValue)
+  await context.updateState((latestState) => {
+    if (requestVersions.get(latestState.uid) !== requestVersion || !isSamePicker(state, latestState)) {
+      return latestState
+    }
+    return {
+      ...latestState,
+      fileIconCache: result.fileIconCache,
+      finalDeltaY: result.finalDeltaY,
+      focusedIndex: result.focusedIndex,
+      icons: result.icons,
+      inputSource: result.inputSource,
+      items: result.items,
+      picks: result.picks,
+      value: result.value,
+    }
+  })
+  if (requestVersions.get(state.uid) === requestVersion) {
+    requestVersions.delete(state.uid)
   }
 }

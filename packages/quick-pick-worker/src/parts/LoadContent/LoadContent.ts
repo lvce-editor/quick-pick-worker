@@ -1,3 +1,4 @@
+import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
@@ -13,10 +14,12 @@ import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuic
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickVisibleCallbacks from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
 interface ParsedArgs {
   readonly ignoreFocusOut: boolean
   readonly initialValue: string
+  readonly placeholder: string
 }
 
 const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
@@ -24,6 +27,7 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
     return {
       ignoreFocusOut: false,
       initialValue: '',
+      placeholder: '',
     }
   }
   const last = args.at(-1)
@@ -31,20 +35,23 @@ const parseArgs = (subId: number, args: readonly unknown[]): ParsedArgs => {
     return {
       ignoreFocusOut: false,
       initialValue: '',
+      placeholder: '',
     }
   }
   return {
     // @ts-ignore
     ignoreFocusOut: Boolean(last.ignoreFocusOut),
     // @ts-ignore
-    initialValue: String(last.initialValue),
+    initialValue: last.initialValue ? String(last.initialValue) : '',
+    // @ts-ignore
+    placeholder: last.placeholder ? String(last.placeholder) : '',
   }
 }
 
-export const loadContent = async (state: QuickPickState): Promise<QuickPickState> => {
+const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> => {
   const { args, assetDir, fileIconCache, height, itemHeight, maxVisibleItems, platform, uri } = state
   const id = GetQuickPickProviderId.getQuickPickProviderId(uri)
-  const value = GetDefaultValue.getDefaultValue(id)
+  const value = GetDefaultValue.getDefaultValue(id, uri, args)
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
   const newPicks = await GetPicks.getPicks(subId, value, args, { assetDir, platform })
@@ -74,9 +81,40 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
     maxLineY,
     minLineY,
     picks: newPicks,
-    placeholder: '',
+    placeholder: parsedArgs.placeholder,
     providerId: id,
     state: QuickPickOpenState.Finished,
     value: finalValue,
   }
+}
+
+export const loadContent = async (state: QuickPickState): Promise<QuickPickState> => {
+  const newState = await getLoadedState(state)
+  QuickPickVisibleCallbacks.notifyVisible()
+  return newState
+}
+
+export const loadContentWithContext = async (context: AsyncCommandContext<QuickPickState>): Promise<void> => {
+  const state = context.getState()
+  const loadedState = await getLoadedState(state)
+  await context.updateState((latestState) => ({
+    ...latestState,
+    cursorOffset: loadedState.cursorOffset,
+    fileIconCache: loadedState.fileIconCache,
+    finalDeltaY: loadedState.finalDeltaY,
+    focused: loadedState.focused,
+    focusedIndex: loadedState.focusedIndex,
+    icons: loadedState.icons,
+    initial: loadedState.initial,
+    inputSource: loadedState.inputSource,
+    items: loadedState.items,
+    maxLineY: loadedState.maxLineY,
+    minLineY: loadedState.minLineY,
+    picks: loadedState.picks,
+    placeholder: loadedState.placeholder,
+    providerId: loadedState.providerId,
+    state: loadedState.state,
+    value: loadedState.value,
+  }))
+  QuickPickVisibleCallbacks.notifyVisible()
 }

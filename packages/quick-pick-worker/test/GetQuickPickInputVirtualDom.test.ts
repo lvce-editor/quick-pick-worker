@@ -9,22 +9,41 @@ import * as InputName from '../src/parts/InputName/InputName.ts'
 test('getQuickPickInputVirtualDom', () => {
   const result = GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom()
 
-  expect(result).toEqual({
-    ariaAutoComplete: 'list',
-    ariaExpanded: true,
-    ariaLabel: expect.any(String),
-    autocapitalize: 'off',
-    autocomplete: 'off',
-    childCount: 0,
-    className: ClassNames.InputBox,
-    inputType: 'text',
-    name: InputName.QuickPickInput,
-    onBeforeInput: DomEventListenerFunctions.HandleBeforeInput,
-    onBlur: DomEventListenerFunctions.HandleBlur,
-    onFocus: DomEventListenerFunctions.HandleFocus,
-    onInput: DomEventListenerFunctions.HandleInput,
-    role: AriaRoles.ComboBox,
-    spellcheck: false,
-    type: VirtualDomElements.Input,
-  })
+  expect(result).toEqual([
+    {
+      childCount: 1,
+      className: ClassNames.QuickPickInputWrapper,
+      type: VirtualDomElements.Div,
+    },
+    {
+      ariaAutoComplete: 'list',
+      ariaExpanded: true,
+      ariaLabel: expect.any(String),
+      autocapitalize: 'off',
+      autocomplete: 'off',
+      childCount: 0,
+      className: ClassNames.InputBox,
+      inputType: 'text',
+      name: InputName.QuickPickInput,
+      onBlur: DomEventListenerFunctions.HandleBlur,
+      onFocus: DomEventListenerFunctions.HandleFocus,
+      onInput: DomEventListenerFunctions.HandleInput,
+      placeholder: '',
+      role: AriaRoles.ComboBox,
+      spellcheck: false,
+      type: VirtualDomElements.Input,
+    },
+  ])
+})
+
+test('getQuickPickInputVirtualDom - placeholder', () => {
+  const result = GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom('Select branch')
+
+  expect(result[1].placeholder).toBe('Select branch')
+})
+
+test('getQuickPickInputVirtualDom - aria label', () => {
+  const result = GetQuickPickInputVirtualDom.getQuickPickInputVirtualDom('', 'Go to File')
+
+  expect(result[1].ariaLabel).toBe('Go to File')
 })

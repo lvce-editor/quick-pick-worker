@@ -8,6 +8,19 @@ test('returns ColorTheme when prefix is ColorTheme', () => {
   expect(result).toBe(QuickPickEntryId.ColorTheme)
 })
 
+test('returns LanguageMode when prefix is LanguageMode', () => {
+  const result = GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.LanguageMode)
+  expect(result).toBe(QuickPickEntryId.LanguageMode)
+})
+
+test('returns EndOfLine when prefix is EndOfLine', () => {
+  expect(GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.EndOfLine)).toBe(QuickPickEntryId.EndOfLine)
+})
+
+test('returns Indentation when prefix is Indentation', () => {
+  expect(GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.Indentation)).toBe(QuickPickEntryId.Indentation)
+})
+
 test('returns EveryThing when prefix is Commands', () => {
   const result = GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.Commands)
   expect(result).toBe(QuickPickEntryId.EveryThing)

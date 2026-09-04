@@ -1,5 +1,7 @@
-let id = 0
+const state = {
+  value: 0,
+}
 
 export const create = (): number => {
-  return ++id
+  return ++state.value
 }

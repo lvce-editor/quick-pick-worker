@@ -5,6 +5,16 @@ import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnVa
 import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
 const selectPickBuiltin = async (item: any): Promise<any> => {
+  if (item.id === 'QuickPick.showColorTheme') {
+    return {
+      command: QuickPickReturnValue.OpenColorTheme,
+    }
+  }
+  if (item.id === 'QuickPick.changeLanguageMode') {
+    return {
+      command: QuickPickReturnValue.OpenLanguageMode,
+    }
+  }
   const args = item.args || []
   // TODO ids should be all numbers for efficiency -> also directly can call command
   await RendererWorker.invoke(item.id, ...args)
@@ -25,6 +35,9 @@ const selectPickExtension = async (item: any): Promise<any> => {
   } catch (error) {
     await ErrorHandling.handleError(error, false)
     await ErrorHandling.showErrorDialog(error)
+    return {
+      command: QuickPickReturnValue.Hide,
+    }
   }
   return {
     command: QuickPickReturnValue.Hide,

@@ -1,20 +1,22 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
-import { loadContent } from '../src/parts/LoadContent/LoadContent.ts'
+import { loadContent, loadContentWithContext } from '../src/parts/LoadContent/LoadContent.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
+import { waitUntilVisible } from '../src/parts/QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
-let consoleErrorSpy: ReturnType<typeof jest.spyOn>
+const testState: { consoleErrorSpy?: ReturnType<typeof jest.spyOn> } = {}
 
 beforeEach(() => {
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  testState.consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
 afterEach(() => {
-  consoleErrorSpy.mockRestore()
+  testState.consoleErrorSpy?.mockRestore()
 })
 
 test('loadContent returns state with loaded content', async () => {
@@ -45,7 +47,7 @@ test('loadContent returns state with loaded content', async () => {
   expect(result.fileIconCache).toBeDefined()
 })
 
-test('loadContent handles empty picks', async () => {
+test('loadContent handles builtin command only', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
     'IconTheme.getFolderIcon': () => 'icon',
@@ -59,12 +61,17 @@ test('loadContent handles empty picks', async () => {
 
   const result = await loadContent(state)
 
-  expect(result.picks).toEqual([])
-  expect(result.items).toEqual([])
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      id: 'QuickPick.changeLanguageMode',
+      label: 'Change Language Mode',
+    }),
+  ])
+  expect(result.items).toHaveLength(1)
   expect(result.focused).toBe(true)
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
-  expect(result.maxLineY).toBe(0)
+  expect(result.maxLineY).toBe(1)
 })
 
 test('loadContent handles many picks', async () => {
@@ -476,4 +483,71 @@ test('loadContent handles Recent URI', async () => {
 
   expect(result.providerId).toBeDefined()
   expect(result.picks).toBeDefined()
+})
+
+test('loadContent initializes workspace symbols with #', async () => {
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.WorkspaceSymbol,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe('#')
+  expect(result.cursorOffset).toBe(1)
+})
+
+test('loadContent initializes go to line with :', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': () => ['line 1', 'line 2'],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.GoToLine,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe(':')
+  expect(result.cursorOffset).toBe(1)
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      label: 'Type a line number to go to (from 1 to 2)',
+    }),
+  ])
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
+})
+
+test('loadContent commits state before notifying that the quick pick is visible', async () => {
+  RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [null, [{ label: 'file1.txt' }]],
+    initial: true,
+    uid: 1,
+    uri: QuickPickEntryUri.Custom,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+  let stateWhenVisible: QuickPickState | undefined
+  const visible = (async (): Promise<void> => {
+    await waitUntilVisible()
+    stateWhenVisible = QuickPickStates.get(state.uid).newState
+  })()
+
+  await loadCommand(state.uid)
+  await visible
+
+  expect(stateWhenVisible?.initial).toBe(false)
+  expect(stateWhenVisible?.items).toHaveLength(1)
+  expect(stateWhenVisible?.state).toBe(QuickPickOpenState.Finished)
 })

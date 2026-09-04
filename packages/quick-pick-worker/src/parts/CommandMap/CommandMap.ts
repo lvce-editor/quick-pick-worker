@@ -14,6 +14,7 @@ import * as HandleClickAt from '../HandleClickAt/HandleClickAt.ts'
 import * as HandleFocus from '../HandleFocus/HandleFocus.ts'
 import * as HandleInput from '../HandleInput/HandleInput.ts'
 import { handleMessagePort } from '../HandleMessagePort/HandleMessagePort.ts'
+import { handleRendererProcessMessagePort } from '../HandleRendererProcessMessagePort/HandleRendererProcessMessagePort.ts'
 import * as HandleScrollbarPointerDown from '../HandleScrollbarPointerDown/HandleScrollbarPointerDown.ts'
 import * as HandleScrollbarPointerMove from '../HandleScrollbarPointerMove/HandleScrollbarPointerMove.ts'
 import * as HandleScrollbarPointerUp from '../HandleScrollbarPointerUp/HandleScrollbarPointerUp.ts'
@@ -24,18 +25,24 @@ import * as MenuEntriesState from '../MenuEntriesState/MenuEntriesState.ts'
 import { executeCallback } from '../QuickPickCallbacks/QuickPickCallbacks.ts'
 import * as WrapCommand from '../QuickPickStates/QuickPickStates.ts'
 import { getCommandIds } from '../QuickPickStates/QuickPickStates.ts'
+import { waitUntilVisible } from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 import * as Render2 from '../Render2/Render2.ts'
 import * as RenderEventListeners from '../RenderEventListeners/RenderEventListeners.ts'
 import * as SelectCurrentIndex from '../SelectCurrentIndex/SelectCurrentIndex.ts'
 import * as SelectIndex from '../SelectIndex/SelectIndex.ts'
 import * as SelectItem from '../SelectItem/SelectItem.ts'
+import * as SerializeCommand from '../SerializeCommand/SerializeCommand.ts'
 import * as SetValue from '../SetValue/SetValue.ts'
 import { showQuickInput } from '../ShowQuickInput/ShowQuickInput.ts'
+import { showQuickPick } from '../ShowQuickPick/ShowQuickPick.ts'
 import * as VirtualList from '../VirtualList/VirtualList.ts'
+
+const handleDirectMessagePort = (port: MessagePort, setAsRendererProcess = true): Promise<void> =>
+  handleRendererProcessMessagePort(port, commandMap, setAsRendererProcess)
 
 export const commandMap = {
   'QuickPick.addMenuEntries': MenuEntriesState.add,
-  'QuickPick.close': Close.close,
+  'QuickPick.close': WrapCommand.wrapCommand(Close.close),
   'QuickPick.create2': Create2.create,
   'QuickPick.diff2': Diff2.diff2,
   'QuickPick.dispose': Dispose.dispose,
@@ -51,20 +58,23 @@ export const commandMap = {
   'QuickPick.handleBlur': WrapCommand.wrapCommand(HandleBlur.handleBlur),
   'QuickPick.handleClickAt': WrapCommand.wrapCommand(HandleClickAt.handleClickAt),
   'QuickPick.handleFocus': WrapCommand.wrapCommand(HandleFocus.handleFocus),
-  'QuickPick.handleInput': WrapCommand.wrapCommand(HandleInput.handleInput),
+  'QuickPick.handleInput': SerializeCommand.serialize(WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext)),
   'QuickPick.handleMessagePort': handleMessagePort,
+  'QuickPick.handleRendererProcessMessagePort': handleDirectMessagePort,
   'QuickPick.handleScrollBarPointerDown': WrapCommand.wrapCommand(HandleScrollbarPointerDown.handleScrollBarPointerDown),
   'QuickPick.handleScrollBarPointerMove': WrapCommand.wrapCommand(HandleScrollbarPointerMove.handleScrollBarPointerMove),
   'QuickPick.handleScrollBarPointerUp': WrapCommand.wrapCommand(HandleScrollbarPointerUp.handleScrollBarPointerUp),
   'QuickPick.handleWheel': WrapCommand.wrapCommand(HandleWheel.handleWheel),
   'QuickPick.initialize': initialize,
-  'QuickPick.loadContent': WrapCommand.wrapCommand(LoadContent.loadContent),
+  'QuickPick.loadContent': WrapCommand.wrapAsyncCommand(LoadContent.loadContentWithContext),
   'QuickPick.render2': Render2.render2,
   'QuickPick.renderEventListeners': RenderEventListeners.renderEventListeners,
-  'QuickPick.selectCurrentIndex': WrapCommand.wrapCommand(SelectCurrentIndex.selectCurrentIndex),
+  'QuickPick.selectCurrentIndex': SerializeCommand.serialize(WrapCommand.wrapCommand(SelectCurrentIndex.selectCurrentIndex)),
   'QuickPick.selectIndex': WrapCommand.wrapCommand(SelectIndex.selectIndex),
   'QuickPick.selectItem': WrapCommand.wrapCommand(SelectItem.selectItem),
   'QuickPick.setDeltaY': WrapCommand.wrapCommand(VirtualList.setDeltaY),
-  'QuickPick.setValue': WrapCommand.wrapCommand(SetValue.setValue),
+  'QuickPick.setValue': WrapCommand.wrapAsyncCommand(SetValue.setValueWithContext),
   'QuickPick.showQuickInput': showQuickInput,
+  'QuickPick.showQuickPick': showQuickPick,
+  'QuickPick.waitUntilVisible': waitUntilVisible,
 }

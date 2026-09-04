@@ -1,20 +1,36 @@
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
+import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
+import * as ExtensionHostWorker from '../ExtensionHostWorker/ExtensionHostWorker.ts'
+import { state } from '../QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 
 const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
-  const { label } = item
+  const { args, command, description = '', icon = '', label, value } = item
   return {
-    description: '',
+    args,
+    command,
+    description,
     direntType: 0,
     fileIcon: '',
-    icon: '',
+    icon,
     label,
     matches: [],
     uri: '',
+    value,
   }
 }
 
 export const getPicks = async (searchValue: string, args: readonly unknown[]): Promise<readonly ProtoVisibleItem[]> => {
-  const items = (args[1] as readonly unknown[]) || []
+  state.args = args
+  const options = args.at(-1) as any
+  let items: readonly unknown[]
+  if (options?.mode === 'quickInput') {
+    items =
+      searchValue === '' && options?.customItemsId
+        ? CustomQuickPickItems.get(options.customItemsId)
+        : ((await ExtensionHostWorker.invoke('ExtensionHostQuickPick.renderQuickInput', options.quickInputId, searchValue)) as readonly unknown[])
+  } else {
+    items = options?.customItemsId ? CustomQuickPickItems.get(options.customItemsId) : (args[1] as readonly unknown[]) || []
+  }
   const mapped = items.map(toProtoVisibleItem)
   return mapped
 }

@@ -59,6 +59,35 @@ test('returns position preview for line 1', async () => {
   })
 })
 
+test('returns instruction when line is zero', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': (editorId: number) => {
+      if (editorId === 1) {
+        return ['line1', 'line2', 'line3']
+      }
+      throw new Error(`unexpected editorId ${editorId}`)
+    },
+  })
+
+  const result = await getPicks(':0')
+  expect(result).toHaveLength(1)
+  expect(result[0]).toEqual({
+    description: '',
+    direntType: 0,
+    fileIcon: '',
+    icon: '',
+    label: 'Type a line number to go to (from 1 to 3)',
+    matches: [],
+    uri: '',
+  })
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
+})
+
 test('returns empty array when value does not start with ":"', async () => {
   const result = await getPicks('')
   expect(result).toHaveLength(0)

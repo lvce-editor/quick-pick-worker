@@ -5,8 +5,7 @@ import * as KeyCode from '../KeyCode/KeyCode.ts'
 export const getKeyBindings = (): readonly KeyBinding[] => {
   return [
     {
-      args: ['QuickPick'],
-      command: 'Viewlet.closeWidget',
+      command: 'QuickPick.close',
       key: KeyCode.Escape,
       when: WhenExpression.FocusQuickPickInput,
     },

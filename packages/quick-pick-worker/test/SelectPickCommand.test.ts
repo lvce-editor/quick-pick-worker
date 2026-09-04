@@ -32,6 +32,40 @@ test('selectPickBuiltin calls RendererWorker.invoke with item id and args', asyn
   expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
+test('selectPickBuiltin opens the language mode provider', async () => {
+  const pick: ProtoVisibleItem = {
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    id: 'QuickPick.changeLanguageMode',
+    label: 'Change Language Mode',
+    matches: [],
+    uri: '',
+  } as CommandItem
+
+  const result = await selectPick(pick)
+
+  expect(result.command).toBe(QuickPickReturnValue.OpenLanguageMode)
+})
+
+test('selectPickBuiltin opens the color theme provider', async () => {
+  const pick: ProtoVisibleItem = {
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    id: 'QuickPick.showColorTheme',
+    label: 'Preferences: Color Theme',
+    matches: [],
+    uri: '',
+  } as CommandItem
+
+  const result = await selectPick(pick)
+
+  expect(result.command).toBe(QuickPickReturnValue.OpenColorTheme)
+})
+
 test('selectPickBuiltin returns Hide when shouldHide returns true', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'test-command': () => {},
@@ -76,7 +110,7 @@ test('selectPickBuiltin handles item without args', async () => {
   expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
-test('selectPickExtension calls ExtensionHost.executeCommand with id without ext. prefix', async () => {
+test('selectPickExtension calls ExtensionHost.executeCommand and hides the quick pick', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'ExtensionHost.executeCommand': () => {},
   })

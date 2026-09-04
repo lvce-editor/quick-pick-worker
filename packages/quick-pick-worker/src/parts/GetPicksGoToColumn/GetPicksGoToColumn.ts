@@ -11,7 +11,7 @@ export const getPicksGoToColumn = async (value: string): Promise<readonly ProtoV
   }
   if (value.startsWith(QuickPickPrefix.GoToColumn)) {
     const columnString = value.slice(QuickPickPrefix.GoToColumn.length)
-    const wantedColumn = Number.parseInt(columnString, 10)
+    const wantedColumn = Number(columnString)
     if (Number.isNaN(wantedColumn)) {
       return getPicksGoToColumnBase()
     }

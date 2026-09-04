@@ -22,7 +22,7 @@ const getRootNodeCount = (nodes: readonly VirtualDomNode[]): number => {
       count++
     } else {
       const lastIndex = remainingChildCounts.length - 1
-      remainingChildCounts[lastIndex] = remainingChildCounts[lastIndex] - 1
+      remainingChildCounts[lastIndex] -= 1
     }
     remainingChildCounts.push(node.childCount)
   }
@@ -33,6 +33,8 @@ export const getQuickPickVirtualDom = (
   visibleItems: readonly VisibleItem[],
   scrollBarHeight: number,
   scrollBarTop: number,
+  placeholder = '',
+  inputAriaLabel?: string,
 ): readonly VirtualDomNode[] => {
   const quickOpen = QuickPickStrings.quickOpen()
   const shouldShowScrollbar = scrollBarHeight > 0
@@ -46,7 +48,7 @@ export const getQuickPickVirtualDom = (
       id: DomId.QuickPick,
       type: VirtualDomElements.Div,
     },
-    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(),
+    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder, inputAriaLabel),
     {
       ariaActivedescendant: DomId.QuickPickItemActive,
       childCount: shouldShowScrollbar ? 2 : 1,
