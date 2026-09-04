@@ -44,6 +44,9 @@ export const getFilterValue = (id: number, subId: number, value: string): string
   if (subId === QuickPickEntryId.GoToLine) {
     return getValueGoToLine(value)
   }
+  if (id === QuickPickEntryId.File && subId === QuickPickEntryId.Commands) {
+    return getFilterValueEverything(value)
+  }
   const fn = getFn(id)
   const filterValue = fn(value)
   return filterValue
