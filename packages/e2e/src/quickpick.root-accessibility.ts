@@ -8,5 +8,5 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
 
   // assert
   const quickPick = Locator('#QuickPick')
-  await expect(quickPick).toHaveAttribute('aria-label', 'Quick Open')
+  await expect(quickPick).toHaveAttribute('aria-label', 'Quick open')
 }
