@@ -30,7 +30,7 @@ test('getQuickPickVirtualDom with empty items', () => {
     {
       ariaActivedescendant: 'QuickPickItemActive',
       childCount: 1,
-      className: 'List ContainContent',
+      className: 'List ContainContent QuickPickItems',
       id: 'QuickPickItems',
       onPointerDown: 'handlePointerDown',
       onWheel: 'handleWheel',

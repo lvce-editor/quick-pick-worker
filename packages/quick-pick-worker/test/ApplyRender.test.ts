@@ -19,6 +19,31 @@ test('skips Height diff type', () => {
   expect(result).toEqual([])
 })
 
+test('calls renderer for RenderCss', () => {
+  const oldState = CreateDefaultState.createDefaultState()
+  const newState = CreateDefaultState.createDefaultState()
+  const diffResult: readonly number[] = [DiffType.RenderCss]
+  const result = ApplyRender.applyRender(oldState, newState, diffResult)
+  expect(result).toEqual([
+    [
+      'Viewlet.setCss',
+      1,
+      `.QuickPick {
+  --QuickPickItemsHeight: 300px;
+  --ScrollBarThumbHeight: 0px;
+  --ScrollBarThumbTop: 0px;
+}
+.QuickPick .QuickPickItems {
+  height: var(--QuickPickItemsHeight);
+}
+.QuickPick .ScrollBarThumb {
+  height: var(--ScrollBarThumbHeight);
+  translate: 0px var(--ScrollBarThumbTop);
+}`,
+    ],
+  ])
+})
+
 test('skips RenderFocusedIndex diff type', () => {
   const oldState = CreateDefaultState.createDefaultState()
   const newState = CreateDefaultState.createDefaultState()
@@ -113,6 +138,22 @@ test('skips Height and RenderFocusedIndex in mixed diff types', () => {
   const diffResult: readonly number[] = [DiffType.Height, DiffType.RenderValue, DiffType.RenderFocusedIndex, DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
   expect(result).toEqual([
+    ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
+  ])
+})
+
+test('handles RenderCss in mixed diff types', () => {
+  const oldState = CreateDefaultState.createDefaultState()
+  const newState = {
+    ...CreateDefaultState.createDefaultState(),
+    uid: 1,
+    value: 'test',
+  }
+  const diffResult: readonly number[] = [DiffType.RenderCss, DiffType.RenderValue, DiffType.RenderFocusedIndex, DiffType.RenderFocus]
+  const result = ApplyRender.applyRender(oldState, newState, diffResult)
+  expect(result).toEqual([
+    expect.arrayContaining(['Viewlet.setCss', newState.uid]),
     ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
     ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
   ])
