@@ -8,7 +8,7 @@ export const focusIndex = async (state: QuickPickState, index: number): Promise<
 
   if (index < minLineY + 1) {
     const minLineY = index
-    const maxLineY = Math.min(index + maxVisibleItems, items.length - 1)
+    const maxLineY = Math.min(index + maxVisibleItems, items.length)
     const sliced = items.slice(minLineY, maxLineY)
     const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(sliced, fileIconCache)
 
