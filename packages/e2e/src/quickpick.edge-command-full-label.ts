@@ -5,9 +5,9 @@ export const name = 'quickpick.edge-command-full-label'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   const input = Locator('#QuickPick .InputBox')
-  const items = Locator('.QuickPickItem')
+  const items = Locator('.QuickPickItem[role="option"]')
 
   // act
   await QuickPick.setValue('> Help: About')

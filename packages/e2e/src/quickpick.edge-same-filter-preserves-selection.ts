@@ -5,7 +5,7 @@ export const name = 'quickpick.edge-same-filter-preserves-selection'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   const activeItemById = Locator('#QuickPickItemActive')
   await QuickPick.setValue('> Layout')
   await QuickPick.focusIndex(1)

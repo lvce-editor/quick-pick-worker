@@ -10,15 +10,17 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await Main.openUri(`${tmpDir}/edge.txt`)
   await QuickPick.open()
   const label = Locator('.QuickPickItemLabel')
-  const items = Locator('.QuickPickItem')
+  const items = Locator('.QuickPickItem[role="option"]')
   const quickPick = Locator('#QuickPick')
   await QuickPick.setValue(':2:2')
+  await expect(label).toHaveCount(1)
   await expect(label).toHaveText("Press 'Enter' to go to line 1 column 1")
 
   // act
   await QuickPick.setValue(':2:abc')
 
   // assert
+  await expect(label).toHaveCount(1)
   await expect(label).toHaveText('Type a line number to go to (from 1 to 3)')
   await expect(items).toHaveCount(1)
 

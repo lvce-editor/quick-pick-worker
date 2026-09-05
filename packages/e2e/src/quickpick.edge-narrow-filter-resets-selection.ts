@@ -5,8 +5,8 @@ export const name = 'quickpick.edge-narrow-filter-resets-selection'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
-  const items = Locator('.QuickPickItem')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
+  const items = Locator('.QuickPickItem[role="option"]')
   await QuickPick.setValue('> Layout')
   await QuickPick.focusIndex(2)
   await expect(activeItem).toHaveAttribute('aria-posinset', '3')

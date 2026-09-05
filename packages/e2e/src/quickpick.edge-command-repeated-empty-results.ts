@@ -5,9 +5,9 @@ export const name = 'quickpick.edge-command-repeated-empty-results'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   const status = Locator('.QuickPickStatus')
-  const items = Locator('.QuickPickItem')
+  const items = Locator('.QuickPickItem[role="option"]')
   await QuickPick.setValue('> no-such-command-111')
   await expect(status).toHaveText('No Results')
 

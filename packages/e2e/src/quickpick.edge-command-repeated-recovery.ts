@@ -5,16 +5,17 @@ export const name = 'quickpick.edge-command-repeated-recovery'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   const activeItemById = Locator('#QuickPickItemActive')
   const status = Locator('.QuickPickStatus')
-  const items = Locator('.QuickPickItem')
+  const items = Locator('.QuickPickItem[role="option"]')
+
   // act
   for (let i = 0; i < 3; i++) {
     await QuickPick.setValue('> no-such-command-333')
     await expect(status).toHaveText('No Results')
     await expect(items).toHaveCount(0)
-    await QuickPick.setValue('> About')
+    await QuickPick.setValue('> Help: About')
     await expect(status).toBeHidden()
     await expect(activeItem).toHaveText('Help: About')
   }

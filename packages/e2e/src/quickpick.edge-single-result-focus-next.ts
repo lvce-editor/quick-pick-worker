@@ -5,10 +5,10 @@ export const name = 'quickpick.edge-single-result-focus-next'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const activeItem = Locator('.QuickPickItemActive')
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   const activeItemById = Locator('#QuickPickItemActive')
-  const items = Locator('.QuickPickItem')
-  await QuickPick.setValue('> About')
+  const items = Locator('.QuickPickItem[role="option"]')
+  await QuickPick.setValue('> Help: About')
   await expect(items).toHaveCount(1)
 
   // act

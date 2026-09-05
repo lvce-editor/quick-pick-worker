@@ -5,8 +5,8 @@ export const name = 'quickpick.edge-widen-filter-resets-selection'
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
-  const secondItem = Locator('.QuickPickItem').nth(1)
-  const activeItem = Locator('.QuickPickItemActive')
+  const secondItem = Locator('.QuickPickItem[role="option"]').nth(1)
+  const activeItem = Locator('.QuickPickItemActive[role="option"]')
   await QuickPick.setValue('> Layout: Reset View Locations')
   await expect(activeItem).toHaveText('Layout: Reset View Locations')
 
