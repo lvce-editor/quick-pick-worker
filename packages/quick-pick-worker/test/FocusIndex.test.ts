@@ -125,7 +125,8 @@ test('focusIndex handles edge case when scrolling up with maxVisibleItems larger
 
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
-  expect(result.maxLineY).toBe(1)
+  expect(result.maxLineY).toBe(2)
+  expect(result.icons).toHaveLength(2)
   expect(mockRpc.invocations.length).toBeGreaterThan(0)
 })
 
