@@ -23,14 +23,17 @@ const prefixIdWithExt = (item: any): any => {
   }
 }
 
-const getExtensionPicks = async (assetDir: string, platform: number): Promise<readonly unknown[]> => {
+const getExtensionPicks = async (assetDir: string, platform: number, applicationId?: string): Promise<readonly unknown[]> => {
   try {
     // TODO
     // Assert.string(assetDir)
     // Assert.number(platform)
     // TODO ask extension management worker directly
     // TODO don't call this every time, cache the results
-    const extensionPicks = await RendererWorker.invoke('ExtensionHost.getCommands', assetDir, platform)
+    const extensionPicks =
+      applicationId === undefined
+        ? await RendererWorker.invoke('ExtensionHost.getCommands', assetDir, platform)
+        : await RendererWorker.invoke('Application.execute', applicationId, 'ExtensionHost.getCommands', assetDir, platform)
     if (!extensionPicks) {
       return []
     }
@@ -64,10 +67,14 @@ const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
   return pick
 }
 
-export const getPicks = async (value: string, args: any, { assetDir = '', platform = 0 } = {}): Promise<readonly ProtoVisibleItem[]> => {
+export const getPicks = async (
+  value: string,
+  args: any,
+  { applicationId, assetDir = '', platform = 0 }: { assetDir?: string; platform?: number; applicationId?: string } = {},
+): Promise<readonly ProtoVisibleItem[]> => {
   // TODO get picks in parallel
   const builtinPicks = await getBuiltinPicks()
-  const extensionPicks = await getExtensionPicks(assetDir, platform)
+  const extensionPicks = await getExtensionPicks(assetDir, platform, applicationId)
   const allPicks = [...builtinPicks, ...extensionPicks]
   const converted = allPicks.map(toProtoVisibleItem)
   return converted

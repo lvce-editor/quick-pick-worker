@@ -18,9 +18,11 @@ export const create = (
   _renderAllItems: boolean,
   workspaceUri: string,
   assetDir: string,
+  applicationId?: string,
 ): void => {
   const state: QuickPickState = {
     allowEmptyResult: false,
+    applicationId,
     cursorOffset: 0,
     height: 300,
     icons: [],

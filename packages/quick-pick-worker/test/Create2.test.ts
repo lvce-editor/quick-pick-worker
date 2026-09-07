@@ -94,3 +94,8 @@ test('create handles different uid values', () => {
   expect(state2?.uri).toBe('uri2')
   expect(state2?.workspaceUri).toBe('workspace2')
 })
+
+test('retains the application supplied by the host', () => {
+  Create2.create(501, 'quickpick://commands', 22, 0, 0, 600, 300, 1, [], true, 'memfs:///sample', '/static', 'source')
+  expect(QuickPickStates.get(501).newState.applicationId).toBe('source')
+})
