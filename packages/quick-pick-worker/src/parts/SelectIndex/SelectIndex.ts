@@ -47,10 +47,10 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
   const fn = QuickPickEntries.getSelect(subId)
   if (shouldCloseBeforeSelect(subId, pick)) {
     await CloseWidget.closeWidget(state.uid)
-    void fn(pick, value)
+    void fn(pick, value, state.applicationId)
     return state
   }
-  const selectPickResult = await fn(pick, value)
+  const selectPickResult = await fn(pick, value, state.applicationId)
   Assert.object(selectPickResult)
   Assert.string(selectPickResult.command)
   const { command } = selectPickResult

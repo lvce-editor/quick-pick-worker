@@ -337,3 +337,26 @@ test('selectIndex closes the command palette before opening keybindings', async 
   expect(result).toBe(state)
   expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['Main.openKeyBindings']])
 })
+
+test('extension commands keep their application after closing the command palette', async () => {
+  const started = Promise.withResolvers<void>()
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Application.execute': () => started.resolve(),
+    'ExtensionHost.executeCommand': () => started.resolve(),
+    'Viewlet.closeWidget': () => {},
+  })
+  const state = {
+    ...CreateDefaultState.createDefaultState(),
+    applicationId: 'source',
+    items: [{ id: 'ext.eslint.showPerformanceTrace', label: 'ESLint: Show Performance Trace' } as CommandItem],
+    providerId: QuickPickEntryId.Commands,
+    uid: 123,
+    value: '>',
+  }
+  await selectIndex(state, 0)
+  await started.promise
+  expect(mockRpc.invocations).toEqual([
+    ['Viewlet.closeWidget', 123],
+    ['Application.execute', 'source', 'ExtensionHost.executeCommand', 'eslint.showPerformanceTrace'],
+  ])
+})

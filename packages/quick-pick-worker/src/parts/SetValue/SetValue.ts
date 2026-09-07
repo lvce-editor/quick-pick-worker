@@ -40,7 +40,7 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   const newPicks =
     isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode
       ? state.picks
-      : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform })
+      : await GetPicks.getPicks(subId, newValue, args, { assetDir, platform, applicationId: state.applicationId })
   const filterValue = quickInput ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
   const focusedIndex = items.length === 0 ? -1 : 0

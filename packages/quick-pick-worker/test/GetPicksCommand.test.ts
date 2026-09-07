@@ -175,3 +175,13 @@ test('getPicks uses MenuEntriesState when Layout.getAllQuickPickMenuEntries fail
   expect(result[0].label).toBe('State 1')
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
+
+test('queries extension commands in the owning application', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Application.execute': () => [{ id: 'eslint.showPerformanceTrace', label: 'ESLint: Show Performance Trace' }],
+    'Layout.getAllQuickPickMenuEntries': () => [],
+  })
+  const picks = await GetPicksCommand.getPicks('>', [], { applicationId: 'source', assetDir: '/static', platform: 1 })
+  expect(picks).toContainEqual(expect.objectContaining({ id: 'ext.eslint.showPerformanceTrace' }))
+  expect(mockRpc.invocations).toContainEqual(['Application.execute', 'source', 'ExtensionHost.getCommands', '/static', 1])
+})
