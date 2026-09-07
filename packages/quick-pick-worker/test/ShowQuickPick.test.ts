@@ -131,3 +131,16 @@ test('showQuickPick can wait only until visible', async () => {
     ],
   ])
 })
+
+test('showQuickPick keeps its explicit application while waiting for selection', async () => {
+  using rpc = RendererWorker.registerMockRpc({
+    'Application.execute': (applicationId: string, command: string, ...args: readonly unknown[]) => {
+      expect(applicationId).toBe('preview')
+      expect(command).toBe('Viewlet.openWidget')
+      QuickPickCallbacks.executeCallback(args[3] as number, 'staging')
+    },
+  })
+  const options = { applicationId: 'preview', items: [{ description: 'Preview', label: 'Staging', value: 'staging' }] }
+  await expect(ShowQuickPick.showQuickPick(options)).resolves.toBe('staging')
+  expect(rpc.invocations).toHaveLength(1)
+})

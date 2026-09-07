@@ -1,4 +1,4 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import * as ApplicationRendererRpc from '../ApplicationRendererRpc/ApplicationRendererRpc.ts'
 import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 import * as QuickPickCallbacks from '../QuickPickCallbacks/QuickPickCallbacks.ts'
 import * as ViewletModuleId from '../ViewletModuleId/ViewletModuleId.ts'
@@ -12,6 +12,7 @@ interface QuickPickItem {
 
 export interface ShowQuickPickOptions {
   readonly acceptInput?: boolean
+  readonly applicationId?: string
   readonly items: readonly QuickPickItem[]
   readonly placeholder?: string
   readonly waitUntil?: 'selected' | 'visible'
@@ -19,6 +20,7 @@ export interface ShowQuickPickOptions {
 
 export const showQuickPick = async ({
   acceptInput = false,
+  applicationId,
   items,
   placeholder = '',
   waitUntil = 'selected',
@@ -26,7 +28,7 @@ export const showQuickPick = async ({
   const customItemsId = CustomQuickPickItems.add(items)
   const { id, promise } = QuickPickCallbacks.registerCallback()
   try {
-    await RendererWorker.invoke('Viewlet.openWidget', ViewletModuleId.QuickPick, 'custom', [], id, {
+    await ApplicationRendererRpc.invoke(applicationId, 'Viewlet.openWidget', ViewletModuleId.QuickPick, 'custom', [], id, {
       acceptInput,
       callbackOwner: 'quickPickWorker',
       customItemsId,

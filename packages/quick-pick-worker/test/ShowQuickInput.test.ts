@@ -51,3 +51,14 @@ test('showQuickInput returns canceled result when renderer returns undefined', a
   })
   expect(mockRpc.invocations).toHaveLength(1)
 })
+
+test('showQuickInput returns the result from the calling application', async () => {
+  using rpc = RendererWorker.registerMockRpc({
+    'Application.execute': () => ({ canceled: false, inputValue: 'Ada' }),
+  })
+  const options = { applicationId: 'preview', initialValue: 'World' }
+  await expect(ShowQuickInput.showQuickInput(options)).resolves.toEqual({ canceled: false, inputValue: 'Ada' })
+  expect(rpc.invocations).toEqual([
+    ['Application.execute', 'preview', 'QuickPick.showCustom', [], expect.objectContaining({ initialValue: 'World' })],
+  ])
+})
