@@ -54,7 +54,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const value = GetDefaultValue.getDefaultValue(id, uri, args)
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
-  const newPicks = await GetPicks.getPicks(subId, value, args, { assetDir, platform, applicationId: state.applicationId })
+  const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
   const filterValue = GetFilterValue.getFilterValue(id, subId, value)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)

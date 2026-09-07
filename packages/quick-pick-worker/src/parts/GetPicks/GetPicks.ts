@@ -5,7 +5,7 @@ export interface IGetPicks {
   (
     value: string,
     args: readonly unknown[],
-    { assetDir, platform, applicationId }: { assetDir: string; platform: number; applicationId?: string },
+    { applicationId, assetDir, platform }: { assetDir: string; platform: number; applicationId?: string },
   ): Promise<readonly ProtoVisibleItem[]>
 }
 
@@ -13,8 +13,8 @@ export const getPicks = (
   id: number,
   searchValue: string,
   args: readonly unknown[],
-  { assetDir, platform, applicationId }: { assetDir: string; platform: number; applicationId?: string },
+  { applicationId, assetDir, platform }: { assetDir: string; platform: number; applicationId?: string },
 ): Promise<readonly ProtoVisibleItem[]> => {
   const fn = QuickPickEntries.getPicks(id)
-  return fn(searchValue, args, { assetDir, platform, applicationId })
+  return fn(searchValue, args, { applicationId, assetDir, platform })
 }
