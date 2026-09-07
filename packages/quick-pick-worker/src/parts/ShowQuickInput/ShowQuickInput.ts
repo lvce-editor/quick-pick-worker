@@ -1,9 +1,10 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickInputOptions } from '../QuickInputOptions/QuickInputOptions.ts'
 import type { QuickInputResult } from '../QuickInputResult/QuickInputResult.ts'
+import * as ApplicationRendererRpc from '../ApplicationRendererRpc/ApplicationRendererRpc.ts'
 import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 
 export const showQuickInput = async ({
+  applicationId,
   id,
   ignoreFocusOut,
   initialItems = [],
@@ -14,7 +15,7 @@ export const showQuickInput = async ({
   const customItemsId = CustomQuickPickItems.add(initialItems)
   const picks: readonly any[] = []
   try {
-    const result = (await RendererWorker.invoke('QuickPick.showCustom', picks, {
+    const result = (await ApplicationRendererRpc.invoke(applicationId, 'QuickPick.showCustom', picks, {
       customItemsId,
       ignoreFocusOut,
       initialValue,
