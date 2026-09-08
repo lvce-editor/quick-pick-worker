@@ -1,3 +1,4 @@
+/* eslint-disable virtual-dom/no-object-attribute-values -- Quick pick options use a type field but are not virtual DOM nodes. */
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as QuickPickCallbacks from '../src/parts/QuickPickCallbacks/QuickPickCallbacks.ts'
@@ -142,5 +143,16 @@ test('showQuickPick keeps its explicit application while waiting for selection',
   })
   const options = { applicationId: 'preview', items: [{ description: 'Preview', label: 'Staging', value: 'staging' }] }
   await expect(ShowQuickPick.showQuickPick(options)).resolves.toBe('staging')
+  expect(rpc.invocations).toHaveLength(1)
+})
+
+test('text mode accepts input without requiring acceptInput', async () => {
+  using rpc = RendererWorker.registerMockRpc({
+    'Viewlet.openWidget': (...args: readonly unknown[]) => {
+      expect(args[4]).toEqual(expect.objectContaining({ acceptInput: true, type: 'text' }))
+      QuickPickCallbacks.executeCallback(args[3] as number, 'Ada')
+    },
+  })
+  await expect(ShowQuickPick.showQuickPick({ items: [], type: 'text' })).resolves.toBe('Ada')
   expect(rpc.invocations).toHaveLength(1)
 })

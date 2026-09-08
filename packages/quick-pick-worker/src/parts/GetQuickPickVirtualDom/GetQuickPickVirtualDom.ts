@@ -35,8 +35,21 @@ export const getQuickPickVirtualDom = (
   scrollBarTop: number,
   placeholder = '',
   inputAriaLabel?: string,
+  textInput = false,
 ): readonly VirtualDomNode[] => {
   const quickOpen = QuickPickStrings.quickOpen()
+  if (textInput) {
+    return [
+      {
+        ariaLabel: quickOpen,
+        childCount: 1,
+        className: MergeClassNames.mergeClassNames(ClassNames.Viewlet, ClassNames.QuickPick),
+        id: DomId.QuickPick,
+        type: VirtualDomElements.Div,
+      },
+      ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder, inputAriaLabel, true),
+    ]
+  }
   const shouldShowScrollbar = scrollBarHeight > 0
   const quickPickItemsDom = GetQuickPickItemsVirtualDom.getQuickPickItemsVirtualDom(visibleItems)
   const listItemsChildCount = getRootNodeCount(quickPickItemsDom)

@@ -1,6 +1,7 @@
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 import * as ExtensionHostWorker from '../ExtensionHostWorker/ExtensionHostWorker.ts'
+import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
 import { state } from '../QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 
 const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
@@ -21,6 +22,9 @@ const toProtoVisibleItem = (item: any): ProtoVisibleItem => {
 
 export const getPicks = async (searchValue: string, args: readonly unknown[]): Promise<readonly ProtoVisibleItem[]> => {
   state.args = args
+  if (IsTextInput.isTextInput(args)) {
+    return []
+  }
   const options = args.at(-1) as any
   let items: readonly unknown[]
   if (options?.mode === 'quickInput') {

@@ -15,6 +15,7 @@ export interface ShowQuickPickOptions {
   readonly applicationId?: string
   readonly items: readonly QuickPickItem[]
   readonly placeholder?: string
+  readonly type?: 'text' | 'select'
   readonly waitUntil?: 'selected' | 'visible'
 }
 
@@ -23,17 +24,19 @@ export const showQuickPick = async ({
   applicationId,
   items,
   placeholder = '',
+  type = 'select',
   waitUntil = 'selected',
 }: ShowQuickPickOptions): Promise<unknown> => {
-  const customItemsId = CustomQuickPickItems.add(items)
+  const customItemsId = CustomQuickPickItems.add(type === 'text' ? [] : items)
   const { id, promise } = QuickPickCallbacks.registerCallback()
   try {
     await ApplicationRendererRpc.invoke(applicationId, 'Viewlet.openWidget', ViewletModuleId.QuickPick, 'custom', [], id, {
-      acceptInput,
+      acceptInput: type === 'text' || acceptInput,
       callbackOwner: 'quickPickWorker',
       customItemsId,
       mode: 'quickPick',
       placeholder,
+      type,
     })
     if (waitUntil === 'visible') {
       return undefined
