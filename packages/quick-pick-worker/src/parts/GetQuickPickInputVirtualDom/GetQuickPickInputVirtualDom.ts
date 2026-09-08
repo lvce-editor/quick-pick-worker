@@ -6,7 +6,11 @@ import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEven
 import * as InputName from '../InputName/InputName.ts'
 import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 
-export const getQuickPickInputVirtualDom = (placeholder = '', ariaLabel = QuickPickStrings.typeNameofCommandToRun()): readonly VirtualDomNode[] => {
+export const getQuickPickInputVirtualDom = (
+  placeholder = '',
+  ariaLabel = QuickPickStrings.typeNameofCommandToRun(),
+  textInput = false,
+): readonly VirtualDomNode[] => {
   return [
     {
       childCount: 1,
@@ -14,8 +18,7 @@ export const getQuickPickInputVirtualDom = (placeholder = '', ariaLabel = QuickP
       type: VirtualDomElements.Div,
     },
     {
-      ariaAutoComplete: 'list',
-      ariaExpanded: true,
+      ...(!textInput && { ariaAutoComplete: 'list', ariaExpanded: true, role: AriaRoles.ComboBox }),
       ariaLabel: ariaLabel,
       autocapitalize: 'off',
       autocomplete: 'off',
@@ -27,7 +30,6 @@ export const getQuickPickInputVirtualDom = (placeholder = '', ariaLabel = QuickP
       onFocus: DomEventListenerFunctions.HandleFocus,
       onInput: DomEventListenerFunctions.HandleInput,
       placeholder,
-      role: AriaRoles.ComboBox,
       spellcheck: false,
       type: VirtualDomElements.Input,
     },

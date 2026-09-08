@@ -9,6 +9,7 @@ import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFil
 import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
+import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 
 const requestVersions = new Map<number, number>()
@@ -33,6 +34,9 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   const { args, assetDir, fileIconCache, height, itemHeight, maxLineY, minLineY, platform, providerId, value } = state
   if (value === newValue) {
     return state
+  }
+  if (IsTextInput.isTextInput(args)) {
+    return { ...state, inputSource: InputSource.Script, value: newValue }
   }
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)

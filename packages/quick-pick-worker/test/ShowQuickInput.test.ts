@@ -1,3 +1,4 @@
+/* eslint-disable virtual-dom/no-raw-text-children -- Quick pick options use a type field but are not virtual DOM nodes. */
 import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as ShowQuickInput from '../src/parts/ShowQuickInput/ShowQuickInput.ts'
@@ -32,6 +33,7 @@ test('showQuickInput opens custom quick input with render id', async () => {
         mode: 'quickInput',
         placeholder: 'Enter a value',
         quickInputId: 123,
+        type: 'select',
         waitUntil: undefined,
       },
     ],
@@ -61,4 +63,16 @@ test('showQuickInput returns the result from the calling application', async () 
   expect(rpc.invocations).toEqual([
     ['Application.execute', 'preview', 'QuickPick.showCustom', [], expect.objectContaining({ initialValue: 'World' })],
   ])
+})
+
+test('showQuickInput defaults to text mode without a renderer or items', async () => {
+  using rpc = RendererWorker.registerMockRpc({ 'QuickPick.showCustom': () => undefined })
+  await ShowQuickInput.showQuickInput({ initialValue: 'World' })
+  expect(rpc.invocations[0][2]).toEqual(expect.objectContaining({ type: 'text' }))
+})
+
+test('showQuickInput preserves a list when initial items are supplied', async () => {
+  using rpc = RendererWorker.registerMockRpc({ 'QuickPick.showCustom': () => undefined })
+  await ShowQuickInput.showQuickInput({ initialItems: [{ label: 'World' }] })
+  expect(rpc.invocations[0][2]).toEqual(expect.objectContaining({ type: 'select' }))
 })

@@ -4,6 +4,7 @@ import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as CreateQuickPickViewModel from '../CreateQuickPickViewModel/CreateQuickPickViewModel.ts'
 import * as GetQuickPickInputAriaLabel from '../GetQuickPickInputAriaLabel/GetQuickPickInputAriaLabel.ts'
 import * as GetQuickPickVirtualDom from '../GetQuickPickVirtualDom/GetQuickPickVirtualDom.ts'
+import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
 
 export const renderItemsDom = (state: QuickPickState): readonly VirtualDomNode[] => {
   if (state.initial) {
@@ -12,7 +13,14 @@ export const renderItemsDom = (state: QuickPickState): readonly VirtualDomNode[]
   const viewModel = CreateQuickPickViewModel.createQuickPickViewModel(state, state)
   const { scrollBarHeight, scrollBarTop, visibleItems } = viewModel
   const inputAriaLabel = GetQuickPickInputAriaLabel.getQuickPickInputAriaLabel(state.providerId, state.value, state.placeholder)
-  return GetQuickPickVirtualDom.getQuickPickVirtualDom(visibleItems, scrollBarHeight, scrollBarTop, state.placeholder, inputAriaLabel)
+  return GetQuickPickVirtualDom.getQuickPickVirtualDom(
+    visibleItems,
+    scrollBarHeight,
+    scrollBarTop,
+    state.placeholder,
+    inputAriaLabel,
+    IsTextInput.isTextInput(state.args),
+  )
 }
 
 export const renderItems = (_oldState: QuickPickState, newState: QuickPickState): readonly unknown[] => {

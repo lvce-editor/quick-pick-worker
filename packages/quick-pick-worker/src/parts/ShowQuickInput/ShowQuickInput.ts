@@ -10,6 +10,7 @@ export const showQuickInput = async ({
   initialItems = [],
   initialValue,
   placeholder,
+  type = id === undefined && initialItems.length === 0 ? 'text' : 'select',
   waitUntil,
 }: QuickInputOptions): Promise<QuickInputResult> => {
   const customItemsId = CustomQuickPickItems.add(initialItems)
@@ -22,6 +23,7 @@ export const showQuickInput = async ({
       mode: 'quickInput',
       placeholder,
       quickInputId: id,
+      type,
       waitUntil,
     })) as QuickInputResult | undefined
     return (

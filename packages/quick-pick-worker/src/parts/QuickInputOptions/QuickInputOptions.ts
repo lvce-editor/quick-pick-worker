@@ -6,5 +6,6 @@ export interface QuickInputOptions {
   readonly initialValue?: string
   readonly placeholder?: string
   readonly render?: any
+  readonly type?: 'text' | 'select'
   readonly waitUntil?: 'visible' | 'finished'
 }

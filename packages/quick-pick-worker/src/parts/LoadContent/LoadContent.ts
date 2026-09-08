@@ -12,6 +12,7 @@ import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts
 import * as GetQuickPickProviderId from '../GetQuickPickProviderId/GetQuickPickProviderId.ts'
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
+import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
 import * as QuickPickVisibleCallbacks from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
@@ -57,7 +58,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
   const filterValue = GetFilterValue.getFilterValue(id, subId, value)
-  const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
+  const items = IsTextInput.isTextInput(args) ? newPicks : FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
   const minLineY = 0
   const maxLineY = Math.min(minLineY + maxVisibleItems, newPicks.length)
   const sliced = newPicks.slice(minLineY, maxLineY)
