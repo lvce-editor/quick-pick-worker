@@ -13,6 +13,6 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
   const firstItem = Locator('.QuickPickItem').nth(0)
   await expect(firstItem).toHaveText('SSH: Connect')
   await expect(firstItem).toHaveId('QuickPickItemActive')
-  const weakerMatch = Locator('.QuickPickItem').filter({ hasText: 'Developer: Crash Shared Process' })
+  const weakerMatch = Locator('.QuickPickItem', { hasText: 'Developer: Crash Shared Process' })
   await expect(weakerMatch).toBeVisible()
 }
