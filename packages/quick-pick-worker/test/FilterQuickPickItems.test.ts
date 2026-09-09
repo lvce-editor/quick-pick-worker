@@ -61,3 +61,30 @@ test('handles case insensitive matching', () => {
   const expectedResult = [{ description: '', direntType: 1, fileIcon: '', icon: '', label: 'File.txt', matches: [38, 0, 4], uri: '' }]
   expect(result).toEqual(expectedResult)
 })
+
+const createItems = (labels: readonly string[]): readonly ProtoVisibleItem[] => {
+  return labels.map((label) => ({ description: '', direntType: 0, fileIcon: '', icon: '', label, matches: [], uri: '' }))
+}
+
+test.each(['ssh', 'SSH', 'sSh'])('ranks exact and contiguous command matches above scattered matches for %s', (value) => {
+  const items = createItems(['Focus: Search', 'Developer: Crash Shared Process', 'Remote SSH: Connect', 'SSH: Connect', 'ssh', 'No match'])
+  const result = FilterQuickPickItems.filterQuickPickItems(items, value, true)
+  expect(result.map((item) => item.label)).toEqual(['ssh', 'SSH: Connect', 'Remote SSH: Connect', 'Developer: Crash Shared Process', 'Focus: Search'])
+  expect(result.find((item) => item.label === 'SSH: Connect')?.matches.slice(1)).toEqual([0, 3])
+  expect(items.every((item) => item.matches.length === 0)).toBe(true)
+})
+
+test('preserves provider order for an empty command query', () => {
+  const items = createItems(['Focus: Search', 'SSH: Connect'])
+  expect(FilterQuickPickItems.filterQuickPickItems(items, '', true)).toBe(items)
+})
+
+test('preserves provider order for other pickers', () => {
+  const items = createItems(['Focus: Search', 'SSH: Connect'])
+  expect(FilterQuickPickItems.filterQuickPickItems(items, 'ssh').map((item) => item.label)).toEqual(['Focus: Search', 'SSH: Connect'])
+})
+
+test('preserves command order when match ranks and fuzzy scores tie', () => {
+  const items = createItems(['Layout: Toggle Side Bar', 'Layout: Toggle Panel'])
+  expect(FilterQuickPickItems.filterQuickPickItems(items, 'layout', true).map((item) => item.label)).toEqual(items.map((item) => item.label))
+})

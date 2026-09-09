@@ -58,7 +58,9 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
   const filterValue = GetFilterValue.getFilterValue(id, subId, value)
-  const items = IsTextInput.isTextInput(args) ? newPicks : FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue)
+  const items = IsTextInput.isTextInput(args)
+    ? newPicks
+    : FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue, subId === QuickPickEntryId.Commands)
   const minLineY = 0
   const maxLineY = Math.min(minLineY + maxVisibleItems, newPicks.length)
   const sliced = newPicks.slice(minLineY, maxLineY)

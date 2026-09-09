@@ -398,3 +398,21 @@ test('does not apply command results after the view is reopened with a custom pi
   expect(newState.items).toEqual([branchPick])
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
 })
+
+test('ranks matching commands and focuses SSH Connect when typing ssh', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.getCommands': () => [{ id: 'remote-ssh.connect', label: 'SSH: Connect' }],
+    'Layout.getAllQuickPickMenuEntries': () => [{ id: 'test.crash', label: 'Developer: Crash Shared Process' }],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    providerId: QuickPickEntryId.EveryThing,
+    value: '>',
+  }
+
+  const result = await SetValue.setValue(state, '>ssh')
+
+  expect(result.items.map((item) => item.label)).toEqual(['SSH: Connect', 'Developer: Crash Shared Process'])
+  expect(result.focusedIndex).toBe(0)
+  expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+})
