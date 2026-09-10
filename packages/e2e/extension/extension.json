@@ -12,5 +12,11 @@
       "id": "test.sshConnect",
       "label": "SSH: Connect"
     }
+  ],
+  "iconThemes": [
+    {
+      "id": "test-scroll-icons",
+      "path": "icons.json"
+    }
   ]
 }
