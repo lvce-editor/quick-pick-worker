@@ -1,0 +1,9 @@
+{
+  "iconDefinitions": {
+    "_file": "/file.svg",
+    "_json": "/json.svg"
+  },
+  "fileExtensions": {
+    "json": "_json"
+  }
+}

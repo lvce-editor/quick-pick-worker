@@ -1,6 +1,7 @@
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as GetListHeight from '../GetListHeight/GetListHeight.ts'
+import * as GetQuickPickFileIcons from '../GetQuickPickFileIcons/GetQuickPickFileIcons.ts'
 import * as GetScrollBarSize from '../GetScrollBarSize/GetScrollBarSize.ts'
 import * as ScrollBarFunctions from '../ScrollBarFunctions/ScrollBarFunctions.ts'
 
@@ -60,7 +61,7 @@ const getRelativePointerY = (state: QuickPickState, clientY: number): number => 
   return clientY - state.top - state.headerHeight
 }
 
-export const setDeltaY = (state: QuickPickState, deltaY: number): QuickPickState => {
+export const setDeltaY = async (state: QuickPickState, deltaY: number): Promise<QuickPickState> => {
   Assert.object(state)
   Assert.number(deltaY)
   const { headerHeight, height, itemHeight, items } = state
@@ -79,22 +80,25 @@ export const setDeltaY = (state: QuickPickState, deltaY: number): QuickPickState
   const maxLineY = minLineY + Math.round(listHeight / itemHeight)
   Assert.number(minLineY)
   Assert.number(maxLineY)
+  const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(items.slice(minLineY, maxLineY), state.fileIconCache)
   return {
     ...state,
     deltaY,
+    fileIconCache: newFileIconCache,
+    icons,
     maxLineY,
     minLineY,
   }
 }
 
-export const handleWheel = (state: QuickPickState, deltaMode: number, deltaY: number): QuickPickState => {
+export const handleWheel = async (state: QuickPickState, deltaMode: number, deltaY: number): Promise<QuickPickState> => {
   Assert.object(state)
   Assert.number(deltaMode)
   Assert.number(deltaY)
   return setDeltaY(state, state.deltaY + deltaY)
 }
 
-export const handleScrollBarPointerDown = (state: QuickPickState, clientY: number, pointerId: number): QuickPickState => {
+export const handleScrollBarPointerDown = async (state: QuickPickState, clientY: number, pointerId: number): Promise<QuickPickState> => {
   Assert.object(state)
   Assert.number(clientY)
   Assert.number(pointerId)
@@ -114,7 +118,7 @@ export const handleScrollBarPointerDown = (state: QuickPickState, clientY: numbe
   return handleScrollBarPointerMove(newState, clientY, pointerId)
 }
 
-export const handleScrollBarPointerMove = (state: QuickPickState, clientY: number, pointerId: number): QuickPickState => {
+export const handleScrollBarPointerMove = async (state: QuickPickState, clientY: number, pointerId: number): Promise<QuickPickState> => {
   Assert.object(state)
   Assert.number(clientY)
   Assert.number(pointerId)
