@@ -25,14 +25,19 @@ const getPath = (uri: string): string => {
   if (uri.startsWith(remoteSshScheme)) {
     const pathStart = getRemoteSshPathStart(uri)
     if (pathStart !== -1) {
-      return decodePath(uri.slice(pathStart))
+      return decodePath(uri.slice(pathStart)).replace(/\/+$/, '') || '/'
     }
+    return '/'
   }
   return uri
 }
 
 const getLabel = (uri: string): string => {
   const path = getPath(uri)
+  if (path === '/' && uri.startsWith(remoteSshScheme)) {
+    const pathStart = getRemoteSshPathStart(uri)
+    return uri.slice(remoteSshScheme.length, pathStart === -1 ? undefined : pathStart)
+  }
   if (path.startsWith('/')) {
     return Workspace.pathBaseName(path)
   }
@@ -45,7 +50,8 @@ const getDescription = (uri: string): string => {
     const directory = Workspace.pathDirName(path)
     if (uri.startsWith(remoteSshScheme)) {
       const pathStart = getRemoteSshPathStart(uri)
-      return `${uri.slice(0, pathStart)}${directory}`
+      const authority = pathStart === -1 ? uri : uri.slice(0, pathStart)
+      return `${authority}${path === '/' ? '/' : directory}`
     }
     return directory
   }
