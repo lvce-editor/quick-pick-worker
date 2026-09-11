@@ -7,7 +7,7 @@ export const test: Test = async ({ Command, expect, IconTheme, Locator, QuickPic
   await Command.execute('RecentlyOpened.addToRecentlyOpened', 'remote-ssh://example.com/')
   await IconTheme.setIconTheme('test-scroll-icons')
 
-  await QuickPick.executeCommand('>File: Open Recent')
+  await Command.execute('QuickPick.showRecent')
 
   const label = Locator('.QuickPickItemLabel').nth(0)
   const description = Locator('.QuickPickItemDescription').nth(0)
