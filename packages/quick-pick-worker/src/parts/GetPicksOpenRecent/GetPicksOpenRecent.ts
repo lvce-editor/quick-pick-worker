@@ -25,7 +25,12 @@ const getPath = (uri: string): string => {
   if (uri.startsWith(remoteSshScheme)) {
     const pathStart = getRemoteSshPathStart(uri)
     if (pathStart !== -1) {
-      return decodePath(uri.slice(pathStart)).replace(/\/+$/, '') || '/'
+      const path = decodePath(uri.slice(pathStart))
+      let end = path.length
+      while (end > 1 && path[end - 1] === '/') {
+        end--
+      }
+      return path.slice(0, end)
     }
     return '/'
   }
@@ -36,7 +41,7 @@ const getLabel = (uri: string): string => {
   const path = getPath(uri)
   if (path === '/' && uri.startsWith(remoteSshScheme)) {
     const pathStart = getRemoteSshPathStart(uri)
-    return uri.slice(remoteSshScheme.length, pathStart === -1 ? undefined : pathStart)
+    return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
   }
   if (path.startsWith('/')) {
     return Workspace.pathBaseName(path)

@@ -2,8 +2,8 @@ import { expect, test } from '@jest/globals'
 import { RendererWorker } from '@lvce-editor/rpc-registry'
 import * as DirentType from '../src/parts/DirentType/DirentType.ts'
 import * as FilterQuickPickItems from '../src/parts/FilterQuickPickItems/FilterQuickPickItems.ts'
-import * as GetQuickPickFileIcons from '../src/parts/GetQuickPickFileIcons/GetQuickPickFileIcons.ts'
 import * as GetPicksOpenRecent from '../src/parts/GetPicksOpenRecent/GetPicksOpenRecent.ts'
+import * as GetQuickPickFileIcons from '../src/parts/GetQuickPickFileIcons/GetQuickPickFileIcons.ts'
 
 test('getPicks uses folder name as label and full path as description for file uris', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
@@ -97,8 +97,8 @@ test.each([
   ['remote-ssh://example.com/work/my%20project///', 'my project', 'remote-ssh://example.com/work'],
 ])('getPicks displays remote roots and trailing slashes: %s', async (uri, label, description) => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'RecentlyOpened.getRecentlyOpened': () => [uri],
     'IconTheme.getFolderIcon': ({ name }: { name: string }) => `folder-icon-for-${name}`,
+    'RecentlyOpened.getRecentlyOpened': () => [uri],
   })
 
   const picks = await GetPicksOpenRecent.getPicks()

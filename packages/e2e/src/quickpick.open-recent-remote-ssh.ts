@@ -9,10 +9,13 @@ export const test: Test = async ({ Command, expect, IconTheme, Locator, QuickPic
 
   await QuickPick.executeCommand('>File: Open Recent')
 
-  await expect(Locator('.QuickPickItemLabel').nth(0)).toHaveText('example.com')
-  await expect(Locator('.QuickPickItemDescription').nth(0)).toHaveText('remote-ssh://example.com/')
+  const label = Locator('.QuickPickItemLabel').nth(0)
+  const description = Locator('.QuickPickItemDescription').nth(0)
+  const icon = Locator('.QuickPickItem .FileIcon').nth(0)
+  await expect(label).toHaveText('example.com')
+  await expect(description).toHaveText('remote-ssh://example.com/')
   const folderIcon = await Command.execute('IconTheme.getFolderIcon', { name: 'example.com' })
-  await expect(Locator('.QuickPickItem .FileIcon').nth(0)).toHaveAttribute('src', folderIcon)
+  await expect(icon).toHaveAttribute('src', folderIcon)
   await QuickPick.setValue('example')
-  await expect(Locator('.QuickPickItemLabel').nth(0)).toHaveText('example.com')
+  await expect(label).toHaveText('example.com')
 }
