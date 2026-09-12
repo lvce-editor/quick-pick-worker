@@ -13,7 +13,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await QuickPick.setValue('::2')
   const label = Locator('.QuickPickItemLabel')
   await expect(label).toBeVisible()
-  await expect(label).toHaveText(`Press 'Enter' to go to line 0 column 2`)
+  await expect(label).toHaveText(`Press 'Enter' to go to line 1 column 3`)
 
   // act
   await QuickPick.selectIndex(0)

@@ -21,7 +21,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await QuickPick.setValue(':1')
 
   // assert
-  await expectQuickPickLabel("Press 'Enter' to go to line 0 column 0")
+  await expectQuickPickLabel("Press 'Enter' to go to line 1 column 1")
 
   // act
   await QuickPick.selectIndex(0)
