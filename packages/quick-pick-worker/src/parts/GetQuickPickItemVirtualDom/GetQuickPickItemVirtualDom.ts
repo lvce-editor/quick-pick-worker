@@ -50,5 +50,13 @@ export const getQuickPickItemVirtualDom = (visibleItem: VisibleItem): readonly V
       text(description),
     )
   }
+  if (visibleItem.keyBinding) {
+    parent.childCount++
+    const keys = visibleItem.keyBinding.split('+')
+    dom.push({ childCount: keys.length, className: 'QuickPickKeyBinding', type: VirtualDomElements.Div })
+    for (const key of keys) {
+      dom.push({ childCount: 1, className: 'Key', type: VirtualDomElements.Span }, text(key))
+    }
+  }
   return dom
 }

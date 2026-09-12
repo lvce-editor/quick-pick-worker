@@ -18,5 +18,11 @@
       "id": "test-scroll-icons",
       "path": "icons.json"
     }
+  ],
+  "keybindings": [
+    {
+      "command": "test.sshConnect",
+      "key": "Ctrl+Shift+U"
+    }
   ]
 }

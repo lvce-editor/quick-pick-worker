@@ -7,6 +7,7 @@ export interface QuickPickState extends List<any> {
   readonly applicationId?: string
   readonly args: readonly unknown[]
   readonly assetDir: string
+  readonly commandKeyBindings: Readonly<Record<string, string>>
   readonly cursorOffset: number
   readonly fileIconCache: FileIconCache
   readonly focused: boolean
