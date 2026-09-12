@@ -15,7 +15,6 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, Workspa
 
   // act
   await quickPickInput.type('>')
-  await new Promise((resolve) => setTimeout(resolve, 200))
 
   // assert
   await expect(quickPickInput).toHaveValue('>')

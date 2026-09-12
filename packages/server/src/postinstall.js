@@ -1,6 +1,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { patchWaitingAssertions } from './patchWaitingAssertions.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -35,4 +36,11 @@ const quickPickWorkerUrl = \`${remoteUrl}\``
 
   const newContent = content.replace(occurrence, replacement)
   await writeFile(rendererWorkerMainPath, newContent)
+}
+
+const rendererProcessPath = join(serverStaticPath, commitHash, 'packages', 'renderer-process', 'dist', 'rendererProcessMain.js')
+const rendererProcessContent = await readFile(rendererProcessPath, 'utf8')
+const patchedRendererProcessContent = patchWaitingAssertions(rendererProcessContent)
+if (patchedRendererProcessContent !== rendererProcessContent) {
+  await writeFile(rendererProcessPath, patchedRendererProcessContent)
 }
