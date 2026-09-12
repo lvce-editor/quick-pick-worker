@@ -53,7 +53,7 @@ test('returns position preview when value starts with "::" and has number', asyn
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 0 column 5",
+    label: "Press 'Enter' to go to line 1 column 6",
     matches: [],
     uri: '',
   })
@@ -83,7 +83,7 @@ test('returns position preview for multi-line text', async () => {
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 1 column 4",
+    label: "Press 'Enter' to go to line 2 column 5",
     matches: [],
     uri: '',
   })

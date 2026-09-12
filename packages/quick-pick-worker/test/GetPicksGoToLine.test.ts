@@ -39,7 +39,7 @@ test('returns position preview when value starts with ":" and has number', async
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 1 column 0",
+    label: "Press 'Enter' to go to line 2 column 1",
     matches: [],
     uri: '',
   })
@@ -53,7 +53,7 @@ test('returns position preview for line 1', async () => {
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 0 column 0",
+    label: "Press 'Enter' to go to line 1 column 1",
     matches: [],
     uri: '',
   })
@@ -96,4 +96,9 @@ test('returns empty array when value does not start with ":"', async () => {
 test('returns empty array for non-colon value', async () => {
   const result = await getPicks('test')
   expect(result).toHaveLength(0)
+})
+
+test('preview matches the entered line and column', async () => {
+  const result = await getPicks(':15:20')
+  expect(result[0].label).toBe("Press 'Enter' to go to line 15 column 20")
 })

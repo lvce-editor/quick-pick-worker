@@ -18,7 +18,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   const items = Locator('.QuickPickItem[role="option"]')
   const quickPick = Locator('#QuickPick')
   await QuickPick.setValue(':2:2')
-  await expectQuickPickLabel("Press 'Enter' to go to line 1 column 1")
+  await expectQuickPickLabel("Press 'Enter' to go to line 2 column 2")
 
   // act
   await QuickPick.setValue(':Infinity')
