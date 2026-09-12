@@ -11,6 +11,7 @@ const locations = [
   '.github/workflows/release.yml',
   'packages/build/src/computeNodeModulesCacheKey.js',
   'packages/server/src/postinstall.js',
+  'packages/server/src/patchWaitingAssertions.js',
 ]
 
 const getAbsolutePath = (relativePath) => {
