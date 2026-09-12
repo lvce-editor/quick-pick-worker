@@ -11,7 +11,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
 
   // arrange
   const tmpDir = await FileSystem.getTmpDir()
-  await FileSystem.writeFile(`${tmpDir}/edge.txt`, Array.from({ length: 15 }).fill('abcdefghijklmnopqrst').join('\n'))
+  await FileSystem.writeFile(`${tmpDir}/edge.txt`, 'abcdefghijklmnopqrst\n'.repeat(15))
   await Workspace.setPath(tmpDir)
   await Main.openUri(`${tmpDir}/edge.txt`)
   await QuickPick.open()
