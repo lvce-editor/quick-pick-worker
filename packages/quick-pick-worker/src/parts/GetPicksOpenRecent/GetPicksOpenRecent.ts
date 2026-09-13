@@ -18,6 +18,11 @@ const getRemoteSshPathStart = (uri: string): number => {
   return uri.indexOf('/', remoteSshScheme.length)
 }
 
+const getRemoteSshAuthority = (uri: string): string => {
+  const pathStart = getRemoteSshPathStart(uri)
+  return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
+}
+
 const getPath = (uri: string): string => {
   if (uri.startsWith(fileScheme)) {
     return decodePath(uri.slice(fileScheme.length))
@@ -37,39 +42,32 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const getLabel = (uri: string): string => {
-  const path = getPath(uri)
-  if (path === '/' && uri.startsWith(remoteSshScheme)) {
-    const pathStart = getRemoteSshPathStart(uri)
-    return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
-  }
-  if (path.startsWith('/')) {
-    return Workspace.pathBaseName(path)
-  }
-  return path
-}
-
-const getDescription = (uri: string): string => {
-  const path = getPath(uri)
-  if (path.startsWith('/')) {
-    const directory = Workspace.pathDirName(path)
-    if (uri.startsWith(remoteSshScheme)) {
-      const pathStart = getRemoteSshPathStart(uri)
-      const authority = pathStart === -1 ? uri : uri.slice(0, pathStart)
-      return `${authority}${path === '/' ? '/' : directory}`
-    }
-    return directory
-  }
-  return ''
-}
-
 const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
+  const path = getPath(uri)
+  const isRemoteSsh = uri.startsWith(remoteSshScheme)
+  const authority = isRemoteSsh ? getRemoteSshAuthority(uri) : ''
+  let folderName = path
+  if (path.startsWith('/')) {
+    folderName = Workspace.pathBaseName(path)
+  }
+  if (path === '/' && isRemoteSsh) {
+    folderName = authority
+  }
+  let description = ''
+  if (path.startsWith('/')) {
+    description = Workspace.pathDirName(path)
+  }
+  if (path === '/' && isRemoteSsh) {
+    description = '/'
+  }
+  const label = isRemoteSsh ? `${folderName} [SSH: ${authority}]` : folderName
   return {
-    description: getDescription(uri),
+    description,
     direntType: DirentType.Directory,
     fileIcon: '',
     icon: '',
-    label: getLabel(uri),
+    iconName: isRemoteSsh ? folderName : undefined,
+    label,
     matches: [],
     uri,
   }

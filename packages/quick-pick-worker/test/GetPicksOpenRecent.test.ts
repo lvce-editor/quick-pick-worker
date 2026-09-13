@@ -78,11 +78,12 @@ test('getPicks uses the remote folder name as label so remote ssh folders can be
 
   expect(result).toEqual([
     {
-      description: 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet',
+      description: '/home/simon/Documents/levivilet',
       direntType: DirentType.Directory,
       fileIcon: '',
       icon: '',
-      label: 'about-view',
+      iconName: 'about-view',
+      label: 'about-view [SSH: 89.167.102.168]',
       matches: [48, 0, 5],
       uri: 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/about%2Dview',
     },
@@ -91,19 +92,19 @@ test('getPicks uses the remote folder name as label so remote ssh folders can be
 })
 
 test.each([
-  ['remote-ssh://example.com/', 'example.com', 'remote-ssh://example.com/'],
-  ['remote-ssh://example.com', 'example.com', 'remote-ssh://example.com/'],
-  ['remote-ssh://user@[2001:db8::1]:2222/', 'user@[2001:db8::1]:2222', 'remote-ssh://user@[2001:db8::1]:2222/'],
-  ['remote-ssh://example.com/work/my%20project///', 'my project', 'remote-ssh://example.com/work'],
-])('getPicks displays remote roots and trailing slashes: %s', async (uri, label, description) => {
+  ['remote-ssh://example.com/', 'example.com [SSH: example.com]', 'example.com', '/'],
+  ['remote-ssh://example.com', 'example.com [SSH: example.com]', 'example.com', '/'],
+  ['remote-ssh://user@[2001:db8::1]:2222/', 'user@[2001:db8::1]:2222 [SSH: user@[2001:db8::1]:2222]', 'user@[2001:db8::1]:2222', '/'],
+  ['remote-ssh://example.com/work/my%20project///', 'my project [SSH: example.com]', 'my project', '/work'],
+])('getPicks displays remote roots and trailing slashes: %s', async (uri, label, iconName, description) => {
   using mockRpc = RendererWorker.registerMockRpc({
     'IconTheme.getFolderIcon': ({ name }: { name: string }) => `folder-icon-for-${name}`,
     'RecentlyOpened.getRecentlyOpened': () => [uri],
   })
 
   const picks = await GetPicksOpenRecent.getPicks()
-  expect(picks).toEqual([{ description, direntType: DirentType.Directory, fileIcon: '', icon: '', label, matches: [], uri }])
+  expect(picks).toEqual([{ description, direntType: DirentType.Directory, fileIcon: '', icon: '', iconName, label, matches: [], uri }])
   const { icons } = await GetQuickPickFileIcons.getQuickPickFileIcons(picks, {})
-  expect(icons).toEqual([`folder-icon-for-${label}`])
-  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['IconTheme.getFolderIcon', { name: label }]])
+  expect(icons).toEqual([`folder-icon-for-${iconName}`])
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['IconTheme.getFolderIcon', { name: iconName }]])
 })
