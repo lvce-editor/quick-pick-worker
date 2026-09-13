@@ -18,6 +18,11 @@ const getRemoteSshPathStart = (uri: string): number => {
   return uri.indexOf('/', remoteSshScheme.length)
 }
 
+const getRemoteSshAuthority = (uri: string): string => {
+  const pathStart = getRemoteSshPathStart(uri)
+  return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
+}
+
 const getPath = (uri: string): string => {
   if (uri.startsWith(fileScheme)) {
     return decodePath(uri.slice(fileScheme.length))
@@ -39,9 +44,9 @@ const getPath = (uri: string): string => {
 
 const getLabel = (uri: string): string => {
   const path = getPath(uri)
-  if (path === '/' && uri.startsWith(remoteSshScheme)) {
-    const pathStart = getRemoteSshPathStart(uri)
-    return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
+  if (uri.startsWith(remoteSshScheme)) {
+    const label = path === '/' ? getRemoteSshAuthority(uri) : Workspace.pathBaseName(path)
+    return `${label} [SSH: ${getRemoteSshAuthority(uri)}]`
   }
   if (path.startsWith('/')) {
     return Workspace.pathBaseName(path)
@@ -54,13 +59,19 @@ const getDescription = (uri: string): string => {
   if (path.startsWith('/')) {
     const directory = Workspace.pathDirName(path)
     if (uri.startsWith(remoteSshScheme)) {
-      const pathStart = getRemoteSshPathStart(uri)
-      const authority = pathStart === -1 ? uri : uri.slice(0, pathStart)
-      return `${authority}${path === '/' ? '/' : directory}`
+      return path === '/' ? '/' : directory
     }
     return directory
   }
   return ''
+}
+
+const getIconName = (uri: string): string | undefined => {
+  if (!uri.startsWith(remoteSshScheme)) {
+    return undefined
+  }
+  const path = getPath(uri)
+  return path === '/' ? getRemoteSshAuthority(uri) : Workspace.pathBaseName(path)
 }
 
 const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
@@ -69,6 +80,7 @@ const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
     direntType: DirentType.Directory,
     fileIcon: '',
     icon: '',
+    iconName: getIconName(uri),
     label: getLabel(uri),
     matches: [],
     uri,
