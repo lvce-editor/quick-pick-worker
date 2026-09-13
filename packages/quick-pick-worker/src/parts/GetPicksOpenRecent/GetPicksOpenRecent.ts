@@ -42,46 +42,32 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const getLabel = (uri: string): string => {
-  const path = getPath(uri)
-  if (uri.startsWith(remoteSshScheme)) {
-    const label = path === '/' ? getRemoteSshAuthority(uri) : Workspace.pathBaseName(path)
-    return `${label} [SSH: ${getRemoteSshAuthority(uri)}]`
-  }
-  if (path.startsWith('/')) {
-    return Workspace.pathBaseName(path)
-  }
-  return path
-}
-
-const getDescription = (uri: string): string => {
-  const path = getPath(uri)
-  if (path.startsWith('/')) {
-    const directory = Workspace.pathDirName(path)
-    if (uri.startsWith(remoteSshScheme)) {
-      return path === '/' ? '/' : directory
-    }
-    return directory
-  }
-  return ''
-}
-
-const getIconName = (uri: string): string | undefined => {
-  if (!uri.startsWith(remoteSshScheme)) {
-    return undefined
-  }
-  const path = getPath(uri)
-  return path === '/' ? getRemoteSshAuthority(uri) : Workspace.pathBaseName(path)
-}
-
 const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
+  const path = getPath(uri)
+  const isRemoteSsh = uri.startsWith(remoteSshScheme)
+  const authority = isRemoteSsh ? getRemoteSshAuthority(uri) : ''
+  let folderName = path
+  if (path.startsWith('/')) {
+    folderName = Workspace.pathBaseName(path)
+  }
+  if (path === '/' && isRemoteSsh) {
+    folderName = authority
+  }
+  let description = ''
+  if (path.startsWith('/')) {
+    description = Workspace.pathDirName(path)
+  }
+  if (path === '/' && isRemoteSsh) {
+    description = '/'
+  }
+  const label = isRemoteSsh ? `${folderName} [SSH: ${authority}]` : folderName
   return {
-    description: getDescription(uri),
+    description,
     direntType: DirentType.Directory,
     fileIcon: '',
     icon: '',
-    iconName: getIconName(uri),
-    label: getLabel(uri),
+    iconName: isRemoteSsh ? folderName : undefined,
+    label,
     matches: [],
     uri,
   }
