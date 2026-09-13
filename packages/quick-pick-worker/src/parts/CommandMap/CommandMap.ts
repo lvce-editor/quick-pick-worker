@@ -12,7 +12,6 @@ import * as HandleBeforeInput from '../HandleBeforeInput/HandleBeforeInput.ts'
 import * as HandleBlur from '../HandleBlur/HandleBlur.ts'
 import * as HandleClickAt from '../HandleClickAt/HandleClickAt.ts'
 import * as HandleFocus from '../HandleFocus/HandleFocus.ts'
-import * as HandleIconThemeChange from '../HandleIconThemeChange/HandleIconThemeChange.ts'
 import * as HandleInput from '../HandleInput/HandleInput.ts'
 import { handleMessagePort } from '../HandleMessagePort/HandleMessagePort.ts'
 import { handleRendererProcessMessagePort } from '../HandleRendererProcessMessagePort/HandleRendererProcessMessagePort.ts'
@@ -59,7 +58,6 @@ export const commandMap = {
   'QuickPick.handleBlur': WrapCommand.wrapCommand(HandleBlur.handleBlur),
   'QuickPick.handleClickAt': WrapCommand.wrapCommand(HandleClickAt.handleClickAt),
   'QuickPick.handleFocus': WrapCommand.wrapCommand(HandleFocus.handleFocus),
-  'QuickPick.handleIconThemeChange': WrapCommand.wrapCommand(HandleIconThemeChange.handleIconThemeChange),
   'QuickPick.handleInput': SerializeCommand.serialize(WrapCommand.wrapAsyncCommand(HandleInput.handleInputWithContext)),
   'QuickPick.handleMessagePort': handleMessagePort,
   'QuickPick.handleRendererProcessMessagePort': handleDirectMessagePort,
