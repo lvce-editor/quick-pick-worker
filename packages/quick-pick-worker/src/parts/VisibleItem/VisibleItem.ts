@@ -6,6 +6,7 @@ export interface VisibleItem {
   readonly highlights: readonly HighlightSection[]
   readonly icon: string
   readonly isActive: boolean
+  readonly keyBinding?: string
   readonly label: string
   readonly posInSet: number
   readonly setSize: number

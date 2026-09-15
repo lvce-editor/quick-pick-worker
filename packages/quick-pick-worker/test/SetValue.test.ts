@@ -396,7 +396,11 @@ test('does not apply command results after the view is reopened with a custom pi
   expect(newState.value).toBe('')
   expect(newState.picks).toEqual([branchPick])
   expect(newState.items).toEqual([branchPick])
-  expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  expect(mockRpc.invocations).toEqual([
+    ['Preferences.get', 'quickPick.showKeyBindings'],
+    ['Layout.getAllQuickPickMenuEntries'],
+    ['ExtensionHost.getCommands', '', 0],
+  ])
 })
 
 test('ranks matching commands and focuses SSH Connect when typing ssh', async () => {

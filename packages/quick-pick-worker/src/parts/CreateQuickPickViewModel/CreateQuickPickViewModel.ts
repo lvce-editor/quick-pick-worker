@@ -2,8 +2,11 @@ import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import type { QuickPickViewModel } from '../QuickPickViewModel/QuickPickViewModel.ts'
 import * as GetListHeight from '../GetListHeight/GetListHeight.ts'
 import * as GetProtoVisibleQuickPickItems from '../GetProtoVisibleQuickPickItems/GetProtoVisibleQuickPickItems.ts'
+import { getQuickPickPrefix } from '../GetQuickPickPrefix/GetQuickPickPrefix.ts'
+import { getQuickPickSubProviderId } from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as GetScrollBarSize from '../GetScrollBarSize/GetScrollBarSize.ts'
 import * as GetVisibleQuickPickItems from '../GetVisibleQuickPickItems/GetVisibleQuickPickItems.ts'
+import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as ScrollBarFunctions from '../ScrollBarFunctions/ScrollBarFunctions.ts'
 
 export const createQuickPickViewModel = (oldState: QuickPickState, newState: QuickPickState): QuickPickViewModel => {
@@ -25,7 +28,14 @@ export const createQuickPickViewModel = (oldState: QuickPickState, newState: Qui
     value,
   } = newState
   const protoVisibleItems = GetProtoVisibleQuickPickItems.getVisible(items, minLineY, maxLineY, icons)
-  const visibleItems = GetVisibleQuickPickItems.getVisible(items.length, protoVisibleItems, minLineY, focusedIndex)
+  const isCommands = getQuickPickSubProviderId(newState.providerId, getQuickPickPrefix(value)) === QuickPickEntryId.Commands
+  const visibleItems = GetVisibleQuickPickItems.getVisible(
+    items.length,
+    protoVisibleItems,
+    minLineY,
+    focusedIndex,
+    isCommands ? newState.commandKeyBindings : {},
+  )
   const oldFocusedIndex = oldState.focusedIndex - oldState.minLineY
   const newFocusedIndex = focusedIndex - minLineY
   const itemCount = items.length

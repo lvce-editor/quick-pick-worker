@@ -13,6 +13,7 @@ import * as GetQuickPickProviderId from '../GetQuickPickProviderId/GetQuickPickP
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
+import { loadCommandKeyBindings } from '../LoadCommandKeyBindings/LoadCommandKeyBindings.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
 import * as QuickPickVisibleCallbacks from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
@@ -55,6 +56,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const value = GetDefaultValue.getDefaultValue(id, uri, args)
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
+  const commandKeyBindings = subId === QuickPickEntryId.Commands ? await loadCommandKeyBindings(state.applicationId) : {}
   const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
   const filterValue = GetFilterValue.getFilterValue(id, subId, value)
@@ -72,6 +74,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   return {
     ...state,
     args,
+    commandKeyBindings,
     cursorOffset: value.length,
     fileIconCache: newFileIconCache,
     finalDeltaY,
@@ -102,6 +105,7 @@ export const loadContentWithContext = async (context: AsyncCommandContext<QuickP
   const loadedState = await getLoadedState(state)
   await context.updateState((latestState) => ({
     ...latestState,
+    commandKeyBindings: loadedState.commandKeyBindings,
     cursorOffset: loadedState.cursorOffset,
     fileIconCache: loadedState.fileIconCache,
     finalDeltaY: loadedState.finalDeltaY,

@@ -10,6 +10,7 @@ import * as GetQuickPickPrefix from '../GetQuickPickPrefix/GetQuickPickPrefix.ts
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
+import { loadCommandKeyBindings } from '../LoadCommandKeyBindings/LoadCommandKeyBindings.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 
 const requestVersions = new Map<number, number>()
@@ -40,6 +41,9 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   }
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
+  const previousSubId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, GetQuickPickPrefix.getQuickPickPrefix(value))
+  const commandKeyBindings =
+    subId === QuickPickEntryId.Commands && previousSubId !== subId ? await loadCommandKeyBindings(state.applicationId) : state.commandKeyBindings
   const quickInput = isQuickInput(args)
   const newPicks =
     isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode
@@ -56,6 +60,7 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
 
   return {
     ...state,
+    commandKeyBindings,
     fileIconCache: newFileIconCache,
     finalDeltaY,
     focusedIndex,
@@ -81,6 +86,7 @@ export const setValueWithContext = async (context: AsyncCommandContext<QuickPick
     }
     return {
       ...latestState,
+      commandKeyBindings: result.commandKeyBindings,
       fileIconCache: result.fileIconCache,
       finalDeltaY: result.finalDeltaY,
       focusedIndex: result.focusedIndex,
