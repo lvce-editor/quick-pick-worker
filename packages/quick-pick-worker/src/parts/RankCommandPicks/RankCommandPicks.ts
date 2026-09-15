@@ -14,8 +14,7 @@ const getWordStartMatchCount = (label: string, matches: readonly number[]): numb
   return count
 }
 
-const getMatchRank = (item: ProtoVisibleItem, value: string): number => {
-  const { label, matches } = item
+const getMatchRank = (label: string, matches: readonly number[], value: string): number => {
   if (label === value) {
     return 4
   }
@@ -42,7 +41,7 @@ export const rankCommandPicks = (items: readonly ProtoVisibleItem[], value: stri
   const normalizedValue = value.toLowerCase()
   const ranked = items.map((item) => ({
     item,
-    rank: getMatchRank({ ...item, label: item.label.toLowerCase() }, normalizedValue),
+    rank: getMatchRank(item.label.toLowerCase(), item.matches, normalizedValue),
   }))
   // The first match entry is the fuzzy score; the remaining entries describe highlights.
   ranked.sort((a, b) => b.rank - a.rank || b.item.matches[0] - a.item.matches[0])
