@@ -3,8 +3,8 @@ import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as GetIndex from '../GetIndex/GetIndex.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
-import * as SetValue from '../SetValue/SetValue.ts'
 import { selectIndex } from '../SelectIndex/SelectIndex.ts'
+import * as SetValue from '../SetValue/SetValue.ts'
 
 const removeRecentlyOpened = async (state: QuickPickState, uri: string): Promise<QuickPickState> => {
   const canRemove = state.providerId === QuickPickEntryId.Recent && state.items.some((item) => item.removeButton && item.uri === uri)

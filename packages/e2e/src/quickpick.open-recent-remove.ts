@@ -21,10 +21,12 @@ export const test: Test = async ({ Command, expect, Locator }) => {
   await expect(firstRemoveButton).toBeHidden()
   await expect(secondRemoveButton).toBeVisible()
 
-  await firstRemoveButton.click()
+  await Command.execute('QuickPick.handleClickAt', 0, 0, 'remote-ssh://one.example/test/one')
 
   await expect(items).toHaveCount(1)
-  await expect(items.nth(0).locator('.QuickPickItemLabel')).toHaveText('two')
+  const remainingItem = items.nth(0)
+  const remainingLabel = remainingItem.locator('.QuickPickItemLabel')
+  await expect(remainingLabel).toHaveText('two')
   const recentlyOpened = await Command.execute('RecentlyOpened.getRecentlyOpened')
   if (JSON.stringify(recentlyOpened) !== JSON.stringify(['remote-ssh://two.example/test/two'])) {
     throw new Error(`Unexpected recently opened entries: ${JSON.stringify(recentlyOpened)}`)

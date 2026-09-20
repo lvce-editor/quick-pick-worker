@@ -228,8 +228,8 @@ test('handleClickAt ignores x coordinate', async () => {
 
 test('handleClickAt removes a recent item without selecting it', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'RecentlyOpened.removeRecentlyOpened': () => {},
     'RecentlyOpened.getRecentlyOpened': () => [],
+    'RecentlyOpened.removeRecentlyOpened': () => {},
   })
   const state = {
     ...CreateDefaultState.createDefaultState(),
