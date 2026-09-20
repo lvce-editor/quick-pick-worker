@@ -417,6 +417,53 @@ test('loadContent calculates finalDeltaY for short lists', async () => {
   expect(result.finalDeltaY).toBe(0)
 })
 
+test('loadContent focuses the current color theme and makes it visible', async () => {
+  const colorThemes = Array.from({ length: 20 }, (_, i) => `theme-${i}`)
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'theme-15',
+    'ColorTheme.getColorThemeNames': () => colorThemes,
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    maxVisibleItems: 10,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(15)
+  expect(result.minLineY).toBe(6)
+  expect(result.maxLineY).toBe(16)
+  expect(result.deltaY).toBe(180)
+  expect(result.items.map((item) => item.label)).toEqual(colorThemes)
+  expect(result.icons).toHaveLength(10)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
+test('loadContent falls back to the first color theme when the current theme is absent', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'missing-theme',
+    'ColorTheme.getColorThemeNames': () => ['theme-1', 'theme-2'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(0)
+  expect(result.minLineY).toBe(0)
+  expect(result.maxLineY).toBe(2)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
 test('loadContent preserves other state properties', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
@@ -550,4 +597,32 @@ test('loadContent commits state before notifying that the quick pick is visible'
   expect(stateWhenVisible?.initial).toBe(false)
   expect(stateWhenVisible?.items).toHaveLength(1)
   expect(stateWhenVisible?.state).toBe(QuickPickOpenState.Finished)
+})
+
+test('loadContentWithContext transfers the initial color theme scroll position', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'theme-15',
+    'ColorTheme.getColorThemeNames': () => Array.from({ length: 20 }, (_, i) => `theme-${i}`),
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    initial: true,
+    maxVisibleItems: 10,
+    uid: 2,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+
+  await loadCommand(state.uid)
+
+  const newState = QuickPickStates.get(state.uid).newState
+  expect(newState.focusedIndex).toBe(15)
+  expect(newState.minLineY).toBe(6)
+  expect(newState.maxLineY).toBe(16)
+  expect(newState.deltaY).toBe(180)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
 })

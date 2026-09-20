@@ -21,9 +21,27 @@ export const test: Test = async ({ expect, FileSystem, Locator, Main, QuickPick,
   await expect(firstItem).toHaveText('atom-one-dark')
 
   // act
+  await QuickPick.setValue('ayu')
   await QuickPick.selectIndex(0)
 
   // assert
   const quickPick = Locator('.QuickPick')
+  await expect(quickPick).toBeHidden()
+
+  // act
+  await QuickPick.open()
+  await QuickPick.setValue('>Preferences: Color Theme')
+  await QuickPick.selectItem('Preferences: Color Theme', {
+    waitUntil: 'quickPick',
+  })
+
+  // assert
+  const activeItem = Locator('.QuickPickItemActive')
+  await expect(activeItem).toHaveText('ayu')
+
+  // act
+  await QuickPick.selectIndex(1)
+
+  // assert
   await expect(quickPick).toBeHidden()
 }
