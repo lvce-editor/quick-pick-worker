@@ -111,6 +111,7 @@ test('selectIndex handles default command case', async () => {
 
 test('selectIndex opens the color theme provider from the command palette', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'atom-one-dark',
     'ColorTheme.getColorThemeNames': () => ['atom-one-dark', 'ayu'],
   })
 
@@ -142,7 +143,7 @@ test('selectIndex opens the color theme provider from the command palette', asyn
   expect(result.uri).toBe(QuickPickEntryUri.ColorTheme)
   expect(result.value).toBe('')
   expect(result.items.map((item) => item.label)).toEqual(['atom-one-dark', 'ayu'])
-  expect(mockRpc.invocations).toEqual([['ColorTheme.getColorThemeNames', '', 0]])
+  expect(mockRpc.invocations).toEqual([['ColorTheme.getColorThemeNames', '', 0], ['ColorTheme.getColorTheme']])
 })
 
 test('selectIndex calculates actualIndex correctly with minLineY', async () => {

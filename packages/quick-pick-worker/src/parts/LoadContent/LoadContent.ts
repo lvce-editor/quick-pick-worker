@@ -1,4 +1,5 @@
 import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as Assert from '../Assert/Assert.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
@@ -57,13 +58,28 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
   const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
+  let colorTheme = ''
+  if (subId === QuickPickEntryId.ColorTheme) {
+    try {
+      colorTheme = await RendererWorker.invoke('ColorTheme.getColorTheme')
+    } catch {
+      // The worker can be released before the renderer endpoint.
+    }
+  }
   const filterValue = GetFilterValue.getFilterValue(id, subId, value)
   const items = IsTextInput.isTextInput(args)
     ? newPicks
     : FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue, subId === QuickPickEntryId.Commands)
-  const minLineY = 0
-  const maxLineY = Math.min(minLineY + maxVisibleItems, newPicks.length)
-  const sliced = newPicks.slice(minLineY, maxLineY)
+  const focusedIndex =
+    subId === QuickPickEntryId.ColorTheme
+      ? Math.max(
+          items.findIndex((item) => item.label === colorTheme),
+          0,
+        )
+      : 0
+  const minLineY = Math.max(Math.min(focusedIndex - maxVisibleItems + 1, items.length - maxVisibleItems), 0)
+  const maxLineY = Math.min(minLineY + maxVisibleItems, items.length)
+  const sliced = items.slice(minLineY, maxLineY)
   const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(sliced, fileIconCache)
   const listHeight = GetListHeight.getListHeight(items.length, itemHeight, height)
   const finalDeltaY = GetFinalDeltaY.getFinalDeltaY(listHeight, itemHeight, items.length)
@@ -73,10 +89,11 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
     ...state,
     args,
     cursorOffset: value.length,
+    deltaY: minLineY * itemHeight,
     fileIconCache: newFileIconCache,
     finalDeltaY,
     focused: true,
-    focusedIndex: 0,
+    focusedIndex,
     icons,
     initial: false,
     inputSource: InputSource.Script,
@@ -103,6 +120,7 @@ export const loadContentWithContext = async (context: AsyncCommandContext<QuickP
   await context.updateState((latestState) => ({
     ...latestState,
     cursorOffset: loadedState.cursorOffset,
+    deltaY: loadedState.deltaY,
     fileIconCache: loadedState.fileIconCache,
     finalDeltaY: loadedState.finalDeltaY,
     focused: loadedState.focused,
