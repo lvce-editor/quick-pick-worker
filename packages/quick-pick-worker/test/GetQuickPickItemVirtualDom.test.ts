@@ -174,7 +174,7 @@ test('adds remove button when specified', () => {
   expect(dom.at(-2)).toEqual({
     ariaLabel: 'Remove from Recently Opened',
     childCount: 1,
-    className: ClassNames.QuickPickItemRemove,
+    className: 'QuickPickItemRemove',
     'data-uri': 'file:///test',
     title: 'Remove from Recently Opened',
     type: VirtualDomElements.Button,

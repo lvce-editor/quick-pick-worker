@@ -7,7 +7,6 @@ import * as DomId from '../DomId/DomId.ts'
 import * as GetFileIconVirtualDom from '../GetFileIconVirtualDom/GetFileIconVirtualDom.ts'
 import * as GetHighlights from '../GetHighlights/GetHighlights.ts'
 import * as MergeClassNames from '../MergeClassNames/MergeClassNames.ts'
-import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 import { text } from '../VirtualDomHelpers/VirtualDomHelpers.ts'
 
 export const getQuickPickItemVirtualDom = (visibleItem: VisibleItem): readonly VirtualDomNode[] => {
@@ -55,11 +54,11 @@ export const getQuickPickItemVirtualDom = (visibleItem: VisibleItem): readonly V
     parent.childCount++
     dom.push(
       {
-        ariaLabel: QuickPickStrings.removeFromRecentlyOpened(),
+        ariaLabel: 'Remove from Recently Opened',
         childCount: 1,
-        className: ClassNames.QuickPickItemRemove,
+        className: 'QuickPickItemRemove',
         'data-uri': uri,
-        title: QuickPickStrings.removeFromRecentlyOpened(),
+        title: 'Remove from Recently Opened',
         type: VirtualDomElements.Button,
       },
       text('×'),

@@ -6,22 +6,18 @@ import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import { selectIndex } from '../SelectIndex/SelectIndex.ts'
 import * as SetValue from '../SetValue/SetValue.ts'
 
-const removeRecentlyOpened = async (state: QuickPickState, uri: string): Promise<QuickPickState> => {
-  const canRemove = state.providerId === QuickPickEntryId.Recent && state.items.some((item) => item.removeButton && item.uri === uri)
-  if (!canRemove) {
+const r = async (state: QuickPickState, uri: string): Promise<QuickPickState> => {
+  if (state.providerId !== QuickPickEntryId.Recent || state.items.every((item) => item.uri !== uri)) {
     return state
   }
   await RendererWorker.invoke('RecentlyOpened.removeRecentlyOpened', uri)
-  const reloadedState = await LoadContent.loadContent({ ...state, value: '' })
-  if (state.value) {
-    return SetValue.setValue(reloadedState, state.value)
-  }
-  return reloadedState
+  const next = await LoadContent.loadContent({ ...state, value: '' })
+  return state.value ? SetValue.setValue(next, state.value) : next
 }
 
-export const handleClickAt = (state: QuickPickState, x: number, y: number, removeUri?: string): Promise<QuickPickState> => {
-  if (removeUri) {
-    return removeRecentlyOpened(state, removeUri)
+export const handleClickAt = (state: QuickPickState, x: number, y: number, uri?: string): Promise<QuickPickState> => {
+  if (uri) {
+    return r(state, uri)
   }
   const { headerHeight, itemHeight, top } = state
   const index = GetIndex.getIndex(top, headerHeight, itemHeight, y)

@@ -52,10 +52,6 @@ export const openRecent = (): string => {
   return I18NString.i18nString(UiStrings.OpenRecent)
 }
 
-export const removeFromRecentlyOpened = (): string => {
-  return I18NString.i18nString(UiStrings.RemoveFromRecentlyOpened)
-}
-
 export const noRecentlyOpenedFoldersFound = (): string => {
   return I18NString.i18nString(UiStrings.NoRecentlyOpenedFoldersFound)
 }
