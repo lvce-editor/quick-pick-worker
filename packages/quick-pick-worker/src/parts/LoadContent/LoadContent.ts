@@ -70,7 +70,13 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const items = IsTextInput.isTextInput(args)
     ? newPicks
     : FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue, subId === QuickPickEntryId.Commands)
-  const focusedIndex = subId === QuickPickEntryId.ColorTheme ? Math.max(items.findIndex((item) => item.label === colorTheme), 0) : 0
+  const focusedIndex =
+    subId === QuickPickEntryId.ColorTheme
+      ? Math.max(
+          items.findIndex((item) => item.label === colorTheme),
+          0,
+        )
+      : 0
   const minLineY = Math.max(Math.min(focusedIndex - maxVisibleItems + 1, items.length - maxVisibleItems), 0)
   const maxLineY = Math.min(minLineY + maxVisibleItems, items.length)
   const sliced = items.slice(minLineY, maxLineY)
