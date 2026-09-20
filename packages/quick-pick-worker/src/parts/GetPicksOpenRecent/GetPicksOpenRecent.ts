@@ -1,6 +1,6 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as DirentType from '../DirentType/DirentType.ts'
-import * as GetHomeDir from '../GetHomeDir/GetHomeDir.ts'
 import * as GetRecentlyOpened from '../GetRecentlyOpened/GetRecentlyOpened.ts'
 import * as Workspace from '../Workspace/Workspace.ts'
 
@@ -43,13 +43,6 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const abbreviateHomeDir = (path: string, homeDir: string): string => {
-  if (homeDir && (path === homeDir || path.startsWith(`${homeDir}/`))) {
-    return `~${path.slice(homeDir.length)}`
-  }
-  return path
-}
-
 const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
   const path = getPath(uri)
   const isRemoteSsh = uri.startsWith(remoteSshScheme)
@@ -64,8 +57,8 @@ const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
   let description = ''
   if (path.startsWith('/')) {
     description = Workspace.pathDirName(path)
-    if (!isRemoteSsh) {
-      description = abbreviateHomeDir(description, homeDir)
+    if (!isRemoteSsh && homeDir && (description === homeDir || description.startsWith(`${homeDir}/`))) {
+      description = `~${description.slice(homeDir.length)}`
     }
   }
   if (path === '/' && isRemoteSsh) {
@@ -88,7 +81,15 @@ const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
 export const getPicks = async (): Promise<readonly ProtoVisibleItem[]> => {
   const recentlyOpened = await GetRecentlyOpened.getRecentlyOpened()
   const hasLocalEntries = recentlyOpened.some((uri) => !uri.startsWith(remoteSshScheme) && getPath(uri).startsWith('/'))
-  const homeDir = hasLocalEntries ? await GetHomeDir.getHomeDir() : ''
+  let homeDir = ''
+  if (hasLocalEntries) {
+    try {
+      const value = await RendererWorker.invoke('Workspace.getHomeDir')
+      homeDir = typeof value === 'string' ? value : ''
+    } catch {
+      // Ignore unavailable workspace RPCs and keep the full path.
+    }
+  }
   const picks = recentlyOpened.map((uri) => toProtoVisibleItem(uri, homeDir))
   return picks
 }
