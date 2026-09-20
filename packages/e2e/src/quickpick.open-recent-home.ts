@@ -12,6 +12,8 @@ export const test: Test = async ({ Command, expect, Locator, QuickPick }) => {
   await QuickPick.setValue('levivilet')
 
   const descriptions = Locator('.QuickPickItemDescription')
-  await expect(descriptions.nth(0)).toHaveText(`~ish/Documents`)
-  await expect(descriptions.nth(1)).toHaveText('~/Documents')
+  const firstDescription = descriptions.nth(0)
+  const secondDescription = descriptions.nth(1)
+  await expect(firstDescription).toHaveText(`~ish/Documents`)
+  await expect(secondDescription).toHaveText('~/Documents')
 }
