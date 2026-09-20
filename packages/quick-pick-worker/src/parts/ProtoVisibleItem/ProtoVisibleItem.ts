@@ -8,6 +8,7 @@ export interface ProtoVisibleItem {
   readonly iconName?: string
   readonly label: string
   readonly matches: readonly number[]
+  readonly removeButton?: boolean
   readonly uri: string
   readonly value?: unknown
 }

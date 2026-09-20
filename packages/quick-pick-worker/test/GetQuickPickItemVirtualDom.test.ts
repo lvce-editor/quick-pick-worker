@@ -157,6 +157,35 @@ test('adds description when specified', () => {
   ])
 })
 
+test('adds remove button when specified', () => {
+  const visibleItem: VisibleItem = {
+    description: '',
+    fileIcon: '',
+    highlights: [],
+    icon: '',
+    isActive: false,
+    label: 'test-label',
+    posInSet: 1,
+    removeButton: true,
+    setSize: 10,
+    uri: 'file:///test',
+  }
+  const dom = GetQuickPickItemVirtualDom.getQuickPickItemVirtualDom(visibleItem)
+  expect(dom.at(-2)).toEqual({
+    ariaLabel: 'Remove from Recently Opened',
+    childCount: 1,
+    className: ClassNames.QuickPickItemRemove,
+    'data-uri': 'file:///test',
+    title: 'Remove from Recently Opened',
+    type: VirtualDomElements.Button,
+  })
+  expect(dom.at(-1)).toEqual({
+    childCount: 0,
+    text: '×',
+    type: 12,
+  })
+})
+
 test('adds highlights for matched text', () => {
   const visibleItem: VisibleItem = {
     description: '',

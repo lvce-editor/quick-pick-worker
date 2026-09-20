@@ -8,5 +8,7 @@ export interface VisibleItem {
   readonly isActive: boolean
   readonly label: string
   readonly posInSet: number
+  readonly removeButton?: boolean
   readonly setSize: number
+  readonly uri?: string
 }

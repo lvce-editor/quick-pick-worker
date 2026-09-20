@@ -225,3 +225,32 @@ test('handleClickAt ignores x coordinate', async () => {
   expect(closeWidgetCallCount).toBe(2)
   expect(result1).toBe(result2)
 })
+
+test('handleClickAt removes a recent item without selecting it', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'RecentlyOpened.removeRecentlyOpened': () => {},
+    'RecentlyOpened.getRecentlyOpened': () => [],
+  })
+  const state = {
+    ...CreateDefaultState.createDefaultState(),
+    items: [
+      {
+        description: '',
+        direntType: 1,
+        fileIcon: '',
+        icon: '',
+        label: 'item',
+        matches: [],
+        removeButton: true,
+        uri: 'file:///test/item',
+      },
+    ],
+    providerId: QuickPickEntryId.Recent,
+    uri: 'quickPick://recent',
+  }
+
+  const result = await HandleClickAt.handleClickAt(state, 0, 0, 'file:///test/item')
+
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.removeRecentlyOpened', 'file:///test/item'], ['RecentlyOpened.getRecentlyOpened']])
+  expect(result.items).toEqual([])
+})
