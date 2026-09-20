@@ -1,8 +1,7 @@
 import { join } from 'node:path'
 import { root } from './root.js'
 
-// Modest increases are acceptable for expected worker growth and platform variation.
-export const threshold = 560_000
+export const threshold = 556_000
 
 export const instantiations = 8_000
 
