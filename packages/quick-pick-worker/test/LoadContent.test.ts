@@ -464,6 +464,24 @@ test('loadContent falls back to the first color theme when the current theme is 
   expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
 })
 
+test('loadContent falls back to the first color theme when the renderer does not expose the current theme', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['theme-1', 'theme-2'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(0)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
 test('loadContent preserves other state properties', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
