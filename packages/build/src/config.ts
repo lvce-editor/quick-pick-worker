@@ -1,7 +1,9 @@
 import { join } from 'node:path'
 import { root } from './root.js'
 
-export const threshold = 556_000
+// Intentionally increased to 560,000 bytes at the maintainer's request for PR #131.
+// Modest increases are acceptable for expected worker growth and platform variation.
+export const threshold = 560_000
 
 export const instantiations = 8_000
 
