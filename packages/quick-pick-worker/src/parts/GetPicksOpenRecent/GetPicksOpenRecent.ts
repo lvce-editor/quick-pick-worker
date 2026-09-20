@@ -80,15 +80,12 @@ const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
 
 export const getPicks = async (): Promise<readonly ProtoVisibleItem[]> => {
   const recentlyOpened = await GetRecentlyOpened.getRecentlyOpened()
-  const hasLocalEntries = recentlyOpened.some((uri) => !uri.startsWith(remoteSshScheme) && getPath(uri).startsWith('/'))
   let homeDir = ''
-  if (hasLocalEntries) {
-    try {
-      const value = await RendererWorker.invoke('Workspace.getHomeDir')
-      homeDir = typeof value === 'string' ? value : ''
-    } catch {
-      // Ignore unavailable workspace RPCs and keep the full path.
-    }
+  try {
+    const value = await RendererWorker.invoke('Workspace.getHomeDir')
+    homeDir = typeof value === 'string' ? value : ''
+  } catch {
+    // Ignore unavailable workspace RPCs and keep the full path.
   }
   const picks = recentlyOpened.map((uri) => toProtoVisibleItem(uri, homeDir))
   return picks

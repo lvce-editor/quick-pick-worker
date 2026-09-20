@@ -251,6 +251,10 @@ test('handleClickAt removes a recent item without selecting it', async () => {
 
   const result = await HandleClickAt.handleClickAt(state, 0, 0, 'file:///test/item')
 
-  expect(mockRpc.invocations).toEqual([['RecentlyOpened.removeRecentlyOpened', 'file:///test/item'], ['RecentlyOpened.getRecentlyOpened']])
+  expect(mockRpc.invocations).toEqual([
+    ['RecentlyOpened.removeRecentlyOpened', 'file:///test/item'],
+    ['RecentlyOpened.getRecentlyOpened'],
+    ['Workspace.getHomeDir'],
+  ])
   expect(result.items).toEqual([])
 })

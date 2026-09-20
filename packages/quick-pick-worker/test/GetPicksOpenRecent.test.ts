@@ -115,6 +115,7 @@ test('getPicks does not abbreviate remote ssh descriptions with the local home d
 test('getPicks keeps non-file uris as label when no filesystem folder name can be derived', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'RecentlyOpened.getRecentlyOpened': () => ['vscode-remote://ssh-remote+dev/test/project'],
+    'Workspace.getHomeDir': () => '',
   })
 
   const result = await GetPicksOpenRecent.getPicks()
@@ -131,12 +132,13 @@ test('getPicks keeps non-file uris as label when no filesystem folder name can b
       uri: 'vscode-remote://ssh-remote+dev/test/project',
     },
   ])
-  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened']])
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['Workspace.getHomeDir']])
 })
 
 test('getPicks uses the remote folder name as label so remote ssh folders can be filtered', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'RecentlyOpened.getRecentlyOpened': () => ['remote-ssh://89.167.102.168/home/simon/Documents/levivilet/about%2Dview'],
+    'Workspace.getHomeDir': () => '',
   })
 
   const picks = await GetPicksOpenRecent.getPicks()
@@ -155,7 +157,7 @@ test('getPicks uses the remote folder name as label so remote ssh folders can be
       uri: 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/about%2Dview',
     },
   ])
-  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened']])
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['Workspace.getHomeDir']])
 })
 
 test.each([
@@ -167,6 +169,7 @@ test.each([
   using mockRpc = RendererWorker.registerMockRpc({
     'IconTheme.getFolderIcon': ({ name }: { name: string }) => `folder-icon-for-${name}`,
     'RecentlyOpened.getRecentlyOpened': () => [uri],
+    'Workspace.getHomeDir': () => '',
   })
 
   const picks = await GetPicksOpenRecent.getPicks()
@@ -175,5 +178,9 @@ test.each([
   ])
   const { icons } = await GetQuickPickFileIcons.getQuickPickFileIcons(picks, {})
   expect(icons).toEqual([`folder-icon-for-${iconName}`])
-  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['IconTheme.getFolderIcon', { name: iconName }]])
+  expect(mockRpc.invocations).toEqual([
+    ['RecentlyOpened.getRecentlyOpened'],
+    ['Workspace.getHomeDir'],
+    ['IconTheme.getFolderIcon', { name: iconName }],
+  ])
 })
