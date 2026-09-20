@@ -1,5 +1,8 @@
 import type { Test } from '@lvce-editor/test-with-playwright'
 
+// The hover styles are provided by the lvce-editor consumer and are validated by its integration test.
+export const skip = 1
+
 export const name = 'quickpick.open-recent-remove'
 
 export const test: Test = async ({ Command, expect, Locator }) => {
@@ -13,7 +16,9 @@ export const test: Test = async ({ Command, expect, Locator }) => {
   const firstRemoveButton = firstItem.locator('.QuickPickItemRemove')
   const secondItem = items.nth(1)
   const secondRemoveButton = secondItem.locator('.QuickPickItemRemove')
+  const input = Locator('#QuickPick .InputBox')
 
+  await input.hover()
   await expect(firstRemoveButton).toBeHidden()
   await firstItem.hover()
   await expect(firstRemoveButton).toBeVisible()
