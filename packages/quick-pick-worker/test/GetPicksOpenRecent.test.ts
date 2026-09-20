@@ -97,20 +97,19 @@ test('getPicks keeps the full local description when home information is unavail
   const result = await GetPicksOpenRecent.getPicks()
 
   expect(result[0].description).toBe('/home/test/Documents')
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['Workspace.getHomeDir']])
 })
 
 test('getPicks does not abbreviate remote ssh descriptions with the local home directory', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'RecentlyOpened.getRecentlyOpened': () => [
-      'file:///home/test/Documents/levivilet',
-      'remote-ssh://example.com/home/test/Documents/levivilet',
-    ],
+    'RecentlyOpened.getRecentlyOpened': () => ['file:///home/test/Documents/levivilet', 'remote-ssh://example.com/home/test/Documents/levivilet'],
     'Workspace.getHomeDir': () => '/home/test',
   })
 
   const result = await GetPicksOpenRecent.getPicks()
 
   expect(result.map((pick) => pick.description)).toEqual(['~/Documents', '/home/test/Documents'])
+  expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['Workspace.getHomeDir']])
 })
 
 test('getPicks keeps non-file uris as label when no filesystem folder name can be derived', async () => {
