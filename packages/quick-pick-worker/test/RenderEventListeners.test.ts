@@ -9,3 +9,12 @@ test('renderEventListeners does not register handleBeforeInput', () => {
     }),
   )
 })
+
+test('renderEventListeners passes the remove button uri to the click handler', () => {
+  const eventListeners = renderEventListeners()
+  expect(eventListeners).toContainEqual({
+    name: 'handlePointerDown',
+    params: ['handleClickAt', 'event.clientX', 'event.clientY', 'event.target.dataset.uri'],
+    preventDefault: true,
+  })
+})

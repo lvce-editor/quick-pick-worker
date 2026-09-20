@@ -20,6 +20,7 @@ test('getPicks uses folder name as label and full path as description for file u
       icon: '',
       label: 'some-folder',
       matches: [],
+      removeButton: true,
       uri: 'file:///test/projects/some-folder',
     },
   ])
@@ -41,6 +42,7 @@ test('getPicks decodes file uri paths for display while keeping the original uri
       icon: '',
       label: 'workspace – ü',
       matches: [],
+      removeButton: true,
       uri: 'file:///test/projects/workspace%20%E2%80%93%20%C3%BC',
     },
   ])
@@ -62,6 +64,7 @@ test('getPicks keeps non-file uris as label when no filesystem folder name can b
       icon: '',
       label: 'vscode-remote://ssh-remote+dev/test/project',
       matches: [],
+      removeButton: true,
       uri: 'vscode-remote://ssh-remote+dev/test/project',
     },
   ])
@@ -85,6 +88,7 @@ test('getPicks uses the remote folder name as label so remote ssh folders can be
       iconName: 'about-view',
       label: 'about-view [SSH: 89.167.102.168]',
       matches: [48, 0, 5],
+      removeButton: true,
       uri: 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/about%2Dview',
     },
   ])
@@ -103,7 +107,9 @@ test.each([
   })
 
   const picks = await GetPicksOpenRecent.getPicks()
-  expect(picks).toEqual([{ description, direntType: DirentType.Directory, fileIcon: '', icon: '', iconName, label, matches: [], uri }])
+  expect(picks).toEqual([
+    { description, direntType: DirentType.Directory, fileIcon: '', icon: '', iconName, label, matches: [], removeButton: true, uri },
+  ])
   const { icons } = await GetQuickPickFileIcons.getQuickPickFileIcons(picks, {})
   expect(icons).toEqual([`folder-icon-for-${iconName}`])
   expect(mockRpc.invocations).toEqual([['RecentlyOpened.getRecentlyOpened'], ['IconTheme.getFolderIcon', { name: iconName }]])

@@ -69,6 +69,7 @@ const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
     iconName: isRemoteSsh ? folderName : undefined,
     label,
     matches: [],
+    removeButton: true,
     uri,
   }
 }
