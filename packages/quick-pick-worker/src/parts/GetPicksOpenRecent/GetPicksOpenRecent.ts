@@ -43,7 +43,7 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
+const toProtoVisibleItem = (uri: string, homeDir?: string): ProtoVisibleItem => {
   const path = getPath(uri)
   const isRemoteSsh = uri.startsWith(remoteSshScheme)
   const authority = isRemoteSsh ? getRemoteSshAuthority(uri) : ''
@@ -57,7 +57,12 @@ const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
   let description = ''
   if (path.startsWith('/')) {
     description = Workspace.pathDirName(path)
-    if (!isRemoteSsh && homeDir && (description === homeDir || description.startsWith(`${homeDir}/`))) {
+    if (
+      homeDir &&
+      !isRemoteSsh &&
+      description.startsWith(homeDir) &&
+      (description.length === homeDir.length || description[homeDir.length] === '/')
+    ) {
       description = `~${description.slice(homeDir.length)}`
     }
   }
@@ -80,10 +85,9 @@ const toProtoVisibleItem = (uri: string, homeDir: string): ProtoVisibleItem => {
 
 export const getPicks = async (): Promise<readonly ProtoVisibleItem[]> => {
   const recentlyOpened = await GetRecentlyOpened.getRecentlyOpened()
-  let homeDir = ''
+  let homeDir: string | undefined
   try {
-    const value = await RendererWorker.invoke('Workspace.getHomeDir')
-    homeDir = typeof value === 'string' ? value : ''
+    homeDir = await RendererWorker.invoke('Workspace.getHomeDir')
   } catch {
     // Ignore unavailable workspace RPCs and keep the full path.
   }
