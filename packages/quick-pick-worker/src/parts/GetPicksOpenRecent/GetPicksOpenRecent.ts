@@ -1,3 +1,4 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as DirentType from '../DirentType/DirentType.ts'
 import * as GetRecentlyOpened from '../GetRecentlyOpened/GetRecentlyOpened.ts'
@@ -42,7 +43,7 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
+const toProtoVisibleItem = (uri: string, homeDir?: string): ProtoVisibleItem => {
   const path = getPath(uri)
   const isRemoteSsh = uri.startsWith(remoteSshScheme)
   const authority = isRemoteSsh ? getRemoteSshAuthority(uri) : ''
@@ -56,6 +57,14 @@ const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
   let description = ''
   if (path.startsWith('/')) {
     description = Workspace.pathDirName(path)
+    if (
+      homeDir &&
+      !isRemoteSsh &&
+      description.startsWith(homeDir) &&
+      (description.length === homeDir.length || description[homeDir.length] === '/')
+    ) {
+      description = `~${description.slice(homeDir.length)}`
+    }
   }
   if (path === '/' && isRemoteSsh) {
     description = '/'
@@ -76,6 +85,12 @@ const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
 
 export const getPicks = async (): Promise<readonly ProtoVisibleItem[]> => {
   const recentlyOpened = await GetRecentlyOpened.getRecentlyOpened()
-  const picks = recentlyOpened.map(toProtoVisibleItem)
+  let homeDir: string | undefined
+  try {
+    homeDir = await RendererWorker.invoke('Workspace.getHomeDir')
+  } catch {
+    // Ignore unavailable workspace RPCs and keep the full path.
+  }
+  const picks = recentlyOpened.map((uri) => toProtoVisibleItem(uri, homeDir))
   return picks
 }
