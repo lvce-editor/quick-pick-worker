@@ -1,11 +1,21 @@
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 
-const getMatchRank = (label: string, value: string): number => {
+const getMatchRank = (label: string, matches: readonly number[], value: string): number => {
   if (label === value) {
     return 4
   }
   if (label.startsWith(value)) {
     return 3
+  }
+  let wordStartMatches = 0
+  for (let i = 1; i < matches.length; i += 2) {
+    const start = matches[i]
+    if (start === 0 || !/[\p{L}\p{N}]/u.test(label[start - 1])) {
+      wordStartMatches++
+      if (wordStartMatches >= 2) {
+        return 2
+      }
+    }
   }
   let index = label.indexOf(value)
   if (index === -1) {
@@ -24,7 +34,7 @@ export const rankCommandPicks = (items: readonly ProtoVisibleItem[], value: stri
   const normalizedValue = value.toLowerCase()
   const ranked = items.map((item) => ({
     item,
-    rank: getMatchRank(item.label.toLowerCase(), normalizedValue),
+    rank: getMatchRank(item.label.toLowerCase(), item.matches, normalizedValue),
   }))
   // The first match entry is the fuzzy score; the remaining entries describe highlights.
   ranked.sort((a, b) => b.rank - a.rank || b.item.matches[0] - a.item.matches[0])

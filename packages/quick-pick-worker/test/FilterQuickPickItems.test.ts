@@ -74,6 +74,23 @@ test.each(['ssh', 'SSH', 'sSh'])('ranks exact and contiguous command matches abo
   expect(items.every((item) => item.matches.length === 0)).toBe(true)
 })
 
+test('ranks successive word-start matches above scattered matches', () => {
+  const items = createItems([
+    'Set Pull Requests GitHub Mock List Data',
+    'Set Pull Requests GitHub Mock List Error',
+    'Set Pull Requests GitHub Mock List Response',
+    'Preferences: Open Settings Ui',
+  ])
+  const result = FilterQuickPickItems.filterQuickPickItems(items, 'settui', true)
+  expect(result.map((item) => item.label)).toEqual([
+    'Preferences: Open Settings Ui',
+    'Set Pull Requests GitHub Mock List Data',
+    'Set Pull Requests GitHub Mock List Error',
+    'Set Pull Requests GitHub Mock List Response',
+  ])
+  expect(result[0].matches.slice(1)).toEqual([18, 22, 27, 29])
+})
+
 test('preserves provider order for an empty command query', () => {
   const items = createItems(['Focus: Search', 'SSH: Connect'])
   expect(FilterQuickPickItems.filterQuickPickItems(items, '', true)).toBe(items)
