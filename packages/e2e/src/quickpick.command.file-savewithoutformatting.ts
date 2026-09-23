@@ -27,6 +27,9 @@ export const test: Test = async ({ Command, Editor, expect, Extension, FileSyste
   await Editor.format()
   await Editor.shouldHaveText('const value = 1')
   await Editor.setText('const value=1')
+  await Command.execute('Editor.save')
+  await FileSystem.shouldHaveFile(filePath, 'const value = 1')
+  await Editor.setText('const value=1')
 
   await QuickPick.open()
   await QuickPick.setValue('>File: Save without Formatting')
