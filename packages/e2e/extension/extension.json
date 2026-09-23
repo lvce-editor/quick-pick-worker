@@ -3,6 +3,7 @@
   "name": "test",
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
   "browser": "main.js",
+  "isolated": true,
   "activation": ["*"],
   "formattingProviders": [
     {
