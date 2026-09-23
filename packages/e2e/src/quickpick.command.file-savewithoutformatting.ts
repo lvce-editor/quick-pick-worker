@@ -9,6 +9,15 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await Workspace.setPath(tmpDir)
   await Settings.update({ 'editor.formatOnSave': true })
   await Main.openUri(filePath)
+
+  await QuickPick.open()
+  await QuickPick.setValue('>Change Language Mode')
+  await QuickPick.selectItem('Change Language Mode', {
+    waitUntil: 'quickPick',
+  })
+  await QuickPick.handleInput('quick-pick-formatting')
+  await QuickPick.selectItem('quick-pick-formatting')
+
   await Editor.setText('const value=1')
 
   await QuickPick.open()
