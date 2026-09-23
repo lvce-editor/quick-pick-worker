@@ -9,8 +9,8 @@
       "ignoreDependencies": ["@lvce-editor/verror", "esbuild"]
     },
     "packages/e2e": {
-      "entry": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js"],
-      "project": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js"]
+      "entry": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js", "extension/main.ts"],
+      "project": ["src/**/*.ts", "scripts/*.js", "extension/src/*.js", "extension/main.ts"]
     },
     "packages/quick-pick-worker": {
       "entry": ["src/quickPickWorkerMain.ts", "test/**/*.test.ts"],
