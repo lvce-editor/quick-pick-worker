@@ -1,10 +1,10 @@
+// This extension fixture runs in the isolated extension host, outside the test process.
+// eslint-disable-next-line e2e/no-imports
 import { activate, registerFormattingProvider } from '@lvce-editor/api'
 
 await activate()
 
 registerFormattingProvider({
-  id: 'quick-pick-formatting',
-  languageId: 'quick-pick-formatting',
   format(textDocument) {
     const formatted = textDocument.text.replace('value=', 'value = ')
     if (formatted === textDocument.text) {
@@ -18,4 +18,6 @@ registerFormattingProvider({
       },
     ]
   },
+  id: 'quick-pick-formatting',
+  languageId: 'quick-pick-formatting',
 })
