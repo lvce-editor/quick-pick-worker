@@ -2,13 +2,17 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.command.file-savewithoutformatting'
 
-export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, QuickPick, Settings, Workspace }) => {
+export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, QuickPick, Settings, Workspace }) => {
   const tmpDir = await FileSystem.getTmpDir()
   const filePath = `${tmpDir}/save.quick-pick-formatting`
   await FileSystem.writeFile(filePath, 'const value=0')
   await Workspace.setPath(tmpDir)
   await Settings.update({ 'editor.formatOnSave': true })
   await Main.openUri(filePath)
+  const formatOnSave = await Command.execute('Preferences.get', 'editor.formatOnSave')
+  if (formatOnSave !== true) {
+    throw new Error(`Expected formatOnSave to be enabled, got ${formatOnSave}`)
+  }
 
   await QuickPick.open()
   await QuickPick.setValue('>Change Language Mode')
@@ -18,6 +22,9 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await QuickPick.handleInput('quick-pick-formatting')
   await QuickPick.selectItem('quick-pick-formatting')
 
+  await Editor.setText('const value=1')
+  await Editor.format()
+  await Editor.shouldHaveText('const value = 1')
   await Editor.setText('const value=1')
 
   await QuickPick.open()
