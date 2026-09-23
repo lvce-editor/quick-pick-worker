@@ -7,7 +7,7 @@ export const test: Test = async ({ Command, expect, FileSystem, IconTheme, Locat
   const files = Array.from({ length: 25 }, (_, index) => `scroll-${String(index).padStart(2, '0')}.${index % 2 ? 'json' : 'txt'}`)
   await FileSystem.setFiles(files.map((file) => ({ content: '', uri: `${tmpDir}/${file}` })))
   await Workspace.setPath(tmpDir)
-  await IconTheme.setIconTheme('vscode-icons')
+  await IconTheme.setIconTheme('test-scroll-icons')
   await Command.execute('KeyBindings.handleKeyBinding', (1 << 11) | 44)
   await QuickPick.setValue('scroll-')
   const firstLabel = Locator('.QuickPickItemLabel').nth(0)

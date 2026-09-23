@@ -5,7 +5,7 @@ export const name = 'quickpick.open-recent-remote-ssh'
 export const test: Test = async ({ Command, expect, IconTheme, Locator, QuickPick }) => {
   await Command.execute('RecentlyOpened.clearRecentlyOpened')
   await Command.execute('RecentlyOpened.addToRecentlyOpened', 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/lvce-editor')
-  await IconTheme.setIconTheme('vscode-icons')
+  await IconTheme.setIconTheme('test-scroll-icons')
 
   await Command.execute('QuickPick.showRecent')
 

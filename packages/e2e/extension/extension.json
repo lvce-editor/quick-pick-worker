@@ -3,7 +3,7 @@
   "name": "test",
   "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
   "browser": "main.js",
-  "activation": ["onFormatting:quick-pick-formatting"],
+  "activation": ["*"],
   "formattingProviders": [
     {
       "id": "quick-pick-formatting",
