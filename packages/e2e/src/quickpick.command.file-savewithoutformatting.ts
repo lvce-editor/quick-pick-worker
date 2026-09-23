@@ -2,7 +2,8 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.command.file-savewithoutformatting'
 
-export const test: Test = async ({ Command, Editor, expect, FileSystem, Locator, Main, QuickPick, Settings, Workspace }) => {
+export const test: Test = async ({ Command, Editor, expect, Extension, FileSystem, Locator, Main, QuickPick, Settings, Workspace }) => {
+  await Extension.addWebExtension(import.meta.resolve('../extension'))
   const tmpDir = await FileSystem.getTmpDir()
   const filePath = `${tmpDir}/save.quick-pick-formatting`
   await FileSystem.writeFile(filePath, 'const value=0')
