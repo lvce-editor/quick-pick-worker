@@ -2,7 +2,8 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.scroll-file-icons'
 
-export const test: Test = async ({ Command, expect, FileSystem, IconTheme, Locator, QuickPick, Workspace }) => {
+export const test: Test = async ({ Command, expect, Extension, FileSystem, IconTheme, Locator, QuickPick, Workspace }) => {
+  await Extension.addWebExtension(import.meta.resolve('../extension'))
   const tmpDir = await FileSystem.getTmpDir()
   const files = Array.from({ length: 25 }, (_, index) => `scroll-${String(index).padStart(2, '0')}.${index % 2 ? 'json' : 'txt'}`)
   await FileSystem.setFiles(files.map((file) => ({ content: '', uri: `${tmpDir}/${file}` })))

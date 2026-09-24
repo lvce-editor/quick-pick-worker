@@ -2,7 +2,8 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.open-recent-remote-ssh'
 
-export const test: Test = async ({ Command, expect, IconTheme, Locator, QuickPick }) => {
+export const test: Test = async ({ Command, expect, Extension, IconTheme, Locator, QuickPick }) => {
+  await Extension.addWebExtension(import.meta.resolve('../extension'))
   await Command.execute('RecentlyOpened.clearRecentlyOpened')
   await Command.execute('RecentlyOpened.addToRecentlyOpened', 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/lvce-editor')
   await IconTheme.setIconTheme('test-scroll-icons')
