@@ -1,3 +1,4 @@
+import { WhenExpression } from '@lvce-editor/constants'
 import { expect, test } from '@jest/globals'
 import * as ApplyRender from '../src/parts/ApplyRender/ApplyRender.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
@@ -95,7 +96,10 @@ test('calls renderer for RenderFocus', () => {
   }
   const diffResult: readonly number[] = [DiffType.RenderFocus]
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
-  expect(result).toEqual([['Viewlet.focusElementByName', newState.uid, 'QuickPickInput']])
+  expect(result).toEqual([
+    ['Viewlet.setFocusContext', newState.uid, WhenExpression.FocusQuickPickInput],
+    ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
+  ])
 })
 
 test('calls renderer for RenderCursorOffset', () => {
@@ -124,6 +128,7 @@ test('handles multiple diff types', () => {
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
   expect(result).toEqual([
     ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.setFocusContext', newState.uid, WhenExpression.FocusQuickPickInput],
     ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
   ])
 })
@@ -139,6 +144,7 @@ test('skips Height and RenderFocusedIndex in mixed diff types', () => {
   const result = ApplyRender.applyRender(oldState, newState, diffResult)
   expect(result).toEqual([
     ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.setFocusContext', newState.uid, WhenExpression.FocusQuickPickInput],
     ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
   ])
 })
@@ -155,6 +161,7 @@ test('handles RenderCss in mixed diff types', () => {
   expect(result).toEqual([
     expect.arrayContaining(['Viewlet.setCss', newState.uid]),
     ['Viewlet.setValueByName', newState.uid, 'QuickPickInput', 'test'],
+    ['Viewlet.setFocusContext', newState.uid, WhenExpression.FocusQuickPickInput],
     ['Viewlet.focusElementByName', newState.uid, 'QuickPickInput'],
   ])
 })

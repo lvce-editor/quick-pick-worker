@@ -1,4 +1,5 @@
 import { expect, jest, test } from '@jest/globals'
+import { WhenExpression } from '@lvce-editor/constants'
 import { createMockRpc } from '@lvce-editor/rpc'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
@@ -47,7 +48,10 @@ test('render2 updates QuickPickStates and returns commands when states differ', 
   QuickPickStates.set(uid, oldState, newState)
   const diffResult: readonly number[] = [DiffType.RenderFocus]
   const result = await Render2.render2(uid, diffResult)
-  expect(result).toEqual([['Viewlet.focusElementByName', uid, 'QuickPickInput']])
+  expect(result).toEqual([
+    ['Viewlet.setFocusContext', uid, WhenExpression.FocusQuickPickInput],
+    ['Viewlet.focusElementByName', uid, 'QuickPickInput'],
+  ])
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)
   expect(updatedOldState).toBe(newState)
   expect(updatedNewState).toBe(newState)
@@ -67,6 +71,7 @@ test('render2 handles multiple diff types when states differ', async () => {
   const result = await Render2.render2(uid, diffResult)
   expect(result).toEqual([
     ['Viewlet.setValueByName', uid, 'QuickPickInput', 'test-value'],
+    ['Viewlet.setFocusContext', uid, WhenExpression.FocusQuickPickInput],
     ['Viewlet.focusElementByName', uid, 'QuickPickInput'],
   ])
   const { newState: updatedNewState, oldState: updatedOldState } = QuickPickStates.get(uid)
@@ -90,4 +95,21 @@ test('render2 queues renderer commands and returns a lightweight commit marker',
 
   expect(queueCommands).toHaveBeenCalledWith(uid, [['Viewlet.setValueByName', uid, 'QuickPickInput', 'test-value']])
   expect(result).toEqual([['Viewlet.commitPending', uid, 17]])
+})
+
+test('focus context is established before the direct render becomes interactive', async () => {
+  const queueCommands = jest.fn(() => 18)
+  RendererProcess.set(createMockRpc({ commandMap: { 'Viewlet.queueCommands': queueCommands } }))
+  const uid = 6
+  const oldState = { ...CreateDefaultState.createDefaultState(), uid }
+  const newState = { ...oldState, focused: true }
+  QuickPickStates.set(uid, oldState, newState)
+
+  const commands = await Render2.render2(uid, [DiffType.RenderFocus])
+
+  expect(queueCommands).toHaveBeenCalledWith(uid, [['Viewlet.focusElementByName', uid, 'QuickPickInput']])
+  expect(commands).toEqual([
+    ['Viewlet.setFocusContext', uid, WhenExpression.FocusQuickPickInput],
+    ['Viewlet.commitPending', uid, 18],
+  ])
 })
