@@ -10,6 +10,7 @@ import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as QuickPickEntries from '../QuickPickEntries/QuickPickEntries.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
+import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 
 const createCustomPick = (value: string): ProtoVisibleItem => {
@@ -50,13 +51,26 @@ export const selectIndex = async (state: QuickPickState, index: number, button =
     void fn(pick, value, state.applicationId)
     return state
   }
+  // Restore the editor focus before a builtin command opens or focuses another view.
+  // Closing afterward can steal that view's focus while the user is already typing.
+  const commandId = (pick as ProtoVisibleItem & { readonly id?: string }).id
+  const closeBeforeBuiltin =
+    subId === QuickPickEntryId.Commands &&
+    shouldHide(pick) &&
+    commandId !== 'QuickPick.showColorTheme' &&
+    commandId !== 'QuickPick.changeLanguageMode'
+  if (closeBeforeBuiltin) {
+    await CloseWidget.closeWidget(state.uid)
+  }
   const selectPickResult = await fn(pick, value, state.applicationId)
   Assert.object(selectPickResult)
   Assert.string(selectPickResult.command)
   const { command } = selectPickResult
   switch (command) {
     case QuickPickReturnValue.Hide:
-      await CloseWidget.closeWidget(state.uid)
+      if (!closeBeforeBuiltin) {
+        await CloseWidget.closeWidget(state.uid)
+      }
       if (selectPickResult.itemCommand) {
         await RendererWorker.invoke(selectPickResult.itemCommand, ...(selectPickResult.itemCommandArgs || []))
       }
