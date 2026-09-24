@@ -10,8 +10,8 @@ import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as QuickPickEntries from '../QuickPickEntries/QuickPickEntries.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
-import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
+import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
 const createCustomPick = (value: string): ProtoVisibleItem => {
   return {
