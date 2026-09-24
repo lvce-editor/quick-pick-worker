@@ -98,7 +98,7 @@ test('render2 queues renderer commands and returns a lightweight commit marker',
 })
 
 test('focus context is established before the direct render becomes interactive', async () => {
-  const queueCommands = jest.fn(() => 18)
+  const queueCommands = jest.fn((_uid: number, _commands: readonly unknown[]) => 18)
   RendererProcess.set(createMockRpc({ commandMap: { 'Viewlet.queueCommands': queueCommands } }))
   const uid = 6
   const oldState = { ...CreateDefaultState.createDefaultState(), uid }
