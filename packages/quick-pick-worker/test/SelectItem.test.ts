@@ -87,7 +87,7 @@ test('selectItem calls selectIndex with correct index when label is found', asyn
 
   expect(closeWidgetCalled).toBe(true)
   expect(result).toBe(state)
-  expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['test-command']])
 })
 
 test('selectItem handles empty items array', async () => {

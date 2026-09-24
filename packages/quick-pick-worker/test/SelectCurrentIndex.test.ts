@@ -128,7 +128,7 @@ test('selectCurrentIndex calls selectIndex with focusedIndex', async () => {
   expect(closeWidgetCalled).toBe(true)
   expect(closeWidgetId).toBe(123)
   expect(result).toBe(state)
-  expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['test-command']])
 })
 
 test('selectCurrentIndex uses focusedIndex correctly with minLineY', async () => {
@@ -196,7 +196,7 @@ test('selectCurrentIndex uses focusedIndex correctly with minLineY', async () =>
 
   expect(closeWidgetCalled).toBe(true)
   expect(result).toBe(state)
-  expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['test-command']])
 })
 
 test('selectCurrentIndex handles different focusedIndex values', async () => {
