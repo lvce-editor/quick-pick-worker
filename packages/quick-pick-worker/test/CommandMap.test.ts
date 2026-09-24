@@ -66,7 +66,7 @@ test('select current index waits for a pending input update', async () => {
   expect(mockRpc.invocations).toEqual([
     ['Layout.getAllQuickPickMenuEntries'],
     ['ExtensionHost.getCommands', '', 0],
-    ['Workspace.close'],
     ['Viewlet.closeWidget', uid],
+    ['Workspace.close'],
   ])
 })
