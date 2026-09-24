@@ -1,5 +1,5 @@
-import { WhenExpression } from '@lvce-editor/constants'
 import { expect, test } from '@jest/globals'
+import { WhenExpression } from '@lvce-editor/constants'
 import * as ApplyRender from '../src/parts/ApplyRender/ApplyRender.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as DiffType from '../src/parts/DiffType/DiffType.ts'
