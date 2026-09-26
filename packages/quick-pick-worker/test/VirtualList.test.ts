@@ -49,6 +49,34 @@ test('create uses default minimumSliderSize when not provided', () => {
   expect(result.minimumSliderSize).toBe(20)
 })
 
+test('scrollbar pointer drag scrolls the list and ends on pointer release', async () => {
+  const items = Array.from({ length: 30 }, (_, i) => ({
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    label: `item${i}`,
+    matches: [],
+    uri: `/item${i}`,
+  }))
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    finalDeltaY: 638,
+    height: 300,
+    items,
+    top: 50,
+  }
+
+  const dragging = await VirtualList.handleScrollBarPointerDown(state, 98, 7)
+  const moved = await VirtualList.handleScrollBarPointerMove(dragging, 148, 7)
+  const released = VirtualList.handleScrollBarPointerUp(moved, 7)
+
+  expect(dragging.scrollBarActive).toBe(true)
+  expect(moved.deltaY).toBeGreaterThan(0)
+  expect(released.scrollBarActive).toBe(false)
+  expect(released.scrollBarPointerId).toBe(-1)
+})
+
 test('setDeltaY returns same state when deltaY is unchanged', async () => {
   const state: QuickPickState = {
     ...CreateDefaultState.createDefaultState(),

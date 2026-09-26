@@ -18,3 +18,14 @@ test('renderEventListeners passes the remove button uri to the click handler', (
     preventDefault: true,
   })
 })
+
+test('renderEventListeners isolates scrollbar pointer events from item selection and tracks drag events', () => {
+  const eventListeners = renderEventListeners()
+  expect(eventListeners).toContainEqual({
+    name: 'handleScrollbarPointerDown',
+    params: ['handleScrollBarPointerDown', 'event.clientY', 'event.pointerId'],
+    preventDefault: true,
+    stopPropagation: true,
+    trackPointerEvents: ['handleScrollbarPointerMove', 'handleScrollbarPointerUp'],
+  })
+})
