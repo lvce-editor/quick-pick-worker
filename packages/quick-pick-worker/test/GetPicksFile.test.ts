@@ -146,3 +146,14 @@ test('getPicks encodes raw filenames under a qualified workspace without encodin
   expect(result[0].label).toBe('Ä 100%23 #?.txt')
   expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
 })
+
+test('getPicks exposes the basename of Windows search results for selection', async () => {
+  createMockFileSearchWorker(['src\\Ä 100% #.txt'])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => 'C:\\workspace',
+  })
+  const result = await GetPicksFile.getPicks('100')
+  expect(result[0].label).toBe('Ä 100% #.txt')
+  expect(result[0].description).toBe('C:/workspace/src')
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+})

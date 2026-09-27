@@ -41,7 +41,7 @@ const resolveFileUri = (workspace: string, path: string): string => {
 }
 
 const convertToPick = (uri: string): ProtoVisibleItem => {
-  const displayPath = hasUriScheme(uri) ? decodeURIComponent(new URL(uri).pathname) : uri
+  const displayPath = hasUriScheme(uri) ? decodeURIComponent(new URL(uri).pathname) : uri.replaceAll('\\', '/')
   const baseName = Workspace.pathBaseName(displayPath)
   const dirName = Workspace.pathDirName(displayPath)
 
