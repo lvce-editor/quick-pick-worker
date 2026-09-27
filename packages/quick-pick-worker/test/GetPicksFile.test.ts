@@ -58,6 +58,32 @@ test('getPicks returns file picks from search', async () => {
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'file', true, '']])
 })
 
+test('getPicks resolves relative search results against the local workspace path', async () => {
+  createMockFileSearchWorker(['file1.txt', 'subdir/file2.ts'])
+
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => '/workspace',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result.map(({ uri }) => uri)).toEqual(['/workspace/file1.txt', '/workspace/subdir/file2.ts'])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+})
+
+test('getPicks preserves the workspace scheme for relative search results', async () => {
+  createMockFileSearchWorker(['file1.txt'])
+
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => 'memfs:///workspace',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result.map(({ uri }) => uri)).toEqual(['memfs:///workspace/file1.txt'])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+})
+
 test('getPicks returns empty array when no workspace', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'Workspace.getPath': () => null,
