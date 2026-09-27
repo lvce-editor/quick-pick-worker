@@ -8,7 +8,7 @@ test('selectPick opens nested files using a file uri', async () => {
   let openedUri: string | undefined
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'Main.openUri': ({ uri }: { readonly uri: string }) => {
+    'Main.openUri': (uri: string) => {
       openedUri = uri
     },
   })
@@ -27,14 +27,14 @@ test('selectPick opens nested files using a file uri', async () => {
 
   expect(openedUri).toBe('file:///workspace/path/src/components/Button.tsx')
   expect(result.command).toBe(QuickPickReturnValue.Hide)
-  expect(mockRpc.invocations).toEqual([['Main.openUri', { focus: undefined, uri: 'file:///workspace/path/src/components/Button.tsx' }]])
+  expect(mockRpc.invocations).toEqual([['Main.openUri', 'file:///workspace/path/src/components/Button.tsx']])
 })
 
 test('selectPick opens workspace root files using a file uri', async () => {
   let openedUri: string | undefined
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'Main.openUri': ({ uri }: { readonly uri: string }) => {
+    'Main.openUri': (uri: string) => {
       openedUri = uri
     },
   })
@@ -53,14 +53,14 @@ test('selectPick opens workspace root files using a file uri', async () => {
 
   expect(openedUri).toBe('file:///home/user/project/helper.ts')
   expect(result.command).toBe(QuickPickReturnValue.Hide)
-  expect(mockRpc.invocations).toEqual([['Main.openUri', { focus: undefined, uri: 'file:///home/user/project/helper.ts' }]])
+  expect(mockRpc.invocations).toEqual([['Main.openUri', 'file:///home/user/project/helper.ts']])
 })
 
 test('selectPick encodes spaces, unicode, and reserved filename characters', async () => {
   let openedUri: string | undefined
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'Main.openUri': ({ uri }: { readonly uri: string }) => {
+    'Main.openUri': (uri: string) => {
       openedUri = uri
     },
   })
@@ -79,14 +79,14 @@ test('selectPick encodes spaces, unicode, and reserved filename characters', asy
 
   expect(openedUri).toBe('file:///workspace/%C3%84%20space/100%25%20%23%3F.ts')
   expect(result.command).toBe(QuickPickReturnValue.Hide)
-  expect(mockRpc.invocations).toEqual([['Main.openUri', { focus: undefined, uri: 'file:///workspace/%C3%84%20space/100%25%20%23%3F.ts' }]])
+  expect(mockRpc.invocations).toEqual([['Main.openUri', 'file:///workspace/%C3%84%20space/100%25%20%23%3F.ts']])
 })
 
 test('selectPick preserves an already-qualified supported uri', async () => {
   let openedUri: string | undefined
 
   using mockRpc = RendererWorker.registerMockRpc({
-    'Main.openUri': ({ uri }: { readonly uri: string }) => {
+    'Main.openUri': (uri: string) => {
       openedUri = uri
     },
   })
@@ -104,5 +104,5 @@ test('selectPick preserves an already-qualified supported uri', async () => {
   await selectPick(pick)
 
   expect(openedUri).toBe('remote-ssh://host/workspace/file.ts')
-  expect(mockRpc.invocations).toEqual([['Main.openUri', { focus: undefined, uri: 'remote-ssh://host/workspace/file.ts' }]])
+  expect(mockRpc.invocations).toEqual([['Main.openUri', 'remote-ssh://host/workspace/file.ts']])
 })
