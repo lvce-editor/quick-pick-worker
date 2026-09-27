@@ -5,9 +5,8 @@ export const name = 'quickpick.open-file'
 export const test: Test = async ({ expect, FileSystem, Locator, QuickPick, Workspace }) => {
   // arrange
   const tmpDirUri = await FileSystem.getTmpDir({ scheme: 'file' })
-  const tmpDir = decodeURIComponent(new URL(tmpDirUri).pathname).replace(/^\/([a-z]:)/i, '$1')
-  await FileSystem.writeFile(`${tmpDir}/example.txt`, 'opened from quick pick')
-  await Workspace.setPath(tmpDir)
+  await FileSystem.writeFile(`${tmpDirUri}/example.txt`, 'opened from quick pick')
+  await Workspace.setPath(tmpDirUri)
   await QuickPick.open()
 
   // act
