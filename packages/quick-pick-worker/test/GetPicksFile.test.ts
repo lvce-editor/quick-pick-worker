@@ -135,3 +135,14 @@ test('getPicks handles empty search results', async () => {
   expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'nonexistent', true, '']])
 })
+
+test('getPicks encodes raw filenames under a qualified workspace without encoding the workspace again', async () => {
+  createMockFileSearchWorker(['src/Ä 100%23 #?.txt'])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => 'memfs:///my%20workspace',
+  })
+  const result = await GetPicksFile.getPicks('100')
+  expect(result[0].uri).toBe('memfs:///my%20workspace/src/%C3%84%20100%2523%20%23%3F.txt')
+  expect(result[0].label).toBe('Ä 100%23 #?.txt')
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+})

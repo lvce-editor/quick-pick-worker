@@ -29,7 +29,7 @@ const resolveFileUri = (workspace: string, path: string): string => {
   }
   if (hasUriScheme(workspace)) {
     const workspaceUrl = new URL(workspace)
-    const normalizedPath = path.replaceAll('\\', '/')
+    const normalizedPath = path.replaceAll('\\', '/').replaceAll('%', '%25')
     const workspacePath = trimTrailingSeparators(workspaceUrl.pathname)
     workspaceUrl.pathname = normalizedPath.startsWith('/') ? normalizedPath : `${workspacePath}/${normalizedPath}`
     return workspaceUrl.href
@@ -41,8 +41,9 @@ const resolveFileUri = (workspace: string, path: string): string => {
 }
 
 const convertToPick = (uri: string): ProtoVisibleItem => {
-  const baseName = Workspace.pathBaseName(uri)
-  const dirName = Workspace.pathDirName(uri)
+  const displayPath = hasUriScheme(uri) ? decodeURIComponent(new URL(uri).pathname) : uri
+  const baseName = Workspace.pathBaseName(displayPath)
+  const dirName = Workspace.pathDirName(displayPath)
 
   return {
     description: dirName,
