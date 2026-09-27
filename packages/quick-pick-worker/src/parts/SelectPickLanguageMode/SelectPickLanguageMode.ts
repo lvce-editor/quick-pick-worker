@@ -10,7 +10,7 @@ interface LanguageModeValue {
 export const selectPick = async (pick: ProtoVisibleItem): Promise<any> => {
   const editorId = await RendererWorker.getActiveEditorId()
   const value = pick.value as LanguageModeValue
-  await RendererWorker.invoke('Viewlet.executeViewletCommand', editorId, 'setLanguageId', value.languageId, value.tokenizePath)
+  await RendererWorker.invoke('Viewlet.executeViewletCommand', editorId, 'setLanguageId', value.languageId, value.tokenizePath, true)
   return {
     command: QuickPickReturnValue.Hide,
   }
