@@ -38,6 +38,18 @@ jobs:
       - name: Install application dependencies
         working-directory: .tmp/lvce-integration
         run: npm ci
+        env:
+          DOWNLOAD_BUILTIN_EXTENSIONS: 0
+      - name: Download built-in extensions
+        working-directory: .tmp/lvce-integration
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if node packages/build/src/parts/DownloadBuiltinExtensions/DownloadBuiltinExtensions.ts; then
+              exit 0
+            fi
+          done
+          exit 1
       - name: Install Chromium
         working-directory: .tmp/lvce-integration/packages/extension-host-worker-tests
         run: npx playwright install --with-deps chromium
