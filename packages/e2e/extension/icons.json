@@ -2,9 +2,15 @@
   "iconDefinitions": {
     "_folder": "/folder.svg",
     "_file": "/file.svg",
-    "_json": "/json.svg"
+    "_json": "/json.svg",
+    "_xml": "/xml.svg",
+    "_yaml": "/yaml.svg"
   },
   "fileExtensions": {
     "json": "_json"
+  },
+  "languageIds": {
+    "xml": "_xml",
+    "yaml": "_yaml"
   }
 }
