@@ -55,7 +55,7 @@ test('getPicks returns file picks from search', async () => {
       uri: '/workspace/subdir/file3.js',
     },
   ])
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'file', true, '']])
 })
 
@@ -69,7 +69,7 @@ test('getPicks resolves relative search results against the local workspace path
   const result = await GetPicksFile.getPicks('file')
 
   expect(result.map(({ uri }) => uri)).toEqual(['/workspace/file1.txt', '/workspace/subdir/file2.ts'])
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
 
 test('getPicks preserves the workspace scheme for relative search results', async () => {
@@ -82,7 +82,7 @@ test('getPicks preserves the workspace scheme for relative search results', asyn
   const result = await GetPicksFile.getPicks('file')
 
   expect(result.map(({ uri }) => uri)).toEqual(['memfs:///workspace/file1.txt'])
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
 
 test('getPicks returns empty array when no workspace', async () => {
@@ -196,7 +196,7 @@ test('getPicks handles files in root directory', async () => {
   expect(result).toHaveLength(1)
   expect(result[0].label).toBe('root.txt')
   expect(result[0].description).toBe('/workspace')
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'root', true, '']])
 })
 
@@ -210,7 +210,7 @@ test('getPicks handles empty search results', async () => {
   const result = await GetPicksFile.getPicks('nonexistent')
 
   expect(result).toEqual([])
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'nonexistent', true, '']])
 })
 
@@ -222,7 +222,7 @@ test('getPicks encodes raw filenames under a qualified workspace without encodin
   const result = await GetPicksFile.getPicks('100')
   expect(result[0].uri).toBe('memfs:///my%20workspace/src/%C3%84%20100%2523%20%23%3F.txt')
   expect(result[0].label).toBe('Ä 100%23 #?.txt')
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
 
 test('getPicks exposes the basename of Windows search results for selection', async () => {
@@ -233,5 +233,5 @@ test('getPicks exposes the basename of Windows search results for selection', as
   const result = await GetPicksFile.getPicks('100')
   expect(result[0].label).toBe('Ä 100% #.txt')
   expect(result[0].description).toBe('C:/workspace/src')
-  expect(mockRpc.invocations).toEqual([['Workspace.getPath']])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
