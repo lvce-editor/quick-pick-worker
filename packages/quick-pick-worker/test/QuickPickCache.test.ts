@@ -2,7 +2,10 @@ import { expect, test } from '@jest/globals'
 import * as CacheWorker from '../src/parts/CacheWorker/CacheWorker.ts'
 import * as QuickPickCache from '../src/parts/QuickPickCache/QuickPickCache.ts'
 
-const createCacheResponse = (body: string, expires = new Date(Date.now() + 1000 * 60).toUTCString()): { readonly body: ArrayBuffer; readonly headers: { readonly expires: string } } => ({
+const createCacheResponse = (
+  body: string,
+  expires = new Date(Date.now() + 1000 * 60).toUTCString(),
+): { readonly body: ArrayBuffer; readonly headers: { readonly expires: string } } => ({
   body: new TextEncoder().encode(body).buffer,
   headers: { expires },
 })
