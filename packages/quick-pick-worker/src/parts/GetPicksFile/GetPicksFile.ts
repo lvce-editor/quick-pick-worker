@@ -1,15 +1,15 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as DirentType from '../DirentType/DirentType.ts'
 import { emptyMatches } from '../EmptyMatches/EmptyMatches.ts'
 import * as GetWorkspacePath from '../GetWorkspacePath/GetWorkspacePath.ts'
+import * as QuickPickCache from '../QuickPickCache/QuickPickCache.ts'
 import * as SearchFile from '../SearchFile/SearchFile.ts'
 import * as Workspace from '../Workspace/Workspace.ts'
 
-const searchFile = async (path: string, value: string): Promise<readonly string[]> => {
-  const prepare = true
-  const files = await SearchFile.searchFile(/* path */ path, /* searchTerm */ value, prepare, '')
-  return files
-}
+const isFileList = (
+  value: readonly string[] | { readonly hash: string; readonly matchesCache: boolean; readonly results: readonly string[] },
+): value is readonly string[] => Array.isArray(value)
 
 const hasUriScheme = (path: string): boolean => /^[a-z][a-z\d+.-]*:/i.test(path) && !/^[a-z]:[\\/]/i.test(path)
 
@@ -66,7 +66,25 @@ export const getPicks = async (searchValue: string): Promise<readonly ProtoVisib
   if (!workspace) {
     return []
   }
-  const files = await searchFile(workspace, searchValue)
+  let cacheEnabled = false
+  try {
+    cacheEnabled = (await RendererWorker.invoke('Preferences.get', 'quickPick.cache')) !== false
+  } catch {
+    // If preferences are unavailable, preserve the existing uncached search behavior.
+  }
+  const cached = cacheEnabled ? await QuickPickCache.get(workspace) : undefined
+  const response = await SearchFile.searchFile(workspace, searchValue, true, '', cacheEnabled ? (cached?.hash ?? null) : undefined)
+  let files: readonly string[]
+  if (isFileList(response)) {
+    files = response
+  } else if (response.matchesCache && cached) {
+    files = cached.results
+  } else {
+    files = response.results
+    if (cacheEnabled && !isFileList(response)) {
+      await QuickPickCache.set(workspace, { hash: response.hash, results: files })
+    }
+  }
   const picks = files.map((path) => convertToPick(resolveFileUri(workspace, path)))
   return picks
 }
