@@ -30,10 +30,10 @@
   },
   "devDependencies": {
     "@lvce-editor/eslint-config": "^18.14.2",
-    "@lvce-editor/eslint-plugin-virtual-dom": "^13.7.0",
+    "@lvce-editor/eslint-plugin-virtual-dom": "^18.14.2",
     "eslint": "10.12.0",
     "knip": "^6.39.0",
     "prettier": "^3.9.9",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
