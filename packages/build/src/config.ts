@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { root } from './root.js'
+import { root } from './root.ts'
 
 // URI resolution measured 561,860 bytes versus a 560,968-byte baseline.
 // Allow modest headroom above the 561,932-byte macOS measurement.
