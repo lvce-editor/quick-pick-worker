@@ -2,9 +2,8 @@ import * as CacheWorker from '../CacheWorker/CacheWorker.ts'
 
 const cacheName = 'quick-pick-files-v1'
 const cacheUrl = (workspace: string): string => {
-  const url = new URL('https://quick-pick-cache.invalid/cache/v1')
-  url.searchParams.set('folder', workspace)
-  return url.href
+  const path = workspace.replaceAll('\\', '/').replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/')
+  return `https://quick-pick-cache.invalid/cache/v1/file/${path}`
 }
 
 interface QuickPickCacheEntry {
@@ -49,12 +48,15 @@ export const get = async (workspace: string): Promise<QuickPickCacheEntry | unde
 
 export const set = async (workspace: string, entry: QuickPickCacheEntry): Promise<void> => {
   const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toUTCString()
+  const body = JSON.stringify(entry)
   const headers = {
     'cache-control': 'private, max-age=7776000',
+    'content-length': String(new TextEncoder().encode(body).byteLength),
+    'content-type': 'application/json',
     expires,
   }
   try {
-    await CacheWorker.invoke('Cache.setCacheStorageItem', cacheUrl(workspace), JSON.stringify(entry), cacheName, headers)
+    await CacheWorker.invoke('Cache.setCacheStorageItem', cacheUrl(workspace), body, cacheName, headers)
   } catch {
     // Caching is optional; a storage failure must not break file search.
   }
