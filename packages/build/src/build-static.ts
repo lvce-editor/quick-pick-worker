@@ -1,7 +1,7 @@
 import { cp, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { root } from './root.js'
+import { root } from './root.ts'
 
 const sharedProcessPath = join(root, 'node_modules', '@lvce-editor', 'shared-process', 'index.js')
 
@@ -17,12 +17,11 @@ const { commitHash } = await sharedProcess.exportStatic({
 
 const rendererWorkerPath = join(root, 'dist', commitHash, 'packages', 'renderer-worker', 'dist', 'rendererWorkerMain.js')
 
-export const getRemoteUrl = (path) => {
+export const getRemoteUrl = (path: string): string => {
   const url = pathToFileURL(path).toString().slice(8)
   return `/remote/${url}`
 }
 
-// @ts-ignore
 const content = await readFile(rendererWorkerPath, 'utf8')
 const workerPath = join(root, '.tmp/dist/dist/quickPickWorkerMain.js')
 const remoteUrl = getRemoteUrl(workerPath)

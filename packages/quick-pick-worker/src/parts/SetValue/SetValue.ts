@@ -1,5 +1,6 @@
 import type { AsyncCommandContext } from '@lvce-editor/viewlet-registry'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
+import * as CanReuseFilePicks from '../CanReuseFilePicks/CanReuseFilePicks.ts'
 import * as FilterQuickPickItems from '../FilterQuickPickItems/FilterQuickPickItems.ts'
 import * as GetFilterValue from '../GetFilterValue/GetFilterValue.ts'
 import * as GetFinalDeltaY from '../GetFinalDeltaY/GetFinalDeltaY.ts'
@@ -29,7 +30,6 @@ const isStaticQuickInput = (args: readonly unknown[]): boolean => {
   return options?.mode === 'quickInput' && options.quickInputId === undefined
 }
 
-// TODO when user types letters -> no need to query provider again -> just filter existing results
 export const setValue = async (state: QuickPickState, newValue: string): Promise<QuickPickState> => {
   const { args, assetDir, fileIconCache, height, itemHeight, maxLineY, minLineY, platform, providerId, value } = state
   if (value === newValue) {
@@ -41,8 +41,9 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(newValue)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(providerId, prefix)
   const quickInput = isQuickInput(args)
+  const reuseFilePicks = !state.initial && CanReuseFilePicks.canReuseFilePicks(providerId, value, newValue, state.picks.length)
   const newPicks =
-    isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode
+    isStaticQuickInput(args) || subId === QuickPickEntryId.LanguageMode || reuseFilePicks
       ? state.picks
       : await GetPicks.getPicks(subId, newValue, args, { applicationId: state.applicationId, assetDir, platform })
   const filterValue = quickInput ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
