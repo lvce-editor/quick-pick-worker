@@ -12,7 +12,7 @@ export const getAll = async (): Promise<readonly unknown[]> => {
   try {
     // @ts-ignore
     const entries = await RendererWorker.invoke('Layout.getAllQuickPickMenuEntries')
-    return entries || []
+    return entries ? [...entries].sort((a, b) => a.label.localeCompare(b.label)) : []
   } catch {
     // ignore
   }
