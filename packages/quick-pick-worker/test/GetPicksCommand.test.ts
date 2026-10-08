@@ -185,3 +185,22 @@ test('queries extension commands in the owning application', async () => {
   expect(picks).toContainEqual(expect.objectContaining({ id: 'ext.eslint.showPerformanceTrace' }))
   expect(mockRpc.invocations).toContainEqual(['Application.execute', 'source', 'ExtensionHost.getCommands', '/static', 1])
 })
+
+test('sorts the bare command prompt and preserves provider order for filtered queries', async () => {
+  const builtinPicks = [
+    { id: 'Tasks.runDefaultBuildTask', label: 'Tasks: Run default build task' },
+    { id: 'Layout.signIn', label: 'Account: Sign In' },
+  ]
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.getCommands': () => [],
+    'Layout.getAllQuickPickMenuEntries': () => builtinPicks,
+  })
+
+  const unfiltered = await GetPicksCommand.getPicks('>', ['', 0])
+  const filtered = await GetPicksCommand.getPicks('>Layout', ['', 0])
+
+  expect(unfiltered.map((item) => item.label)).toEqual(['Account: Sign In', 'Change Language Mode', 'Tasks: Run default build task'])
+  expect(filtered.map((item) => item.label)).toEqual(['Tasks: Run default build task', 'Account: Sign In', 'Change Language Mode'])
+  expect(builtinPicks[0].id).toBe('Tasks.runDefaultBuildTask')
+  expect(mockRpc.invocations).toHaveLength(4)
+})

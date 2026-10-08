@@ -77,5 +77,5 @@ export const getPicks = async (
   const extensionPicks = await getExtensionPicks(assetDir, platform, applicationId)
   const allPicks = [...builtinPicks, ...extensionPicks]
   const converted = allPicks.map(toProtoVisibleItem)
-  return converted
+  return value === '>' ? converted.toSorted((a, b) => a.label.localeCompare(b.label)) : converted
 }
