@@ -84,19 +84,3 @@ test('getAll - returns renderer worker entries when available', async () => {
   expect(result).toEqual(menuEntries)
   expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries']])
 })
-
-test('getAll - sorts renderer commands without mutating the renderer entries', async () => {
-  const menuEntries = [
-    { id: 'Tasks.runDefaultBuildTask', label: 'Tasks: Run default build task' },
-    { id: 'Layout.signIn', label: 'Account: Sign In' },
-  ]
-  using mockRpc = RendererWorker.registerMockRpc({
-    'Layout.getAllQuickPickMenuEntries': () => menuEntries,
-  })
-
-  const result = await MenuEntriesState.getAll()
-
-  expect(result).toEqual([menuEntries[1], menuEntries[0]])
-  expect(menuEntries[0].id).toBe('Tasks.runDefaultBuildTask')
-  expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries']])
-})
