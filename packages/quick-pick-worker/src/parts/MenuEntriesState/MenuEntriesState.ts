@@ -11,8 +11,8 @@ const state: MenuEntriesState = {
 export const getAll = async (): Promise<readonly unknown[]> => {
   try {
     // @ts-ignore
-    const entries = await RendererWorker.invoke('Layout.getAllQuickPickMenuEntries')
-    return entries ? [...entries].sort((a, b) => a.label.localeCompare(b.label)) : []
+    const entries: readonly { label: string }[] = await RendererWorker.invoke('Layout.getAllQuickPickMenuEntries')
+    return entries ? entries.toSorted((a, b) => a.label.localeCompare(b.label)) : []
   } catch {
     // ignore
   }
