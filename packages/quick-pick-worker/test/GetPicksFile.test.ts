@@ -246,6 +246,7 @@ test('getPicks relativizes paths with a trailing workspace separator and preserv
 
   expect(result.map(({ description }) => description)).toEqual(['src', '/workspace-old/src'])
   expect(result.map(({ uri }) => uri)).toEqual(['/workspace/src/file.ts', '/workspace-old/src/file.ts'])
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
 
 test('getPicks relativizes paths for matching qualified workspace schemes', async () => {
@@ -258,4 +259,5 @@ test('getPicks relativizes paths for matching qualified workspace schemes', asyn
 
   expect(result[0].description).toBe('src')
   expect(result[0].uri).toBe('memfs:///workspace/src/file.ts')
+  expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
 })
