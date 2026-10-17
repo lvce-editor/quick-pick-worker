@@ -31,9 +31,9 @@ const getWorkspaceDisplayPath = (workspace: string): { readonly path: string; re
   }
   const url = new URL(workspace)
   return {
+    host: url.host,
     path: decodeURIComponent(url.pathname),
     scheme: url.protocol,
-    host: url.host,
   }
 }
 
