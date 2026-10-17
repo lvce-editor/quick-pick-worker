@@ -28,7 +28,7 @@ test('getPicks returns file picks from search', async () => {
 
   expect(result).toEqual([
     {
-      description: '/workspace',
+      description: '',
       direntType: DirentType.File,
       fileIcon: '',
       icon: '',
@@ -37,7 +37,7 @@ test('getPicks returns file picks from search', async () => {
       uri: '/workspace/file1.txt',
     },
     {
-      description: '/workspace',
+      description: '',
       direntType: DirentType.File,
       fileIcon: '',
       icon: '',
@@ -46,7 +46,7 @@ test('getPicks returns file picks from search', async () => {
       uri: '/workspace/file2.ts',
     },
     {
-      description: '/workspace/subdir',
+      description: 'subdir',
       direntType: DirentType.File,
       fileIcon: '',
       icon: '',
@@ -195,7 +195,7 @@ test('getPicks handles files in root directory', async () => {
 
   expect(result).toHaveLength(1)
   expect(result[0].label).toBe('root.txt')
-  expect(result[0].description).toBe('/workspace')
+  expect(result[0].description).toBe('')
   expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
   expect(mockFileSearchWorker.invocations).toEqual([['FileSearch.searchFile', '/workspace', 'root', true, '']])
 })
@@ -232,6 +232,30 @@ test('getPicks exposes the basename of Windows search results for selection', as
   })
   const result = await GetPicksFile.getPicks('100')
   expect(result[0].label).toBe('Ä 100% #.txt')
-  expect(result[0].description).toBe('C:/workspace/src')
+  expect(result[0].description).toBe('src')
   expect(mockRpc.invocations).toEqual([['Workspace.getPath'], ['Preferences.get', 'quickPick.cache']])
+})
+
+test('getPicks relativizes paths with a trailing workspace separator and preserves prefix collisions', async () => {
+  createMockFileSearchWorker(['/workspace/src/file.ts', '/workspace-old/src/file.ts'])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => '/workspace/',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result.map(({ description }) => description)).toEqual(['src', '/workspace-old/src'])
+  expect(result.map(({ uri }) => uri)).toEqual(['/workspace/src/file.ts', '/workspace-old/src/file.ts'])
+})
+
+test('getPicks relativizes paths for matching qualified workspace schemes', async () => {
+  createMockFileSearchWorker(['src/file.ts'])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getPath': () => 'memfs:///workspace/',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result[0].description).toBe('src')
+  expect(result[0].uri).toBe('memfs:///workspace/src/file.ts')
 })

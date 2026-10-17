@@ -23,6 +23,42 @@ const trimTrailingSeparators = (path: string): string => {
   return result
 }
 
+const normalizePath = (path: string): string => path.replaceAll('\\', '/')
+
+const getWorkspaceDisplayPath = (workspace: string): { readonly path: string; readonly scheme?: string; readonly host?: string } => {
+  if (!hasUriScheme(workspace)) {
+    return { path: normalizePath(workspace) }
+  }
+  const url = new URL(workspace)
+  return {
+    path: decodeURIComponent(url.pathname),
+    scheme: url.protocol,
+    host: url.host,
+  }
+}
+
+const getRelativeDirectory = (workspace: string, uri: string, dirName: string): string => {
+  const workspacePath = getWorkspaceDisplayPath(workspace)
+  if (hasUriScheme(uri)) {
+    const url = new URL(uri)
+    if (workspacePath.scheme !== url.protocol || workspacePath.host !== url.host) {
+      return dirName
+    }
+  } else if (workspacePath.scheme) {
+    return dirName
+  }
+  const normalizedWorkspace = trimTrailingSeparators(workspacePath.path)
+  const normalizedDirectory = normalizePath(dirName)
+  const prefix = normalizedWorkspace.endsWith('/') ? normalizedWorkspace : `${normalizedWorkspace}/`
+  if (normalizedDirectory === normalizedWorkspace) {
+    return ''
+  }
+  if (!normalizedDirectory.startsWith(prefix)) {
+    return dirName
+  }
+  return normalizedDirectory.slice(prefix.length)
+}
+
 const resolveFileUri = (workspace: string, path: string): string => {
   if (hasUriScheme(path)) {
     return path
@@ -40,13 +76,14 @@ const resolveFileUri = (workspace: string, path: string): string => {
   return `${trimTrailingSeparators(workspace)}/${path}`
 }
 
-const convertToPick = (uri: string): ProtoVisibleItem => {
+const convertToPick = (workspace: string, uri: string): ProtoVisibleItem => {
   const displayPath = hasUriScheme(uri) ? decodeURIComponent(new URL(uri).pathname) : uri.replaceAll('\\', '/')
   const baseName = Workspace.pathBaseName(displayPath)
   const dirName = Workspace.pathDirName(displayPath)
+  const description = getRelativeDirectory(workspace, uri, dirName)
 
   return {
-    description: dirName,
+    description,
     direntType: DirentType.File,
     fileIcon: '',
     icon: '',
@@ -85,6 +122,6 @@ export const getPicks = async (searchValue: string): Promise<readonly ProtoVisib
       await QuickPickCache.set(workspace, { hash: response.hash, results: files })
     }
   }
-  const picks = files.map((path) => convertToPick(resolveFileUri(workspace, path)))
+  const picks = files.map((path) => convertToPick(workspace, resolveFileUri(workspace, path)))
   return picks
 }
