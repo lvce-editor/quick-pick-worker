@@ -24,7 +24,13 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
     const firstPick = Locator('.QuickPickItem').nth(0)
     await expect(firstPick).toBeVisible()
     const pickLabel = firstPick.locator('.QuickPickItemLabel')
+    const pickDescription = firstPick.locator('.QuickPickItemDescription')
     await expect(pickLabel).toHaveText(label)
+    if (relativePath.includes('/')) {
+      await expect(pickDescription).toHaveText(relativePath.slice(0, relativePath.lastIndexOf('/')))
+    } else {
+      await expect(pickDescription).toBeHidden()
+    }
     await QuickPick.selectItem(label)
 
     const quickPick = Locator('.QuickPick')
