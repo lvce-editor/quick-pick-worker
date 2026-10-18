@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { root } from './root.ts'
 
 const locations = [
+  '.nvmrc',
   'package.json',
   'package-lock.json',
   '.github/workflows/pr.yml',
