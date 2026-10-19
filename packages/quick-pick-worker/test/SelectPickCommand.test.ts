@@ -32,6 +32,29 @@ test('selectPickBuiltin calls RendererWorker.invoke with item id and args', asyn
   expect(result.command).toBe(QuickPickReturnValue.KeepOpen)
 })
 
+test('selectPickBuiltin executes the command in its application when provided', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Application.execute': () => {},
+  })
+
+  const pick: ProtoVisibleItem = {
+    args: ['arg1'],
+    description: '',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    id: 'Editor.organizeImports',
+    label: 'Editor: Organize Imports',
+    matches: [],
+    uri: '',
+  } as CommandItem
+
+  const result = await selectPick(pick, '', 'preview-application')
+
+  expect(mockRpc.invocations).toEqual([['Application.execute', 'preview-application', 'Editor.organizeImports', 'arg1']])
+  expect(result.command).toBe(QuickPickReturnValue.Hide)
+})
+
 test('selectPickBuiltin opens the language mode provider', async () => {
   const pick: ProtoVisibleItem = {
     description: '',
