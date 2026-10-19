@@ -4,7 +4,7 @@ import * as ErrorHandling from '../ErrorHandling/ErrorHandling.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
-const selectPickBuiltin = async (item: any): Promise<any> => {
+const selectPickBuiltin = async (item: any, applicationId?: string): Promise<any> => {
   if (item.id === 'QuickPick.showColorTheme') {
     return {
       command: QuickPickReturnValue.OpenColorTheme,
@@ -17,7 +17,11 @@ const selectPickBuiltin = async (item: any): Promise<any> => {
   }
   const args = item.args || []
   // TODO ids should be all numbers for efficiency -> also directly can call command
-  await RendererWorker.invoke(item.id, ...args)
+  if (applicationId === undefined) {
+    await RendererWorker.invoke(item.id, ...args)
+  } else {
+    await RendererWorker.invoke('Application.execute', applicationId, item.id, ...args)
+  }
   if (shouldHide(item)) {
     return {
       command: QuickPickReturnValue.Hide,
@@ -54,5 +58,5 @@ export const selectPick = async (item: ProtoVisibleItem, _value = '', applicatio
   if (id.startsWith('ext.')) {
     return selectPickExtension(item, applicationId)
   }
-  return selectPickBuiltin(item)
+  return selectPickBuiltin(item, applicationId)
 }
