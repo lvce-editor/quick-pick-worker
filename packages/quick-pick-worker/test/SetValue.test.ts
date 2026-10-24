@@ -258,7 +258,7 @@ test('reuses complete file picks while narrowing the query', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
     'Preferences.get': () => false,
-    'Workspace.getPath': () => '/workspace',
+    'Workspace.getUri': () => '/workspace',
   })
   const picks = await GetPicksFile.getPicks('')
   const state: QuickPickState = {

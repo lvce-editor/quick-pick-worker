@@ -110,7 +110,14 @@ export const getPicks = async (searchValue: string): Promise<readonly ProtoVisib
     // If preferences are unavailable, preserve the existing uncached search behavior.
   }
   const cached = cacheEnabled ? await QuickPickCache.get(workspace) : undefined
-  const response = await SearchFile.searchFile(workspace, searchValue, true, '', cacheEnabled ? (cached?.hash ?? null) : undefined)
+  let response: Awaited<ReturnType<typeof SearchFile.searchFile>>
+  try {
+    response = await SearchFile.searchFile(workspace, searchValue, true, '', cacheEnabled ? (cached?.hash ?? null) : undefined)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    await RendererWorker.invoke('Notification.create', 'error', `Could not search workspace files: ${message}`)
+    return []
+  }
   let files: readonly string[]
   if (isFileList(response)) {
     files = response
