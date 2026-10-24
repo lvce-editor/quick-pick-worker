@@ -266,8 +266,8 @@ test.each(['remote-server', 'remote-ssh'])('file search preserves the %s workspa
   const workspace = `${scheme}://gateway.example/project`
   const search = createMockFileSearchWorker(['hello.txt'])
   using rpc = RendererWorker.registerMockRpc({
-    'Workspace.getUri': () => workspace,
     'Preferences.get': () => false,
+    'Workspace.getUri': () => workspace,
   })
   const picks = await GetPicksFile.getPicks('hello')
   expect(search.invocations).toEqual([['FileSearch.searchFile', workspace, 'hello', true, '']])
@@ -284,21 +284,22 @@ test('failed file search leaves an empty picker, reports a notification and can 
     },
   } as any)
   using rpc = RendererWorker.registerMockRpc({
-    'Workspace.getUri': () => 'remote-server://gateway.example/project',
-    'Preferences.get': () => false,
     'Notification.create': () => {},
+    'Preferences.get': () => false,
+    'Workspace.getUri': () => 'remote-server://gateway.example/project',
   })
   expect(await GetPicksFile.getPicks('hello')).toEqual([])
   expect(rpc.invocations).toContainEqual(['Notification.create', 'error', 'Could not search workspace files: Search connection closed'])
   fail = false
-  expect((await GetPicksFile.getPicks('hello'))[0].label).toBe('hello.txt')
+  const retriedPicks = await GetPicksFile.getPicks('hello')
+  expect(retriedPicks[0].label).toBe('hello.txt')
 })
 
 test('file search resolves relative results in a local file URI', async () => {
   const search = createMockFileSearchWorker(['hello.txt'])
   using rpc = RendererWorker.registerMockRpc({
-    'Workspace.getUri': () => 'file:///my%20project',
     'Preferences.get': () => false,
+    'Workspace.getUri': () => 'file:///my%20project',
   })
   const picks = await GetPicksFile.getPicks('hello')
   expect(search.invocations).toEqual([['FileSearch.searchFile', 'file:///my%20project', 'hello', true, '']])
