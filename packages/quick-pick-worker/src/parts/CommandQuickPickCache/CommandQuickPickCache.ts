@@ -9,7 +9,7 @@ export interface CachedCommand {
   readonly label: string
 }
 
-export interface CommandContribution {
+interface CommandContribution {
   readonly commands: readonly CachedCommand[]
   readonly hash: string
 }
