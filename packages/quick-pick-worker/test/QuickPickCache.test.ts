@@ -34,13 +34,33 @@ test('builds readable cache paths for remote workspaces and safely encodes path 
     },
   } as any)
 
+  await QuickPickCache.get('remote-ssh://89.167.102.168/home/simon/Documents/levivilet/backend-2')
   await QuickPickCache.get('vscode-remote://ssh-remote+host/home/a folder?x#y')
   await QuickPickCache.get('vscode-remote://ssh-remote+other/home/a folder?x#y')
+  await QuickPickCache.get('file:///home/a%20folder/文件#name')
 
   expect(requests).toEqual([
-    'https://quick-pick-cache.invalid/cache/v1/file/vscode-remote%3A//ssh-remote%2Bhost/home/a%20folder%3Fx%23y',
-    'https://quick-pick-cache.invalid/cache/v1/file/vscode-remote%3A//ssh-remote%2Bother/home/a%20folder%3Fx%23y',
+    'https://quick-pick-cache.invalid/cache/v1/remote-ssh/89.167.102.168/home/simon/Documents/levivilet/backend-2',
+    'https://quick-pick-cache.invalid/cache/v1/vscode-remote/ssh-remote%2Bhost/home/a%20folder%3Fx%23y',
+    'https://quick-pick-cache.invalid/cache/v1/vscode-remote/ssh-remote%2Bother/home/a%20folder%3Fx%23y',
+    'https://quick-pick-cache.invalid/cache/v1/file/home/a%20folder/%E6%96%87%E4%BB%B6%23name',
   ])
+})
+
+test('uses the same key when reading and writing a remote workspace', async () => {
+  const requests: string[] = []
+  CacheWorker.set({
+    invoke(method: string, request: string) {
+      requests.push(`${method}:${request}`)
+      return method === 'Cache.getCacheStorageItem' ? null : { success: true }
+    },
+  } as any)
+
+  const workspace = 'remote-ssh://89.167.102.168/home/simon/Documents/levivilet/backend-2'
+  await QuickPickCache.get(workspace)
+  await QuickPickCache.set(workspace, { hash: 'd'.repeat(64), results: [] })
+
+  expect(requests[0].slice(requests[0].indexOf(':') + 1)).toBe(requests[1].slice(requests[1].indexOf(':') + 1))
 })
 
 test('ignores expired and malformed cache entries', async () => {

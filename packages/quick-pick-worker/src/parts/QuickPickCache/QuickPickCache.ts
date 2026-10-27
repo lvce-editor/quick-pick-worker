@@ -1,8 +1,16 @@
 import * as CacheWorker from '../CacheWorker/CacheWorker.ts'
 
 const cacheName = 'quick-pick-files-v1'
+const encodePathSegment = (segment: string): string => encodeURIComponent(segment).replaceAll('+', '%2B').replace(/%25([\da-f]{2})/gi, '%$1')
+
 const cacheUrl = (workspace: string): string => {
-  const path = workspace.replaceAll('\\', '/').replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/')
+  const uriMatch = workspace.match(/^([a-z][\da-z+.-]*):\/\/([^/]*)(\/.*)?$/i)
+  if (uriMatch) {
+    const [, scheme, authority, uriPath = ''] = uriMatch
+    const path = [scheme.toLowerCase(), encodePathSegment(authority), ...uriPath.split('/').filter(Boolean).map(encodePathSegment)].filter(Boolean).join('/')
+    return `https://quick-pick-cache.invalid/cache/v1/${path}`
+  }
+  const path = workspace.replaceAll('\\', '/').replace(/^\/+/, '').split('/').filter(Boolean).map(encodePathSegment).join('/')
   return `https://quick-pick-cache.invalid/cache/v1/file/${path}`
 }
 
