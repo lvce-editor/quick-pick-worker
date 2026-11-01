@@ -2,10 +2,10 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'viewlet.quick-pick-open-recent-remove'
 
-export const test: Test = async ({ Command, expect, Locator }) => {
-  await Command.execute('RecentlyOpened.clearRecentlyOpened')
-  await Command.execute('RecentlyOpened.addToRecentlyOpened', 'remote-ssh://one.example/test/one')
-  await Command.execute('RecentlyOpened.addToRecentlyOpened', 'remote-ssh://two.example/test/two')
+export const test: Test = async ({ Command, expect, Locator, RecentlyOpened }) => {
+  await RecentlyOpened.clear()
+  await RecentlyOpened.add('remote-ssh://one.example/test/one')
+  await RecentlyOpened.add('remote-ssh://two.example/test/two')
   await Command.execute('QuickPick.showRecent')
 
   const items = Locator('.QuickPickItem')
@@ -31,7 +31,7 @@ export const test: Test = async ({ Command, expect, Locator }) => {
   const remainingItem = items.nth(0)
   const remainingLabel = remainingItem.locator('.QuickPickItemLabel')
   await expect(remainingLabel).toHaveText('one [SSH: one.example]')
-  const recentlyOpened = await Command.execute('RecentlyOpened.getRecentlyOpened')
+  const recentlyOpened = await RecentlyOpened.get()
   if (JSON.stringify(recentlyOpened) !== JSON.stringify(['remote-ssh://one.example/test/one'])) {
     throw new Error(`Unexpected recently opened entries: ${JSON.stringify(recentlyOpened)}`)
   }
