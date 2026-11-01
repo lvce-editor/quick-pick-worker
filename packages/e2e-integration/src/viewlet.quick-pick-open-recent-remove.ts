@@ -2,7 +2,7 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'viewlet.quick-pick-open-recent-remove'
 
-export const test: Test = async ({ Command, RecentlyOpened, expect, Locator }) => {
+export const test: Test = async ({ Command, expect, Locator, RecentlyOpened }) => {
   await RecentlyOpened.clear()
   await RecentlyOpened.add('remote-ssh://one.example/test/one')
   await RecentlyOpened.add('remote-ssh://two.example/test/two')

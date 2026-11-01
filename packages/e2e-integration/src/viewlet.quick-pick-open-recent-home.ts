@@ -2,7 +2,7 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'viewlet.quick-pick-open-recent-home'
 
-export const test: Test = async ({ Command, RecentlyOpened, expect, Locator, QuickPick }) => {
+export const test: Test = async ({ Command, expect, Locator, QuickPick, RecentlyOpened }) => {
   const homeDir = await Command.execute('Workspace.getHomeDir')
   await RecentlyOpened.clear()
   await RecentlyOpened.add(`file://${homeDir}/Documents/levivilet`)

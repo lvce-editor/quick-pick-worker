@@ -2,7 +2,7 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'viewlet.quick-pick-layout'
 
-export const test: Test = async ({ Command, RecentlyOpened, expect, Locator }) => {
+export const test: Test = async ({ Command, expect, Locator, RecentlyOpened }) => {
   await RecentlyOpened.clear()
   await RecentlyOpened.add(
     'remote-ssh://one.example/this-is-a-very-long-parent-directory-name/another-very-long-parent-directory-name/this-is-a-very-long-file-name-that-does-not-fit.txt',
