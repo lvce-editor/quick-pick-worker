@@ -36,8 +36,7 @@ jobs:
         with:
           node-version-file: .tmp/lvce-integration/.nvmrc
       - name: Update test-worker in disposable application lockfile
-        working-directory: .tmp/lvce-integration
-        run: npm update --package-lock-only @lvce-editor/test-worker
+        run: node packages/e2e-integration/updateTestWorkerLock.mjs .tmp/lvce-integration
       - name: Install application dependencies
         working-directory: .tmp/lvce-integration
         run: npm ci
