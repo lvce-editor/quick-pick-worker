@@ -1,9 +1,10 @@
 import { join } from 'node:path'
 import { root } from './root.ts'
 
-// URI resolution measured 561,860 bytes versus a 560,968-byte baseline.
-// Allow modest headroom above the 561,932-byte macOS measurement.
-export const threshold = 563_000
+// Main measured 558,768 bytes on Linux and Windows, and 558,840 on macOS.
+// Command shortcut labels measured 614,172 bytes on Linux and Windows.
+// Keep modest headroom above the measured feature cost with the memory gate enabled.
+export const threshold = 619_000
 
 export const instantiations = 8_000
 

@@ -14,6 +14,7 @@ import * as GetQuickPickProviderId from '../GetQuickPickProviderId/GetQuickPickP
 import * as GetQuickPickSubProviderId from '../GetQuickPickSubProviderId/GetQuickPickSubProviderId.ts'
 import * as InputSource from '../InputSource/InputSource.ts'
 import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
+import { loadCommandKeyBindings } from '../LoadCommandKeyBindings/LoadCommandKeyBindings.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
 import * as QuickPickStates from '../QuickPickStates/QuickPickStates.ts'
@@ -57,6 +58,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const value = GetDefaultValue.getDefaultValue(id, uri, args)
   const prefix = GetQuickPickPrefix.getQuickPickPrefix(value)
   const subId = GetQuickPickSubProviderId.getQuickPickSubProviderId(id, prefix)
+  const commandKeyBindings = subId === QuickPickEntryId.Commands ? await loadCommandKeyBindings(state.applicationId) : {}
   const newPicks = await GetPicks.getPicks(subId, value, args, { applicationId: state.applicationId, assetDir, platform })
   Assert.array(newPicks)
   let colorTheme = ''
@@ -94,6 +96,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   return {
     ...state,
     args,
+    commandKeyBindings,
     cursorOffset: value.length,
     deltaY: minLineY * itemHeight,
     fileIconCache: newFileIconCache,
@@ -129,6 +132,7 @@ export const loadContentWithContext = async (context: AsyncCommandContext<QuickP
     }
     return {
       ...latestState,
+      commandKeyBindings: loadedState.commandKeyBindings,
       cursorOffset: loadedState.cursorOffset,
       deltaY: loadedState.deltaY,
       fileIconCache: loadedState.fileIconCache,
