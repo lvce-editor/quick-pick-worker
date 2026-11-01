@@ -31,7 +31,7 @@ const isStaticQuickInput = (args: readonly unknown[]): boolean => {
 }
 
 export const setValue = async (state: QuickPickState, newValue: string): Promise<QuickPickState> => {
-  const { args, assetDir, fileIconCache, height, itemHeight, maxLineY, minLineY, platform, providerId, value } = state
+  const { args, assetDir, fileIconCache, height, itemHeight, maxVisibleItems, platform, providerId, value } = state
   if (value === newValue) {
     return state
   }
@@ -49,6 +49,8 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
   const filterValue = quickInput ? '' : GetFilterValue.getFilterValue(providerId, subId, newValue)
   const items = FilterQuickPickItems.filterQuickPickItems(newPicks, filterValue, subId === QuickPickEntryId.Commands)
   const focusedIndex = items.length === 0 ? -1 : 0
+  const minLineY = 0
+  const maxLineY = Math.min(maxVisibleItems, items.length)
   const sliced = items.slice(minLineY, maxLineY)
   const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(sliced, fileIconCache)
 
@@ -57,12 +59,15 @@ export const setValue = async (state: QuickPickState, newValue: string): Promise
 
   return {
     ...state,
+    deltaY: 0,
     fileIconCache: newFileIconCache,
     finalDeltaY,
     focusedIndex,
     icons,
     inputSource: InputSource.Script,
     items,
+    maxLineY,
+    minLineY,
     picks: newPicks,
     value: newValue,
   }
@@ -82,12 +87,15 @@ export const setValueWithContext = async (context: AsyncCommandContext<QuickPick
     }
     return {
       ...latestState,
+      deltaY: result.deltaY,
       fileIconCache: result.fileIconCache,
       finalDeltaY: result.finalDeltaY,
       focusedIndex: result.focusedIndex,
       icons: result.icons,
       inputSource: result.inputSource,
       items: result.items,
+      maxLineY: result.maxLineY,
+      minLineY: result.minLineY,
       picks: result.picks,
       value: result.value,
     }

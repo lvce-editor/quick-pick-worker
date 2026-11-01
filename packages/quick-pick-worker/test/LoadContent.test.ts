@@ -1,13 +1,16 @@
 import { afterEach, beforeEach, expect, jest, test } from '@jest/globals'
 import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
+import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import { loadContent, loadContentWithContext } from '../src/parts/LoadContent/LoadContent.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickPrefix from '../src/parts/QuickPickPrefix/QuickPickPrefix.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import { waitUntilVisible } from '../src/parts/QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
+import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
 const testState: { consoleErrorSpy?: ReturnType<typeof jest.spyOn> } = {}
 
@@ -72,6 +75,28 @@ test('loadContent handles builtin command only', async () => {
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
   expect(result.maxLineY).toBe(1)
+})
+
+test('loadContent becomes a no-op when a newer value was typed while it was loading', async () => {
+  RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+
+  EditorWorker.registerMockRpc({
+    'Editor.getLines2': () => ['abc', 'def'],
+  })
+
+  const uid = 901
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
+  const { newState: initialState } = QuickPickStates.get(uid)
+  const typedState = await SetValue.setValue(initialState, `${QuickPickPrefix.GoToColumn}2`)
+  QuickPickStates.set(uid, initialState, typedState)
+
+  const result = await loadContent(initialState)
+
+  expect(result).toBe(initialState)
 })
 
 test('loadContent handles many picks', async () => {
@@ -643,4 +668,31 @@ test('loadContentWithContext transfers the initial color theme scroll position',
   expect(newState.maxLineY).toBe(16)
   expect(newState.deltaY).toBe(180)
   expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
+test('loadContentWithContext preserves input entered during provider loading', async () => {
+  const { promise: themes, resolve: resolveThemes } = Promise.withResolvers<readonly string[]>()
+  const { promise: started, resolve: notifyStarted } = Promise.withResolvers<void>()
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => '',
+    'ColorTheme.getColorThemeNames': () => {
+      notifyStarted()
+      return themes
+    },
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    uid: 902,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+  const pendingLoad = loadCommand(state.uid)
+  await started
+  const typedState = { ...state, initial: false, value: 'typed' }
+  QuickPickStates.set(state.uid, state, typedState)
+  resolveThemes(['theme'])
+  await pendingLoad
+  expect(QuickPickStates.get(state.uid).newState).toBe(typedState)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorThemeNames', '', 0])
 })

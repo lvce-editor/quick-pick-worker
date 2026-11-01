@@ -16,6 +16,7 @@ import * as InputSource from '../InputSource/InputSource.ts'
 import * as IsTextInput from '../IsTextInput/IsTextInput.ts'
 import * as QuickPickEntryId from '../QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickOpenState from '../QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickStates from '../QuickPickStates/QuickPickStates.ts'
 import * as QuickPickVisibleCallbacks from '../QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 
 interface ParsedArgs {
@@ -85,6 +86,11 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const finalDeltaY = GetFinalDeltaY.getFinalDeltaY(listHeight, itemHeight, items.length)
   const parsedArgs = parseArgs(subId, args)
   const finalValue = parsedArgs.initialValue || value
+  const latest = QuickPickStates.get(state.uid)
+  if (latest && latest.newState.uri === state.uri && latest.newState.args === state.args && latest.newState.value !== state.value) {
+    return state
+  }
+
   return {
     ...state,
     args,
@@ -117,25 +123,30 @@ export const loadContent = async (state: QuickPickState): Promise<QuickPickState
 export const loadContentWithContext = async (context: AsyncCommandContext<QuickPickState>): Promise<void> => {
   const state = context.getState()
   const loadedState = await getLoadedState(state)
-  await context.updateState((latestState) => ({
-    ...latestState,
-    cursorOffset: loadedState.cursorOffset,
-    deltaY: loadedState.deltaY,
-    fileIconCache: loadedState.fileIconCache,
-    finalDeltaY: loadedState.finalDeltaY,
-    focused: loadedState.focused,
-    focusedIndex: loadedState.focusedIndex,
-    icons: loadedState.icons,
-    initial: loadedState.initial,
-    inputSource: loadedState.inputSource,
-    items: loadedState.items,
-    maxLineY: loadedState.maxLineY,
-    minLineY: loadedState.minLineY,
-    picks: loadedState.picks,
-    placeholder: loadedState.placeholder,
-    providerId: loadedState.providerId,
-    state: loadedState.state,
-    value: loadedState.value,
-  }))
+  await context.updateState((latestState) => {
+    if (latestState.value !== state.value || latestState.uri !== state.uri || latestState.args !== state.args) {
+      return latestState
+    }
+    return {
+      ...latestState,
+      cursorOffset: loadedState.cursorOffset,
+      deltaY: loadedState.deltaY,
+      fileIconCache: loadedState.fileIconCache,
+      finalDeltaY: loadedState.finalDeltaY,
+      focused: loadedState.focused,
+      focusedIndex: loadedState.focusedIndex,
+      icons: loadedState.icons,
+      initial: loadedState.initial,
+      inputSource: loadedState.inputSource,
+      items: loadedState.items,
+      maxLineY: loadedState.maxLineY,
+      minLineY: loadedState.minLineY,
+      picks: loadedState.picks,
+      placeholder: loadedState.placeholder,
+      providerId: loadedState.providerId,
+      state: loadedState.state,
+      value: loadedState.value,
+    }
+  })
   QuickPickVisibleCallbacks.notifyVisible()
 }
