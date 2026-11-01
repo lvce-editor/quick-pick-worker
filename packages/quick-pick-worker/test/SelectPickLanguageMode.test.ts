@@ -27,7 +27,7 @@ test('selectPick changes the active editor language id', async () => {
 
   expect(mockRendererRpc.invocations).toEqual([
     ['GetActiveEditor.getActiveEditorId'],
-    ['Viewlet.executeViewletCommand', 7, 'setLanguageId', 'xyz', '/extensions/test/tokenizeXyz.js'],
+    ['Viewlet.executeViewletCommand', 7, 'setLanguageId', 'xyz', '/extensions/test/tokenizeXyz.js', true],
   ])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })

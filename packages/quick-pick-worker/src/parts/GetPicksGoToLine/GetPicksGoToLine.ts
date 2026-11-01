@@ -19,7 +19,7 @@ export const getPicks = async (value: string): Promise<readonly ProtoVisibleItem
         direntType: 0,
         fileIcon: '',
         icon: '',
-        label: QuickPickStrings.pressEnterToGoToLine(position.rowIndex, position.columnIndex),
+        label: QuickPickStrings.pressEnterToGoToLine(position.rowIndex + 1, position.columnIndex + 1),
         matches: [],
         uri: '',
       },

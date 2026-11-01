@@ -9,5 +9,7 @@ export interface VisibleItem {
   readonly keyBinding?: string
   readonly label: string
   readonly posInSet: number
+  readonly removeButton?: boolean
   readonly setSize: number
+  readonly uri?: string
 }

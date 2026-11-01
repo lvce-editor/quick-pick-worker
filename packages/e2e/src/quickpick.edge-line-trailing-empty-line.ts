@@ -5,20 +5,8 @@ export const name = 'quickpick.edge-line-trailing-empty-line'
 export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, QuickPick, Workspace }) => {
   const label = Locator('.QuickPickItemLabel')
   const expectQuickPickLabel = async (text: string): Promise<void> => {
-    const deadline = Date.now() + 5000
-    // Direct worker commands finish before the renderer applies their DOM update.
-    while (true) {
-      try {
-        await expect(label).toHaveCount(1)
-        await expect(label).toHaveText(text)
-        return
-      } catch (error) {
-        if (Date.now() >= deadline) {
-          throw error
-        }
-        await new Promise((resolve) => setTimeout(resolve, 20))
-      }
-    }
+    await expect(label).toHaveCount(1)
+    await expect(label).toHaveText(text)
   }
 
   // arrange
@@ -33,7 +21,7 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await QuickPick.setValue(':2')
 
   // assert
-  await expectQuickPickLabel("Press 'Enter' to go to line 1 column 0")
+  await expectQuickPickLabel("Press 'Enter' to go to line 2 column 1")
 
   // act
   await QuickPick.selectIndex(0)

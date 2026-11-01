@@ -74,7 +74,7 @@ test('selectIndex calls select function and returns state for Hide command', asy
   expect(closeWidgetCalled).toBe(true)
   expect(closeWidgetId).toBe(123)
   expect(result).toBe(state)
-  expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['test-command']])
 })
 
 test('selectIndex handles default command case', async () => {
@@ -111,6 +111,7 @@ test('selectIndex handles default command case', async () => {
 
 test('selectIndex opens the color theme provider from the command palette', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'atom-one-dark',
     'ColorTheme.getColorThemeNames': () => ['atom-one-dark', 'ayu'],
   })
 
@@ -142,7 +143,7 @@ test('selectIndex opens the color theme provider from the command palette', asyn
   expect(result.uri).toBe(QuickPickEntryUri.ColorTheme)
   expect(result.value).toBe('')
   expect(result.items.map((item) => item.label)).toEqual(['atom-one-dark', 'ayu'])
-  expect(mockRpc.invocations).toEqual([['ColorTheme.getColorThemeNames', '', 0]])
+  expect(mockRpc.invocations).toEqual([['ColorTheme.getColorThemeNames', '', 0], ['ColorTheme.getColorTheme']])
 })
 
 test('selectIndex calculates actualIndex correctly with minLineY', async () => {
@@ -229,7 +230,7 @@ test('selectIndex calculates actualIndex correctly with minLineY', async () => {
 
   expect(closeWidgetCalled).toBe(true)
   expect(result).toBe(state)
-  expect(mockRpc.invocations).toEqual([['test-command'], ['Viewlet.closeWidget', 123]])
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123], ['test-command']])
 })
 
 test('selectIndex closes a custom quick pick before executing its item command', async () => {

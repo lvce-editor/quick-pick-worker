@@ -1,3 +1,4 @@
+import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 import * as DirentType from '../DirentType/DirentType.ts'
 import * as GetRecentlyOpened from '../GetRecentlyOpened/GetRecentlyOpened.ts'
@@ -16,6 +17,11 @@ const decodePath = (path: string): string => {
 
 const getRemoteSshPathStart = (uri: string): number => {
   return uri.indexOf('/', remoteSshScheme.length)
+}
+
+const getRemoteSshAuthority = (uri: string): string => {
+  const pathStart = getRemoteSshPathStart(uri)
+  return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
 }
 
 const getPath = (uri: string): string => {
@@ -37,46 +43,54 @@ const getPath = (uri: string): string => {
   return uri
 }
 
-const getLabel = (uri: string): string => {
+const toProtoVisibleItem = (uri: string, homeDir?: string): ProtoVisibleItem => {
   const path = getPath(uri)
-  if (path === '/' && uri.startsWith(remoteSshScheme)) {
-    const pathStart = getRemoteSshPathStart(uri)
-    return uri.slice(remoteSshScheme.length, pathStart === -1 ? uri.length : pathStart)
-  }
+  const isRemoteSsh = uri.startsWith(remoteSshScheme)
+  const authority = isRemoteSsh ? getRemoteSshAuthority(uri) : ''
+  let folderName = path
   if (path.startsWith('/')) {
-    return Workspace.pathBaseName(path)
+    folderName = Workspace.pathBaseName(path)
   }
-  return path
-}
-
-const getDescription = (uri: string): string => {
-  const path = getPath(uri)
+  if (path === '/' && isRemoteSsh) {
+    folderName = authority
+  }
+  let description = ''
   if (path.startsWith('/')) {
-    const directory = Workspace.pathDirName(path)
-    if (uri.startsWith(remoteSshScheme)) {
-      const pathStart = getRemoteSshPathStart(uri)
-      const authority = pathStart === -1 ? uri : uri.slice(0, pathStart)
-      return `${authority}${path === '/' ? '/' : directory}`
+    description = Workspace.pathDirName(path)
+    if (
+      homeDir &&
+      !isRemoteSsh &&
+      description.startsWith(homeDir) &&
+      (description.length === homeDir.length || description[homeDir.length] === '/')
+    ) {
+      description = `~${description.slice(homeDir.length)}`
     }
-    return directory
   }
-  return ''
-}
-
-const toProtoVisibleItem = (uri: string): ProtoVisibleItem => {
+  if (path === '/' && isRemoteSsh) {
+    description = '/'
+  }
+  const label = isRemoteSsh ? `${folderName} [SSH: ${authority}]` : folderName
   return {
-    description: getDescription(uri),
+    description,
     direntType: DirentType.Directory,
     fileIcon: '',
     icon: '',
-    label: getLabel(uri),
+    iconName: isRemoteSsh ? folderName : undefined,
+    label,
     matches: [],
+    removeButton: true,
     uri,
   }
 }
 
 export const getPicks = async (): Promise<readonly ProtoVisibleItem[]> => {
   const recentlyOpened = await GetRecentlyOpened.getRecentlyOpened()
-  const picks = recentlyOpened.map(toProtoVisibleItem)
+  let homeDir: string | undefined
+  try {
+    homeDir = await RendererWorker.invoke('Workspace.getHomeDir')
+  } catch {
+    // Ignore unavailable workspace RPCs and keep the full path.
+  }
+  const picks = recentlyOpened.map((uri) => toProtoVisibleItem(uri, homeDir))
   return picks
 }

@@ -1,7 +1,7 @@
 import { execa } from 'execa'
-import { root } from './root.js'
+import { root } from './root.ts'
 
-const main = async () => {
+const main = async (): Promise<void> => {
   execa(`npm`, ['run', 'build:watch'], {
     cwd: root,
     stdio: 'inherit',

@@ -64,9 +64,10 @@ test('select current index waits for a pending input update', async () => {
   await Promise.all([pendingInput, pendingSelection])
 
   expect(mockRpc.invocations).toEqual([
-    ['Layout.getAllQuickPickMenuEntries'],
-    ['ExtensionHost.getCommands', '', 0],
-    ['Workspace.close'],
+    ['Preferences.get', 'quickPick.cache'],
+    ['Layout.getAllQuickPickMenuEntries', undefined],
+    ['ExtensionHost.getCommands', '', 0, undefined, undefined],
     ['Viewlet.closeWidget', uid],
+    ['Workspace.close'],
   ])
 })

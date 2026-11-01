@@ -18,10 +18,12 @@ import { handleRendererProcessMessagePort } from '../HandleRendererProcessMessag
 import * as HandleScrollbarPointerDown from '../HandleScrollbarPointerDown/HandleScrollbarPointerDown.ts'
 import * as HandleScrollbarPointerMove from '../HandleScrollbarPointerMove/HandleScrollbarPointerMove.ts'
 import * as HandleScrollbarPointerUp from '../HandleScrollbarPointerUp/HandleScrollbarPointerUp.ts'
+import { handleStatusBarMessagePort } from '../HandleStatusBarMessagePort/HandleStatusBarMessagePort.ts'
 import * as HandleWheel from '../HandleWheel/HandleWheel.ts'
 import { initialize } from '../Initialize/Initialize.ts'
 import * as LoadContent from '../LoadContent/LoadContent.ts'
 import * as MenuEntriesState from '../MenuEntriesState/MenuEntriesState.ts'
+import { openStatusBarPicker } from '../OpenStatusBarPicker/OpenStatusBarPicker.ts'
 import { executeCallback } from '../QuickPickCallbacks/QuickPickCallbacks.ts'
 import * as WrapCommand from '../QuickPickStates/QuickPickStates.ts'
 import { getCommandIds } from '../QuickPickStates/QuickPickStates.ts'
@@ -64,9 +66,11 @@ export const commandMap = {
   'QuickPick.handleScrollBarPointerDown': WrapCommand.wrapCommand(HandleScrollbarPointerDown.handleScrollBarPointerDown),
   'QuickPick.handleScrollBarPointerMove': WrapCommand.wrapCommand(HandleScrollbarPointerMove.handleScrollBarPointerMove),
   'QuickPick.handleScrollBarPointerUp': WrapCommand.wrapCommand(HandleScrollbarPointerUp.handleScrollBarPointerUp),
+  'QuickPick.handleStatusBarMessagePort': handleStatusBarMessagePort,
   'QuickPick.handleWheel': WrapCommand.wrapCommand(HandleWheel.handleWheel),
   'QuickPick.initialize': initialize,
   'QuickPick.loadContent': WrapCommand.wrapAsyncCommand(LoadContent.loadContentWithContext),
+  'QuickPick.openStatusBarPicker': openStatusBarPicker,
   'QuickPick.render2': Render2.render2,
   'QuickPick.renderEventListeners': RenderEventListeners.renderEventListeners,
   'QuickPick.selectCurrentIndex': SerializeCommand.serialize(WrapCommand.wrapCommand(SelectCurrentIndex.selectCurrentIndex)),

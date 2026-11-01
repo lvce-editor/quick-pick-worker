@@ -1,6 +1,21 @@
 {
+  "id": "test.quick-pick-worker-e2e",
   "name": "test",
+  "contentSecurityPolicy": ["default-src 'none'", "script-src 'self'"],
+  "browser": "main.ts",
+  "isolated": true,
+  "activation": ["*"],
+  "formattingProviders": [
+    {
+      "id": "quick-pick-formatting",
+      "languageId": "quick-pick-formatting"
+    }
+  ],
   "languages": [
+    {
+      "id": "quick-pick-formatting",
+      "extensions": [".quick-pick-formatting"]
+    },
     {
       "id": "xyz",
       "extensions": [".xyz"],

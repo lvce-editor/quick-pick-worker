@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "postinstall": "node src/postinstall.js",
-    "dev": "node ./src/server.js"
+    "dev": "node ./src/server.js",
+    "test": "node --test test/*.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@lvce-editor/server": "^0.103.19"
+    "@lvce-editor/server": "^0.121.3"
   },
   "devDependencies": {
     "@types/node": "^25.9.5"

@@ -61,7 +61,7 @@ const getRelativePointerY = (state: QuickPickState, clientY: number): number => 
   return clientY - state.top - state.headerHeight
 }
 
-export const setDeltaY = async (state: QuickPickState, deltaY: number): Promise<QuickPickState> => {
+export const setDeltaY = async (state: QuickPickState, deltaY: number, force = false): Promise<QuickPickState> => {
   Assert.object(state)
   Assert.number(deltaY)
   const { headerHeight, height, itemHeight, items } = state
@@ -73,14 +73,15 @@ export const setDeltaY = async (state: QuickPickState, deltaY: number): Promise<
   } else if (deltaY > finalDeltaY) {
     deltaY = Math.max(finalDeltaY, 0)
   }
-  if (state.deltaY === deltaY) {
+  if (state.deltaY === deltaY && !force) {
     return state
   }
   const minLineY = Math.round(deltaY / itemHeight)
   const maxLineY = minLineY + Math.round(listHeight / itemHeight)
   Assert.number(minLineY)
   Assert.number(maxLineY)
-  const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(items.slice(minLineY, maxLineY), state.fileIconCache)
+  const fileIconCache = force ? {} : state.fileIconCache
+  const { icons, newFileIconCache } = await GetQuickPickFileIcons.getQuickPickFileIcons(items.slice(minLineY, maxLineY), fileIconCache)
   return {
     ...state,
     deltaY,

@@ -1,8 +1,9 @@
 import { expect, test } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { FileSearchWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/ExtensionHostWorker.ts'
+import * as GetPicksFile from '../src/parts/GetPicksFile/GetPicksFile.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
@@ -246,6 +247,36 @@ test('filters cached language mode picks', async () => {
   expect(result.items.map((item) => item.label)).toEqual(['java', 'javascript'])
 })
 
+test('reuses complete file picks while narrowing the query', async () => {
+  const searchInvocations: unknown[][] = []
+  FileSearchWorker.set({
+    invoke(method: string, ...params: readonly unknown[]) {
+      searchInvocations.push([method, ...params])
+      return ['/workspace/a.ts', '/workspace/ab.ts', '/workspace/b.ts']
+    },
+  } as any)
+  using mockRpc = RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': () => 'icon',
+    'Preferences.get': () => false,
+    'Workspace.getUri': () => '/workspace',
+  })
+  const picks = await GetPicksFile.getPicks('')
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    picks,
+    providerId: QuickPickEntryId.File,
+    value: '',
+  }
+
+  const firstResult = await SetValue.setValue(state, 'a')
+  const secondResult = await SetValue.setValue(firstResult, 'ab')
+
+  expect(searchInvocations).toEqual([['FileSearch.searchFile', '/workspace', '', true, '']])
+  expect(firstResult.items.map((item) => item.label)).toEqual(['a.ts', 'ab.ts'])
+  expect(secondResult.items.map((item) => item.label)).toEqual(['ab.ts'])
+  expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
+})
+
 test('handles empty string value', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'ColorTheme.getColorThemeNames': () => [],
@@ -398,6 +429,7 @@ test('does not apply command results after the view is reopened with a custom pi
   expect(newState.items).toEqual([branchPick])
   expect(mockRpc.invocations).toEqual([
     ['Preferences.get', 'quickPick.showKeyBindings'],
+    ['Preferences.get', 'quickPick.cache'],
     ['Layout.getAllQuickPickMenuEntries'],
     ['ExtensionHost.getCommands', '', 0],
   ])
@@ -418,5 +450,7 @@ test('ranks matching commands and focuses SSH Connect when typing ssh', async ()
 
   expect(result.items.map((item) => item.label)).toEqual(['SSH: Connect', 'Developer: Crash Shared Process'])
   expect(result.focusedIndex).toBe(0)
-  expect(mockRpc.invocations).toEqual([['Layout.getAllQuickPickMenuEntries'], ['ExtensionHost.getCommands', '', 0]])
+  expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
+  expect(mockRpc.invocations).toContainEqual(['Layout.getAllQuickPickMenuEntries', undefined])
+  expect(mockRpc.invocations).toContainEqual(['ExtensionHost.getCommands', '', 0, undefined, undefined])
 })

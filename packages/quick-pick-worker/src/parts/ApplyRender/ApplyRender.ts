@@ -1,3 +1,4 @@
+import { WhenExpression } from '@lvce-editor/constants'
 import type { QuickPickState } from '../QuickPickState/QuickPickState.ts'
 import * as DiffType from '../DiffType/DiffType.ts'
 import * as GetRenderer from '../GetRenderer/GetRenderer.ts'
@@ -10,6 +11,11 @@ export const applyRender = (oldState: QuickPickState, newState: QuickPickState, 
     }
     if (item === DiffType.RenderFocusedIndex) {
       continue
+    }
+    if (item === DiffType.RenderFocus) {
+      // Register shortcuts before rendering/focusing the input. Waiting for its
+      // DOM focus event leaves a round trip where Enter can be lost.
+      commands.push(['Viewlet.setFocusContext', newState.uid, WhenExpression.FocusQuickPickInput])
     }
     const fn = GetRenderer.getRenderer(item)
     commands.push(fn(oldState, newState))
