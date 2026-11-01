@@ -17,15 +17,18 @@ test('create calls QuickPickStates.set with correct state', () => {
   const height = 400
   const platform = 1
   const args = ['arg1', 'arg2']
+  const renderAllItems = true
   const workspaceUri = 'file:///workspace'
+  const assetDir = '/static'
 
-  Create2.create(uid, uri, listItemHeight, x, y, width, height, platform, args, workspaceUri, '')
+  Create2.create(uid, uri, listItemHeight, x, y, width, height, platform, args, renderAllItems, workspaceUri, assetDir)
 
   const { newState } = QuickPickStates.get(uid)
   expect(newState).toBeDefined()
   expect(newState?.uid).toBe(uid)
   expect(newState?.uri).toBe(uri)
   expect(newState?.workspaceUri).toBe(workspaceUri)
+  expect(newState?.assetDir).toBe(assetDir)
   expect(newState?.args).toBe(args)
   expect(newState?.platform).toBe(platform)
   expect(newState?.itemHeight).toBe(listItemHeight)
@@ -54,7 +57,7 @@ test('create sets virtual list properties correctly', () => {
   const uid = 456
   const listItemHeight = 50
 
-  Create2.create(uid, '', listItemHeight, 0, 0, 0, 0, 0, [], '', '')
+  Create2.create(uid, '', listItemHeight, 0, 0, 0, 0, 0, [], false, '', '')
 
   const { newState } = QuickPickStates.get(uid)
   expect(newState).toBeDefined()
@@ -78,8 +81,8 @@ test('create handles different uid values', () => {
   const uid1 = 789
   const uid2 = 790
 
-  Create2.create(uid1, 'uri1', 30, 0, 0, 0, 0, 0, [], 'workspace1', '')
-  Create2.create(uid2, 'uri2', 30, 0, 0, 0, 0, 0, [], 'workspace2', '')
+  Create2.create(uid1, 'uri1', 30, 0, 0, 0, 0, 0, [], false, 'workspace1', '')
+  Create2.create(uid2, 'uri2', 30, 0, 0, 0, 0, 0, [], false, 'workspace2', '')
 
   const { newState: state1 } = QuickPickStates.get(uid1)
   const { newState: state2 } = QuickPickStates.get(uid2)
@@ -98,9 +101,14 @@ test('create handles different uid values', () => {
 test('create initializes providerId from quick pick uri', () => {
   const uid = 791
 
-  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], '', '')
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
 
   const { newState } = QuickPickStates.get(uid)
 
   expect(newState?.providerId).toBe(QuickPickEntryId.EveryThing)
+})
+
+test('retains the application supplied by the host', () => {
+  Create2.create(501, 'quickpick://commands', 22, 0, 0, 600, 300, 1, [], true, 'memfs:///sample', '/static', 'source')
+  expect(QuickPickStates.get(501).newState.applicationId).toBe('source')
 })

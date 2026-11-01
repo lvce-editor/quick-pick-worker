@@ -45,6 +45,7 @@ test('returns position preview when value starts with "::" and has number', asyn
     },
   })
 
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const result = await getPicksGoToColumn('::5')
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
@@ -52,7 +53,7 @@ test('returns position preview when value starts with "::" and has number', asyn
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 0 column 5",
+    label: "Press 'Enter' to go to line 1 column 6",
     matches: [],
     uri: '',
   })
@@ -74,6 +75,7 @@ test('returns position preview for multi-line text', async () => {
     },
   })
 
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const result = await getPicksGoToColumn('::15')
   expect(result).toHaveLength(1)
   expect(result[0]).toEqual({
@@ -81,7 +83,7 @@ test('returns position preview for multi-line text', async () => {
     direntType: 0,
     fileIcon: '',
     icon: '',
-    label: "Press 'Enter' to go to line 1 column 4",
+    label: "Press 'Enter' to go to line 2 column 5",
     matches: [],
     uri: '',
   })

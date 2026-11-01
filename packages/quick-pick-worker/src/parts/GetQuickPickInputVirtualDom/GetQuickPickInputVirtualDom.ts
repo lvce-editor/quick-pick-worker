@@ -6,24 +6,32 @@ import * as DomEventListenerFunctions from '../DomEventListenerFunctions/DomEven
 import * as InputName from '../InputName/InputName.ts'
 import * as QuickPickStrings from '../QuickPickStrings/QuickPickStrings.ts'
 
-export const getQuickPickInputVirtualDom = (): VirtualDomNode => {
-  const ariaLabel = QuickPickStrings.typeNameofCommandToRun()
-  return {
-    ariaAutoComplete: 'list',
-    ariaExpanded: true,
-    ariaLabel: ariaLabel,
-    autocapitalize: 'off',
-    autocomplete: 'off',
-    childCount: 0,
-    className: ClassNames.InputBox,
-    inputType: 'text',
-    name: InputName.QuickPickInput,
-    onBeforeInput: DomEventListenerFunctions.HandleBeforeInput,
-    onBlur: DomEventListenerFunctions.HandleBlur,
-    onFocus: DomEventListenerFunctions.HandleFocus,
-    onInput: DomEventListenerFunctions.HandleInput,
-    role: AriaRoles.ComboBox,
-    spellcheck: false,
-    type: VirtualDomElements.Input,
-  }
+export const getQuickPickInputVirtualDom = (
+  placeholder = '',
+  ariaLabel = QuickPickStrings.typeNameofCommandToRun(),
+  textInput = false,
+): readonly VirtualDomNode[] => {
+  return [
+    {
+      childCount: 1,
+      className: ClassNames.QuickPickInputWrapper,
+      type: VirtualDomElements.Div,
+    },
+    {
+      ...(!textInput && { ariaAutoComplete: 'list', ariaExpanded: true, role: AriaRoles.ComboBox }),
+      ariaLabel: ariaLabel,
+      autocapitalize: 'off',
+      autocomplete: 'off',
+      childCount: 0,
+      className: ClassNames.InputBox,
+      inputType: 'text',
+      name: InputName.QuickPickInput,
+      onBlur: DomEventListenerFunctions.HandleBlur,
+      onFocus: DomEventListenerFunctions.HandleFocus,
+      onInput: DomEventListenerFunctions.HandleInput,
+      placeholder,
+      spellcheck: false,
+      type: VirtualDomElements.Input,
+    },
+  ]
 }

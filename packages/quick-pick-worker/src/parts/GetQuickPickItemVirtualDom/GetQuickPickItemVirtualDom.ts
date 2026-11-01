@@ -10,7 +10,7 @@ import * as MergeClassNames from '../MergeClassNames/MergeClassNames.ts'
 import { text } from '../VirtualDomHelpers/VirtualDomHelpers.ts'
 
 export const getQuickPickItemVirtualDom = (visibleItem: VisibleItem): readonly VirtualDomNode[] => {
-  const { description, fileIcon, highlights, icon, isActive, label, posInSet, setSize } = visibleItem
+  const { description, fileIcon, highlights, icon, isActive, label, posInSet, removeButton, setSize, uri } = visibleItem
   const dom: VirtualDomNode[] = [
     {
       ariaPosInSet: posInSet,
@@ -48,6 +48,20 @@ export const getQuickPickItemVirtualDom = (visibleItem: VisibleItem): readonly V
         type: VirtualDomElements.Div,
       },
       text(description),
+    )
+  }
+  if (removeButton) {
+    parent.childCount++
+    dom.push(
+      {
+        ariaLabel: 'Remove from Recently Opened',
+        childCount: 1,
+        className: 'QuickPickItemRemove',
+        'data-uri': uri,
+        title: 'Remove from Recently Opened',
+        type: VirtualDomElements.Button,
+      },
+      text('×'),
     )
   }
   return dom

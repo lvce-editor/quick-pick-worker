@@ -47,7 +47,7 @@ test('selectPick returns Hide command after opening workspace folder', async () 
 
 test('selectPick handles different uri formats', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
-    'Workspace.setPath': () => {},
+    'Workspace.setUri': () => {},
   })
 
   const pick = {
@@ -62,6 +62,27 @@ test('selectPick handles different uri formats', async () => {
 
   const result = await SelectPickRecent.selectPick(pick)
 
-  expect(mockRpc.invocations).toEqual([['Workspace.setPath', 'file:///home/user/project']])
+  expect(mockRpc.invocations).toEqual([['Workspace.setUri', 'file:///home/user/project']])
+  expect(result.command).toBe(QuickPickReturnValue.Hide)
+})
+
+test('selectPick preserves the original remote uri', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.setUri': () => {},
+  })
+
+  const uri = 'remote-ssh://89.167.102.168/home/user/project%20name'
+  const result = await SelectPickRecent.selectPick({
+    description: '/home/user',
+    direntType: 1,
+    fileIcon: '',
+    icon: '',
+    iconName: 'project name',
+    label: 'project name [SSH: 89.167.102.168]',
+    matches: [],
+    uri,
+  })
+
+  expect(mockRpc.invocations).toEqual([['Workspace.setUri', uri]])
   expect(result.command).toBe(QuickPickReturnValue.Hide)
 })

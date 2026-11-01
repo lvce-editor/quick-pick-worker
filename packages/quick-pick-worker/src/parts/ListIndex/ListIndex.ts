@@ -18,7 +18,7 @@ export const nextNoCycle = (items: readonly unknown[], index: number): number =>
 }
 
 export const previous = (items: readonly unknown[], index: number): number => {
-  return index === 0 ? items.length - 1 : index - 1
+  return (index === 0 ? items.length : index) - 1
 }
 
 export const previousNoCycle = (items: readonly unknown[], index: number): number => {

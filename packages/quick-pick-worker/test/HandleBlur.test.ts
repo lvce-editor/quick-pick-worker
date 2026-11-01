@@ -3,6 +3,7 @@ import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as HandleBlur from '../src/parts/HandleBlur/HandleBlur.ts'
+import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 
 test('returns state unchanged', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
@@ -119,5 +120,26 @@ test('calls closeWidget with quick pick uid', async () => {
   const state: QuickPickState = { ...CreateDefaultState.createDefaultState(), uid: 123 }
   await HandleBlur.handleBlur(state)
 
+  expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123]])
+})
+
+test('does not resolve a callback when executable custom items lose focus', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'QuickPick.executeCallback': () => {
+      throw new Error('should not resolve a callback')
+    },
+    'Viewlet.closeWidget': () => {},
+  })
+
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: ['custom', [], undefined, { executeItemCommand: true }],
+    providerId: QuickPickEntryId.Custom,
+    uid: 123,
+  }
+
+  const result = await HandleBlur.handleBlur(state)
+
+  expect(result).toBe(state)
   expect(mockRpc.invocations).toEqual([['Viewlet.closeWidget', 123]])
 })

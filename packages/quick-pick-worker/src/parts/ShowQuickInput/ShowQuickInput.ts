@@ -1,14 +1,38 @@
-import { RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickInputOptions } from '../QuickInputOptions/QuickInputOptions.ts'
 import type { QuickInputResult } from '../QuickInputResult/QuickInputResult.ts'
+import * as ApplicationRendererRpc from '../ApplicationRendererRpc/ApplicationRendererRpc.ts'
+import * as CustomQuickPickItems from '../CustomQuickPickItems/CustomQuickPickItems.ts'
 
-export const showQuickInput = async ({ ignoreFocusOut, initialValue, waitUntil }: QuickInputOptions): Promise<QuickInputResult> => {
-  // TODO ask renderer worker to create quickpick instance, with given options
+export const showQuickInput = async ({
+  applicationId,
+  id,
+  ignoreFocusOut,
+  initialItems = [],
+  initialValue,
+  placeholder,
+  type = id === undefined && initialItems.length === 0 ? 'text' : 'select',
+  waitUntil,
+}: QuickInputOptions): Promise<QuickInputResult> => {
+  const customItemsId = CustomQuickPickItems.add(initialItems)
   const picks: readonly any[] = []
-  // const id=QuickPickCallbacks.registerCallback()
-  await RendererWorker.invoke('QuickPick.showCustom', picks, { ignoreFocusOut, initialValue, waitUntil })
-  return {
-    canceled: false,
-    inputValue: '',
+  try {
+    const result = (await ApplicationRendererRpc.invoke(applicationId, 'QuickPick.showCustom', picks, {
+      customItemsId,
+      ignoreFocusOut,
+      initialValue,
+      mode: 'quickInput',
+      placeholder,
+      quickInputId: id,
+      type,
+      waitUntil,
+    })) as QuickInputResult | undefined
+    return (
+      result ?? {
+        canceled: true,
+        inputValue: '',
+      }
+    )
+  } finally {
+    CustomQuickPickItems.remove(customItemsId)
   }
 }

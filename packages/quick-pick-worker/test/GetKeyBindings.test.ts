@@ -6,14 +6,13 @@ import * as KeyCode from '../src/parts/KeyCode/KeyCode.ts'
 test('returns array of key bindings', () => {
   const keyBindings = GetKeyBindings.getKeyBindings()
   expect(Array.isArray(keyBindings)).toBe(true)
-  expect(keyBindings.length).toBe(6)
+  expect(keyBindings).toHaveLength(6)
 })
 
 test('has correct escape key binding', () => {
   const keyBindings = GetKeyBindings.getKeyBindings()
   expect(keyBindings).toContainEqual({
-    args: ['QuickPick'],
-    command: 'Viewlet.closeWidget',
+    command: 'QuickPick.close',
     key: KeyCode.Escape,
     when: WhenExpression.FocusQuickPickInput,
   })

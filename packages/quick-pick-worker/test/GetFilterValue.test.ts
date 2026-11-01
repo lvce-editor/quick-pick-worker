@@ -3,6 +3,7 @@ import * as GetFilterValue from '../src/parts/GetFilterValue/GetFilterValue.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 
 test('returns value when subId is GoToColumn and value starts with ::', () => {
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const result = GetFilterValue.getFilterValue(QuickPickEntryId.EveryThing, QuickPickEntryId.GoToColumn, '::123')
   expect(result).toBe('')
 })
@@ -68,6 +69,7 @@ test('returns trimmed value when id is EveryThing and value has no prefix', () =
 })
 
 test('returns value when id is GoToColumn and value starts with ::', () => {
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const result = GetFilterValue.getFilterValue(QuickPickEntryId.GoToColumn, QuickPickEntryId.Noop, '::123')
   expect(result).toBe('')
 })
@@ -105,6 +107,11 @@ test('returns value as-is when id is Custom', () => {
 test('returns value as-is when id is File', () => {
   const result = GetFilterValue.getFilterValue(QuickPickEntryId.File, QuickPickEntryId.Noop, 'test value')
   expect(result).toBe('test value')
+})
+
+test('returns empty string when id is File, subId is Commands, and value is just >', () => {
+  const result = GetFilterValue.getFilterValue(QuickPickEntryId.File, QuickPickEntryId.Commands, '>')
+  expect(result).toBe('')
 })
 
 test('returns value as-is when id is Help', () => {

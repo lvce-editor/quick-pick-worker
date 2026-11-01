@@ -22,7 +22,7 @@ const getRootNodeCount = (nodes: readonly VirtualDomNode[]): number => {
       count++
     } else {
       const lastIndex = remainingChildCounts.length - 1
-      remainingChildCounts[lastIndex] = remainingChildCounts[lastIndex] - 1
+      remainingChildCounts[lastIndex] -= 1
     }
     remainingChildCounts.push(node.childCount)
   }
@@ -33,8 +33,23 @@ export const getQuickPickVirtualDom = (
   visibleItems: readonly VisibleItem[],
   scrollBarHeight: number,
   scrollBarTop: number,
+  placeholder = '',
+  inputAriaLabel?: string,
+  textInput = false,
 ): readonly VirtualDomNode[] => {
   const quickOpen = QuickPickStrings.quickOpen()
+  if (textInput) {
+    return [
+      {
+        ariaLabel: quickOpen,
+        childCount: 1,
+        className: MergeClassNames.mergeClassNames(ClassNames.Viewlet, ClassNames.QuickPick),
+        id: DomId.QuickPick,
+        type: VirtualDomElements.Div,
+      },
+      ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder, inputAriaLabel, true),
+    ]
+  }
   const shouldShowScrollbar = scrollBarHeight > 0
   const quickPickItemsDom = GetQuickPickItemsVirtualDom.getQuickPickItemsVirtualDom(visibleItems)
   const listItemsChildCount = getRootNodeCount(quickPickItemsDom)
@@ -46,11 +61,11 @@ export const getQuickPickVirtualDom = (
       id: DomId.QuickPick,
       type: VirtualDomElements.Div,
     },
-    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(),
+    ...GetQuickPickHeaderVirtualDom.getQuickPickHeaderVirtualDom(placeholder, inputAriaLabel),
     {
       ariaActivedescendant: DomId.QuickPickItemActive,
       childCount: shouldShowScrollbar ? 2 : 1,
-      className: MergeClassNames.mergeClassNames(ClassNames.List, ClassNames.ContainContent),
+      className: MergeClassNames.mergeClassNames(ClassNames.List, ClassNames.ContainContent, ClassNames.QuickPickItems),
       id: DomId.QuickPickItems,
       onPointerDown: DomEventListenerFunctions.HandlePointerDown,
       onWheel: DomEventListenerFunctions.HandleWheel,

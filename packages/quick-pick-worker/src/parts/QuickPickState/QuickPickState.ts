@@ -4,6 +4,7 @@ import type { ProtoVisibleItem } from '../ProtoVisibleItem/ProtoVisibleItem.ts'
 
 export interface QuickPickState extends List<any> {
   readonly allowEmptyResult: boolean
+  readonly applicationId?: string
   readonly args: readonly unknown[]
   readonly assetDir: string
   readonly cursorOffset: number

@@ -4,20 +4,22 @@ import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.
 import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
-import { loadContent } from '../src/parts/LoadContent/LoadContent.ts'
+import { loadContent, loadContentWithContext } from '../src/parts/LoadContent/LoadContent.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOpenState.ts'
+import * as QuickPickPrefix from '../src/parts/QuickPickPrefix/QuickPickPrefix.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
+import { waitUntilVisible } from '../src/parts/QuickPickVisibleCallbacks/QuickPickVisibleCallbacks.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
-let consoleErrorSpy: ReturnType<typeof jest.spyOn>
+const testState: { consoleErrorSpy?: ReturnType<typeof jest.spyOn> } = {}
 
 beforeEach(() => {
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  testState.consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
 afterEach(() => {
-  consoleErrorSpy.mockRestore()
+  testState.consoleErrorSpy?.mockRestore()
 })
 
 test('loadContent returns state with loaded content', async () => {
@@ -48,7 +50,7 @@ test('loadContent returns state with loaded content', async () => {
   expect(result.fileIconCache).toBeDefined()
 })
 
-test('loadContent handles empty picks', async () => {
+test('loadContent handles builtin command only', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
     'IconTheme.getFolderIcon': () => 'icon',
@@ -62,12 +64,17 @@ test('loadContent handles empty picks', async () => {
 
   const result = await loadContent(state)
 
-  expect(result.picks).toEqual([])
-  expect(result.items).toEqual([])
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      id: 'QuickPick.changeLanguageMode',
+      label: 'Change Language Mode',
+    }),
+  ])
+  expect(result.items).toHaveLength(1)
   expect(result.focused).toBe(true)
   expect(result.focusedIndex).toBe(0)
   expect(result.minLineY).toBe(0)
-  expect(result.maxLineY).toBe(0)
+  expect(result.maxLineY).toBe(1)
 })
 
 test('loadContent becomes a no-op when a newer value was typed while it was loading', async () => {
@@ -82,9 +89,9 @@ test('loadContent becomes a no-op when a newer value was typed while it was load
   })
 
   const uid = 901
-  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], '', '')
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
   const { newState: initialState } = QuickPickStates.get(uid)
-  const typedState = await SetValue.setValue(initialState, '::2')
+  const typedState = await SetValue.setValue(initialState, `${QuickPickPrefix.GoToColumn}2`)
   QuickPickStates.set(uid, initialState, typedState)
 
   const result = await loadContent(initialState)
@@ -435,6 +442,71 @@ test('loadContent calculates finalDeltaY for short lists', async () => {
   expect(result.finalDeltaY).toBe(0)
 })
 
+test('loadContent focuses the current color theme and makes it visible', async () => {
+  const colorThemes = Array.from({ length: 20 }, (_, i) => `theme-${i}`)
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'theme-15',
+    'ColorTheme.getColorThemeNames': () => colorThemes,
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    maxVisibleItems: 10,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(15)
+  expect(result.minLineY).toBe(6)
+  expect(result.maxLineY).toBe(16)
+  expect(result.deltaY).toBe(180)
+  expect(result.items.map((item) => item.label)).toEqual(colorThemes)
+  expect(result.icons).toHaveLength(10)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
+test('loadContent falls back to the first color theme when the current theme is absent', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'missing-theme',
+    'ColorTheme.getColorThemeNames': () => ['theme-1', 'theme-2'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(0)
+  expect(result.minLineY).toBe(0)
+  expect(result.maxLineY).toBe(2)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
+test('loadContent falls back to the first color theme when the renderer does not expose the current theme', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['theme-1', 'theme-2'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.focusedIndex).toBe(0)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
 test('loadContent preserves other state properties', async () => {
   RendererWorker.registerMockRpc({
     'IconTheme.getFileIcon': () => 'icon',
@@ -501,4 +573,126 @@ test('loadContent handles Recent URI', async () => {
 
   expect(result.providerId).toBeDefined()
   expect(result.picks).toBeDefined()
+})
+
+test('loadContent initializes workspace symbols with #', async () => {
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.WorkspaceSymbol,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe('#')
+  expect(result.cursorOffset).toBe(1)
+})
+
+test('loadContent initializes go to line with :', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': () => ['line 1', 'line 2'],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    uri: QuickPickEntryUri.GoToLine,
+  }
+
+  const result = await loadContent(state)
+
+  expect(result.value).toBe(':')
+  expect(result.cursorOffset).toBe(1)
+  expect(result.picks).toEqual([
+    expect.objectContaining({
+      label: 'Type a line number to go to (from 1 to 2)',
+    }),
+  ])
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
+})
+
+test('loadContent commits state before notifying that the quick pick is visible', async () => {
+  RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [null, [{ label: 'file1.txt' }]],
+    initial: true,
+    uid: 1,
+    uri: QuickPickEntryUri.Custom,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+  let stateWhenVisible: QuickPickState | undefined
+  const visible = (async (): Promise<void> => {
+    await waitUntilVisible()
+    stateWhenVisible = QuickPickStates.get(state.uid).newState
+  })()
+
+  await loadCommand(state.uid)
+  await visible
+
+  expect(stateWhenVisible?.initial).toBe(false)
+  expect(stateWhenVisible?.items).toHaveLength(1)
+  expect(stateWhenVisible?.state).toBe(QuickPickOpenState.Finished)
+})
+
+test('loadContentWithContext transfers the initial color theme scroll position', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => 'theme-15',
+    'ColorTheme.getColorThemeNames': () => Array.from({ length: 20 }, (_, i) => `theme-${i}`),
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [],
+    initial: true,
+    maxVisibleItems: 10,
+    uid: 2,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+
+  await loadCommand(state.uid)
+
+  const newState = QuickPickStates.get(state.uid).newState
+  expect(newState.focusedIndex).toBe(15)
+  expect(newState.minLineY).toBe(6)
+  expect(newState.maxLineY).toBe(16)
+  expect(newState.deltaY).toBe(180)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorTheme'])
+})
+
+test('loadContentWithContext preserves input entered during provider loading', async () => {
+  const { promise: themes, resolve: resolveThemes } = Promise.withResolvers<readonly string[]>()
+  const { promise: started, resolve: notifyStarted } = Promise.withResolvers<void>()
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorTheme': () => '',
+    'ColorTheme.getColorThemeNames': () => {
+      notifyStarted()
+      return themes
+    },
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    uid: 902,
+    uri: QuickPickEntryUri.ColorTheme,
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const loadCommand = QuickPickStates.wrapAsyncCommand(loadContentWithContext)
+  const pendingLoad = loadCommand(state.uid)
+  await started
+  const typedState = { ...state, initial: false, value: 'typed' }
+  QuickPickStates.set(state.uid, state, typedState)
+  resolveThemes(['theme'])
+  await pendingLoad
+  expect(QuickPickStates.get(state.uid).newState).toBe(typedState)
+  expect(mockRpc.invocations).toContainEqual(['ColorTheme.getColorThemeNames', '', 0])
 })

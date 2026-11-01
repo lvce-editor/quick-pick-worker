@@ -3,4 +3,6 @@ export interface DomEventListener {
   readonly params: readonly string[]
   readonly passive?: boolean
   readonly preventDefault?: boolean
+  readonly stopPropagation?: boolean
+  readonly trackPointerEvents?: readonly string[]
 }

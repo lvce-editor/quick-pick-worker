@@ -3,8 +3,13 @@ import * as GetQuickPickSubProviderId from '../src/parts/GetQuickPickSubProvider
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickPrefix from '../src/parts/QuickPickPrefix/QuickPickPrefix.ts'
 
-test('returns id directly when id is not EveryThing', () => {
+test('returns Commands when id is File and prefix is Command', () => {
   const result = GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.File, QuickPickPrefix.Command)
+  expect(result).toBe(QuickPickEntryId.Commands)
+})
+
+test('returns File when id is File and prefix is None', () => {
+  const result = GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.File, QuickPickPrefix.None)
   expect(result).toBe(QuickPickEntryId.File)
 })
 

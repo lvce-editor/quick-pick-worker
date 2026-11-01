@@ -11,6 +11,10 @@ test('getPlaceholderValue returns color theme placeholder for colorTheme provide
   expect(GetPlaceholderValue.getPlaceholderValue(QuickPickEntryId.ColorTheme)).toBe(QuickPickStrings.selectColorTheme())
 })
 
+test('getPlaceholderValue returns language mode placeholder for languageMode provider', () => {
+  expect(GetPlaceholderValue.getPlaceholderValue(QuickPickEntryId.LanguageMode)).toBe(QuickPickStrings.selectLanguageMode())
+})
+
 test('getPlaceholderValue returns open recent placeholder for openRecent provider', () => {
   expect(GetPlaceholderValue.getPlaceholderValue(QuickPickEntryId.Recent)).toBe(QuickPickStrings.selectToOpen())
 })

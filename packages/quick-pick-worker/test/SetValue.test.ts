@@ -1,10 +1,14 @@
 import { expect, test } from '@jest/globals'
-import { EditorWorker, RendererWorker } from '@lvce-editor/rpc-registry'
+import { EditorWorker, FileSearchWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
 import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
+import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/ExtensionHostWorker.ts'
+import * as GetPicksFile from '../src/parts/GetPicksFile/GetPicksFile.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
+import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
+import * as QuickPickPrefix from '../src/parts/QuickPickPrefix/QuickPickPrefix.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
@@ -19,6 +23,43 @@ test('returns same state when value is unchanged', async () => {
 
   expect(result).toBe(state)
   expect(mockRpc.invocations).toEqual([])
+})
+
+test('updates quick input value without requesting picks', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({})
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [{ mode: 'quickInput' }],
+    picks: [],
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'user@example.com')
+
+  expect(result.value).toBe('user@example.com')
+  expect(result.picks).toBe(state.picks)
+  expect(result.items).toEqual([])
+  expect(mockRpc.invocations).toEqual([])
+})
+
+test('requests picks for a dynamic quick input', async () => {
+  using extensionHostRpc = ExtensionHostWorker.registerMockRpc({
+    'ExtensionHostQuickPick.renderQuickInput': () => [],
+  })
+  using rendererRpc = RendererWorker.registerMockRpc({})
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [{ mode: 'quickInput', quickInputId: 42 }],
+    picks: [],
+    providerId: QuickPickEntryId.Custom,
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'search')
+
+  expect(result.value).toBe('search')
+  expect(extensionHostRpc.invocations).toEqual([['ExtensionHostQuickPick.renderQuickInput', 42, 'search']])
+  expect(rendererRpc.invocations).toEqual([])
 })
 
 test('updates value and processes picks', async () => {
@@ -190,6 +231,54 @@ test('filters items based on filterValue', async () => {
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
 })
 
+test('filters cached language mode picks', async () => {
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    picks: [
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'java', matches: [], uri: '' },
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'javascript', matches: [], uri: '' },
+      { description: '', direntType: 0, fileIcon: '', icon: '', label: 'plaintext', matches: [], uri: '' },
+    ],
+    providerId: QuickPickEntryId.LanguageMode,
+    value: '',
+  }
+
+  const result = await SetValue.setValue(state, 'java')
+
+  expect(result.picks).toBe(state.picks)
+  expect(result.items.map((item) => item.label)).toEqual(['java', 'javascript'])
+})
+
+test('reuses complete file picks while narrowing the query', async () => {
+  const searchInvocations: unknown[][] = []
+  FileSearchWorker.set({
+    invoke(method: string, ...params: readonly unknown[]) {
+      searchInvocations.push([method, ...params])
+      return ['/workspace/a.ts', '/workspace/ab.ts', '/workspace/b.ts']
+    },
+  } as any)
+  using mockRpc = RendererWorker.registerMockRpc({
+    'IconTheme.getFileIcon': () => 'icon',
+    'Preferences.get': () => false,
+    'Workspace.getUri': () => '/workspace',
+  })
+  const picks = await GetPicksFile.getPicks('')
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    picks,
+    providerId: QuickPickEntryId.File,
+    value: '',
+  }
+
+  const firstResult = await SetValue.setValue(state, 'a')
+  const secondResult = await SetValue.setValue(firstResult, 'ab')
+
+  expect(searchInvocations).toEqual([['FileSearch.searchFile', '/workspace', '', true, '']])
+  expect(firstResult.items.map((item) => item.label)).toEqual(['a.ts', 'ab.ts'])
+  expect(secondResult.items.map((item) => item.label)).toEqual(['ab.ts'])
+  expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
+})
+
 test('handles empty string value', async () => {
   using mockRpc = RendererWorker.registerMockRpc({
     'ColorTheme.getColorThemeNames': () => [],
@@ -310,14 +399,156 @@ test('supports go-to-column before loadContent initializes the widget', async ()
   })
 
   const uid = 999
-  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], '', '')
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
   const { newState } = QuickPickStates.get(uid)
 
-  const result = await SetValue.setValue(newState, '::2')
+  const result = await SetValue.setValue(newState, `${QuickPickPrefix.GoToColumn}2`)
 
   expect(result.items).toHaveLength(1)
-  expect(result.items[0].label).toBe("Press 'Enter' to go to line 0 column 2")
+  expect(result.items[0].label).toBe("Press 'Enter' to go to line 1 column 3")
   expect(result.providerId).toBe(newState.providerId)
   expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
   expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
+})
+
+test('keeps the newest value when provider requests finish out of order', async () => {
+  const { promise: firstResult, resolve: resolveFirstResult } = Promise.withResolvers<readonly string[]>()
+  const { promise: firstStarted, resolve: notifyFirstStarted } = Promise.withResolvers<void>()
+  const { promise: secondResult, resolve: resolveSecondResult } = Promise.withResolvers<readonly string[]>()
+  const { promise: secondStarted, resolve: notifySecondStarted } = Promise.withResolvers<void>()
+  let requestCount = 0
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames'(): Promise<readonly string[]> {
+      requestCount++
+      if (requestCount === 1) {
+        notifyFirstStarted()
+        return firstResult
+      }
+      notifySecondStarted()
+      return secondResult
+    },
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    uid: 1,
+    value: 'old',
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+
+  const firstCommand = setValueCommand(state.uid, 'first')
+  await firstStarted
+  const secondCommand = setValueCommand(state.uid, 'second')
+  await secondStarted
+  resolveSecondResult(['second theme'])
+  await secondCommand
+  resolveFirstResult(['first theme'])
+  await firstCommand
+
+  const { newState } = QuickPickStates.get(state.uid)
+  expect(newState.value).toBe('second')
+  expect(newState.picks[0].label).toBe('second theme')
+  expect(mockRpc.invocations).toHaveLength(2)
+})
+
+test('does not apply command results after the view is reopened with a custom picker', async () => {
+  const { promise: commandResult, resolve: resolveCommandResult } = Promise.withResolvers<readonly unknown[]>()
+  const { promise: commandRequestStarted, resolve: notifyCommandRequestStarted } = Promise.withResolvers<void>()
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.getCommands'(): Promise<readonly unknown[]> {
+      notifyCommandRequestStarted()
+      return commandResult
+    },
+    'Layout.getAllQuickPickMenuEntries': () => [],
+  })
+  const commandPickerState: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    providerId: QuickPickEntryId.EveryThing,
+    uid: 1,
+    uri: QuickPickEntryUri.EveryThing,
+    value: '',
+  }
+  QuickPickStates.set(commandPickerState.uid, commandPickerState, commandPickerState)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+
+  const pendingCommandRequest = setValueCommand(commandPickerState.uid, '>')
+  await commandRequestStarted
+
+  const branchPick = {
+    description: 'Local branch',
+    direntType: 0,
+    fileIcon: '',
+    icon: 'git-branch',
+    label: 'main',
+    matches: [],
+    uri: '',
+    value: 'main',
+  }
+  const customPickerState: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    args: [null, [branchPick]],
+    items: [branchPick],
+    picks: [branchPick],
+    providerId: QuickPickEntryId.Custom,
+    uid: commandPickerState.uid,
+    uri: QuickPickEntryUri.Custom,
+    value: '',
+  }
+  QuickPickStates.set(customPickerState.uid, customPickerState, customPickerState)
+
+  resolveCommandResult([{ id: 'workspace.command', label: 'Workspace Command' }])
+  await pendingCommandRequest
+
+  const { newState } = QuickPickStates.get(customPickerState.uid)
+  expect(newState.providerId).toBe(QuickPickEntryId.Custom)
+  expect(newState.value).toBe('')
+  expect(newState.picks).toEqual([branchPick])
+  expect(newState.items).toEqual([branchPick])
+  expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
+  expect(mockRpc.invocations).toContainEqual(['Layout.getAllQuickPickMenuEntries', undefined])
+  expect(mockRpc.invocations).toContainEqual(['ExtensionHost.getCommands', '', 0, undefined, undefined])
+})
+
+test('ranks matching commands and focuses SSH Connect when typing ssh', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ExtensionHost.getCommands': () => [{ id: 'remote-ssh.connect', label: 'SSH: Connect' }],
+    'Layout.getAllQuickPickMenuEntries': () => [{ id: 'test.crash', label: 'Developer: Crash Shared Process' }],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    providerId: QuickPickEntryId.EveryThing,
+    value: '>',
+  }
+
+  const result = await SetValue.setValue(state, '>ssh')
+
+  expect(result.items.map((item) => item.label)).toEqual(['SSH: Connect', 'Developer: Crash Shared Process'])
+  expect(result.focusedIndex).toBe(0)
+  expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
+  expect(mockRpc.invocations).toContainEqual(['Layout.getAllQuickPickMenuEntries', undefined])
+  expect(mockRpc.invocations).toContainEqual(['ExtensionHost.getCommands', '', 0, undefined, undefined])
+})
+
+test('setValueWithContext resets the scrolled viewport when filtering', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['match'],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    deltaY: 1500,
+    maxLineY: 60,
+    maxVisibleItems: 10,
+    minLineY: 50,
+    uid: 903,
+    value: 'old',
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+  await setValueCommand(state.uid, 'match')
+  const { newState } = QuickPickStates.get(state.uid)
+  expect(newState.deltaY).toBe(0)
+  expect(newState.minLineY).toBe(0)
+  expect(newState.maxLineY).toBe(1)
+  expect(newState.items).toHaveLength(1)
+  expect(mockRpc.invocations).toHaveLength(1)
 })

@@ -1,6 +1,11 @@
 export interface QuickInputOptions {
+  readonly applicationId?: string
+  readonly id?: number
   readonly ignoreFocusOut?: boolean
+  readonly initialItems?: readonly unknown[]
   readonly initialValue?: string
+  readonly placeholder?: string
   readonly render?: any
+  readonly type?: 'text' | 'select'
   readonly waitUntil?: 'visible' | 'finished'
 }

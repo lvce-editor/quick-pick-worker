@@ -8,7 +8,7 @@ import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnVa
 export const selectPickGoToColumn = async (item: any, value: string): Promise<SelectPickResult> => {
   if (value.startsWith(QuickPickPrefix.GoToColumn)) {
     const columnString = value.slice(2)
-    const wantedColumn = Number.parseInt(columnString, 10)
+    const wantedColumn = Number(columnString)
     const text = await getText()
     const position = getPosition(text, wantedColumn)
     await goToPositionAndFocus(position.row, position.column)

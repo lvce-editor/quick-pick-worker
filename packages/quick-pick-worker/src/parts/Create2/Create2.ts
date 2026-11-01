@@ -16,12 +16,15 @@ export const create = (
   height: number,
   platform: number,
   args: any,
+  _renderAllItems: boolean,
   workspaceUri: string,
   assetDir: string,
+  applicationId?: string,
 ): void => {
   const providerId = GetQuickPickProviderId.getQuickPickProviderId(uri)
   const state: QuickPickState = {
     allowEmptyResult: false,
+    applicationId,
     cursorOffset: 0,
     height: 300,
     icons: [],

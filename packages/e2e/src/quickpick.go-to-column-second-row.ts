@@ -11,10 +11,11 @@ export const test: Test = async ({ Editor, expect, FileSystem, Locator, Main, Qu
   await Workspace.setPath(tmpDir)
   await Main.openUri(`${tmpDir}/a.txt`)
   await QuickPick.open()
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   await QuickPick.setValue('::7')
   const label = Locator('.QuickPickItemLabel')
   await expect(label).toBeVisible()
-  await expect(label).toHaveText(`Press 'Enter' to go to line 1 column 3`)
+  await expect(label).toHaveText(`Press 'Enter' to go to line 2 column 4`)
 
   // act
   await QuickPick.selectIndex(0)

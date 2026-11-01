@@ -1,9 +1,11 @@
-import config from '@lvce-editor/eslint-config'
-import actions from '@lvce-editor/eslint-plugin-github-actions'
+import { defineConfig } from 'eslint/config'
+import config, { recommendedActions } from '@lvce-editor/eslint-config'
+import recommendedVirtualDom from '@lvce-editor/eslint-plugin-virtual-dom'
 
-export default [
+export default defineConfig([
   ...config,
-  ...actions,
+  ...recommendedVirtualDom,
+  ...recommendedActions,
   {
     ignores: ['packages/quick-pick-worker/test/GetJson.test.ts'],
   },
@@ -22,4 +24,34 @@ export default [
       '@typescript-eslint/only-throw-error': 'off',
     },
   },
-]
+  {
+    files: [
+      'packages/quick-pick-worker/src/parts/GetQuickPickItemVirtualDom/GetQuickPickItemVirtualDom.ts',
+      'packages/quick-pick-worker/src/parts/GetQuickPickNoResultsVirtualDom/GetQuickPickNoResultsVirtualDom.ts',
+    ],
+    rules: {
+      'virtual-dom/valid-child-count': 'off',
+    },
+  },
+  {
+    files: ['packages/quick-pick-worker/test/**/*.ts'],
+    rules: {
+      'virtual-dom/no-inline-event-handlers': 'off',
+      'virtual-dom/prefer-constants': 'off',
+      'virtual-dom/prefer-merge-class-names': 'off',
+    },
+  },
+  {
+    // The pinned application supplies its own Node runtime.
+    files: ['.github/workflows/integration.yml'],
+    rules: { 'github-actions/node-version-file': 'off', 'github-actions/on': 'off' },
+  },
+  {
+    // Preserve real DOM input events covered by the migrated application scenarios.
+    files: [
+      'packages/e2e-integration/src/viewlet.quick-pick-open-keybindings-json.ts',
+      'packages/e2e-integration/src/viewlet.quick-pick-escape-restores-editor-focus.ts',
+    ],
+    rules: { '@typescript-eslint/no-deprecated': 'off' },
+  },
+])

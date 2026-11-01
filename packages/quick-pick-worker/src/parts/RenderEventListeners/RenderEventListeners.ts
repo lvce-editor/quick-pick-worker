@@ -5,7 +5,7 @@ export const renderEventListeners = (): readonly DomEventListener[] => {
   return [
     {
       name: DomEventListenerFunctions.HandlePointerDown,
-      params: ['handleClickAt', 'event.clientX', 'event.clientY'],
+      params: ['handleClickAt', 'event.clientX', 'event.clientY', 'event.target.dataset.uri'],
       preventDefault: true,
     },
     {
@@ -17,6 +17,8 @@ export const renderEventListeners = (): readonly DomEventListener[] => {
       name: DomEventListenerFunctions.HandleScrollbarPointerDown,
       params: ['handleScrollBarPointerDown', 'event.clientY', 'event.pointerId'],
       preventDefault: true,
+      stopPropagation: true,
+      trackPointerEvents: [DomEventListenerFunctions.HandleScrollbarPointerMove, DomEventListenerFunctions.HandleScrollbarPointerUp],
     },
     {
       name: DomEventListenerFunctions.HandleScrollbarPointerMove,
@@ -31,10 +33,6 @@ export const renderEventListeners = (): readonly DomEventListener[] => {
     {
       name: DomEventListenerFunctions.HandleBlur,
       params: ['handleBlur'],
-    },
-    {
-      name: DomEventListenerFunctions.HandleBeforeInput,
-      params: ['handleBeforeInput'],
     },
     {
       name: DomEventListenerFunctions.HandleInput,

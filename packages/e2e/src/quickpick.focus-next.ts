@@ -2,8 +2,6 @@ import type { Test } from '@lvce-editor/test-with-playwright'
 
 export const name = 'quickpick.focus-next'
 
-export const skip = 1
-
 export const test: Test = async ({ expect, Locator, QuickPick }) => {
   // arrange
   await QuickPick.open()
@@ -15,5 +13,5 @@ export const test: Test = async ({ expect, Locator, QuickPick }) => {
 
   // assert
   const activeItem = Locator('.QuickPickItemActive')
-  await expect(activeItem).toHaveText('Layout: Toggle Panel')
+  await expect(activeItem).toHaveText('Layout: Reset View Locations')
 }

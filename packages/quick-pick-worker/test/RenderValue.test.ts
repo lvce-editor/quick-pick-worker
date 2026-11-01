@@ -10,7 +10,7 @@ test('renders value', () => {
     value: 'test value',
   }
 
-  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', InputName.QuickPickInput, 'test value'])
+  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', newState.uid, InputName.QuickPickInput, 'test value'])
 })
 
 test('renders empty value', () => {
@@ -20,7 +20,7 @@ test('renders empty value', () => {
     value: '',
   }
 
-  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', InputName.QuickPickInput, ''])
+  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', newState.uid, InputName.QuickPickInput, ''])
 })
 
 test('handles different values', () => {
@@ -30,7 +30,7 @@ test('handles different values', () => {
     value: 'another value',
   }
 
-  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', InputName.QuickPickInput, 'another value'])
+  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', newState.uid, InputName.QuickPickInput, 'another value'])
 })
 
 test('handles special characters in value', () => {
@@ -40,5 +40,5 @@ test('handles special characters in value', () => {
     value: 'test@example.com',
   }
 
-  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', InputName.QuickPickInput, 'test@example.com'])
+  expect(RenderValue.renderValue(oldState, newState)).toEqual(['Viewlet.setValueByName', newState.uid, InputName.QuickPickInput, 'test@example.com'])
 })

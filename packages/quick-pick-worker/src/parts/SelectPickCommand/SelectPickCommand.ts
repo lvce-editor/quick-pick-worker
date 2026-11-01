@@ -4,10 +4,24 @@ import * as ErrorHandling from '../ErrorHandling/ErrorHandling.ts'
 import * as QuickPickReturnValue from '../QuickPickReturnValue/QuickPickReturnValue.ts'
 import { shouldHide } from '../ShouldHide/ShouldHide.ts'
 
-const selectPickBuiltin = async (item: any): Promise<any> => {
+const selectPickBuiltin = async (item: any, applicationId?: string): Promise<any> => {
+  if (item.id === 'QuickPick.showColorTheme') {
+    return {
+      command: QuickPickReturnValue.OpenColorTheme,
+    }
+  }
+  if (item.id === 'QuickPick.changeLanguageMode') {
+    return {
+      command: QuickPickReturnValue.OpenLanguageMode,
+    }
+  }
   const args = item.args || []
   // TODO ids should be all numbers for efficiency -> also directly can call command
-  await RendererWorker.invoke(item.id, ...args)
+  if (applicationId === undefined) {
+    await RendererWorker.invoke(item.id, ...args)
+  } else {
+    await RendererWorker.invoke('Application.execute', applicationId, item.id, ...args)
+  }
   if (shouldHide(item)) {
     return {
       command: QuickPickReturnValue.Hide,
@@ -18,24 +32,31 @@ const selectPickBuiltin = async (item: any): Promise<any> => {
   }
 }
 
-const selectPickExtension = async (item: any): Promise<any> => {
+const selectPickExtension = async (item: any, applicationId?: string): Promise<any> => {
   const id = item.id.slice(4) // TODO lots of string allocation with 'ext.' find a better way to separate builtin commands from extension commands
   try {
-    await RendererWorker.invoke('ExtensionHost.executeCommand', id)
+    if (applicationId === undefined) {
+      await RendererWorker.invoke('ExtensionHost.executeCommand', id)
+    } else {
+      await RendererWorker.invoke('Application.execute', applicationId, 'ExtensionHost.executeCommand', id)
+    }
   } catch (error) {
     await ErrorHandling.handleError(error, false)
     await ErrorHandling.showErrorDialog(error)
+    return {
+      command: QuickPickReturnValue.Hide,
+    }
   }
   return {
     command: QuickPickReturnValue.Hide,
   }
 }
 
-export const selectPick = async (item: ProtoVisibleItem): Promise<any> => {
+export const selectPick = async (item: ProtoVisibleItem, _value = '', applicationId?: string): Promise<any> => {
   // @ts-ignore
   const { id } = item
   if (id.startsWith('ext.')) {
-    return selectPickExtension(item)
+    return selectPickExtension(item, applicationId)
   }
-  return selectPickBuiltin(item)
+  return selectPickBuiltin(item, applicationId)
 }

@@ -21,3 +21,21 @@ test('toDirent', () => {
     type: DirentType.File,
   })
 })
+
+test('toDirent uses iconName when present', () => {
+  const pick = {
+    description: '',
+    direntType: DirentType.File,
+    fileIcon: '',
+    icon: '',
+    iconName: 'file.ts',
+    label: 'typescript',
+    matches: [],
+    uri: 'file.ts',
+  }
+  expect(toDirent(pick)).toEqual({
+    name: 'file.ts',
+    path: 'file.ts',
+    type: DirentType.File,
+  })
+})

@@ -23,6 +23,7 @@ test('selectPickGoToColumn with ::value parses column and navigates to position'
   })
 
   const item = { label: '1' }
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const value = '::10'
 
   const result = await SelectPickGoToColumn.selectPickGoToColumn(item, value)
@@ -52,6 +53,7 @@ test('selectPickGoToColumn with ::value handles column at newline', async () => 
   })
 
   const item = { label: '1' }
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const value = '::7'
 
   const result = await SelectPickGoToColumn.selectPickGoToColumn(item, value)
@@ -81,6 +83,7 @@ test('selectPickGoToColumn with ::value handles column 0', async () => {
   })
 
   const item = { label: '1' }
+  // eslint-disable-next-line sonarjs/no-hardcoded-ip
   const value = '::0'
 
   const result = await SelectPickGoToColumn.selectPickGoToColumn(item, value)

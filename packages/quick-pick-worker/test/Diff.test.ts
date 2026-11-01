@@ -43,7 +43,7 @@ test('diff returns empty array when all modules return true', () => {
   expect(result).toEqual([])
 })
 
-test('diff returns Height when items length differs', () => {
+test('diff returns RenderCss when items length differs', () => {
   const oldState = createState({
     items: [createItem('item1')],
   })
@@ -51,7 +51,18 @@ test('diff returns Height when items length differs', () => {
     items: [createItem('item1'), createItem('item2')],
   })
   const result = Diff.diff(oldState, newState)
-  expect(result).toContain(DiffType.Height)
+  expect(result).toContain(DiffType.RenderCss)
+})
+
+test('diff returns RenderCss when deltaY differs', () => {
+  const oldState = createState({
+    deltaY: 0,
+  })
+  const newState = createState({
+    deltaY: 10,
+  })
+  const result = Diff.diff(oldState, newState)
+  expect(result).toContain(DiffType.RenderCss)
 })
 
 test('diff returns RenderItems when items differ', () => {
@@ -126,7 +137,7 @@ test('diff returns multiple diff types when multiple properties differ', () => {
   expect(result.length).toBeGreaterThanOrEqual(3)
 })
 
-test('diff returns Height and RenderItems when items length and content differ', () => {
+test('diff returns RenderCss and RenderItems when items length and content differ', () => {
   const oldState = createState({
     focusedIndex: 0,
     items: [createItem('item1')],
@@ -140,6 +151,6 @@ test('diff returns Height and RenderItems when items length and content differ',
     minLineY: 0,
   })
   const result = Diff.diff(oldState, newState)
-  expect(result).toContain(DiffType.Height)
+  expect(result).toContain(DiffType.RenderCss)
   expect(result).toContain(DiffType.RenderIncremental)
 })
