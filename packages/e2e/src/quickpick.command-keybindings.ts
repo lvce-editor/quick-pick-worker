@@ -11,7 +11,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, QuickPi
   }
   try {
     await Settings.update({ 'quickPick.showKeyBindings': true })
-    await FileSystem.writeFile('app://keybindings.json', JSON.stringify([{ command: 'Preferences.openUserKeyBindings', key: 'Ctrl+Shift+Y' }]))
+    await FileSystem.writeFile('app://keybindings.json', JSON.stringify([{ command: 'Preferences.openKeyBindingsJson', key: 'Ctrl+Shift+Y' }]))
     const keyBinding = Locator('.QuickPickKeyBinding')
     const firstKeyBinding = keyBinding.first()
     await QuickPick.open()
@@ -20,7 +20,7 @@ export const test: Test = async ({ Command, expect, FileSystem, Locator, QuickPi
     await QuickPick.setValue('>SSH: Connect')
     await expect(keyBinding).toHaveText('CtrlShiftU')
     await QuickPick.setValue('>')
-    await QuickPick.setValue('>Preferences: Open User Key Bindings')
+    await QuickPick.setValue('>Preferences: Open Keyboard Shortcuts (JSON)')
     await expect(keyBinding).toHaveText('CtrlShiftY')
   } finally {
     await Command.execute('QuickPick.close')
