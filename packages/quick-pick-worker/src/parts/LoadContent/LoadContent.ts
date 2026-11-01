@@ -87,7 +87,7 @@ const getLoadedState = async (state: QuickPickState): Promise<QuickPickState> =>
   const parsedArgs = parseArgs(subId, args)
   const finalValue = parsedArgs.initialValue || value
   const latest = QuickPickStates.get(state.uid)
-  if (latest && latest.newState !== state && latest.newState.value !== state.value) {
+  if (latest && latest.newState.uri === state.uri && latest.newState.args === state.args && latest.newState.value !== state.value) {
     return state
   }
 
