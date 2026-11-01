@@ -35,14 +35,14 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .tmp/lvce-integration/.nvmrc
+      - name: Update test-worker in disposable application lockfile
+        working-directory: .tmp/lvce-integration
+        run: npm update --package-lock-only @lvce-editor/test-worker
       - name: Install application dependencies
         working-directory: .tmp/lvce-integration
         run: npm ci
         env:
           DOWNLOAD_BUILTIN_EXTENSIONS: 0
-      - name: Install test-worker with RecentlyOpened helpers
-        working-directory: .tmp/lvce-integration
-        run: npm install --no-save --package-lock=false @lvce-editor/test-worker@17.31.0
       - name: Download built-in extensions
         working-directory: .tmp/lvce-integration
         shell: bash
