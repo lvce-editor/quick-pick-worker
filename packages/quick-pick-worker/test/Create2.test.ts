@@ -2,6 +2,8 @@ import { expect, test } from '@jest/globals'
 import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import * as MinimumSliderSize from '../src/parts/MinimumSliderSize/MinimumSliderSize.ts'
+import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
+import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
 import * as QuickPickOpenState from '../src/parts/QuickPickOpenState/QuickPickOpenState.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 
@@ -47,6 +49,7 @@ test('create calls QuickPickStates.set with correct state', () => {
   expect(newState?.versionId).toBe(0)
   expect(newState?.maxVisibleItems).toBe(12)
   expect(newState?.fileIconCache).toEqual(Object.create(null))
+  expect(newState?.providerId).toBe(QuickPickEntryId.File)
   expect(newState?.recentPickIds).toEqual(Object.create(null))
 })
 
@@ -93,6 +96,16 @@ test('create handles different uid values', () => {
   expect(state2?.uid).toBe(uid2)
   expect(state2?.uri).toBe('uri2')
   expect(state2?.workspaceUri).toBe('workspace2')
+})
+
+test('create initializes providerId from quick pick uri', () => {
+  const uid = 791
+
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
+
+  const { newState } = QuickPickStates.get(uid)
+
+  expect(newState?.providerId).toBe(QuickPickEntryId.EveryThing)
 })
 
 test('retains the application supplied by the host', () => {

@@ -1,12 +1,14 @@
 import { expect, test } from '@jest/globals'
-import { FileSearchWorker, RendererWorker } from '@lvce-editor/rpc-registry'
+import { EditorWorker, FileSearchWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 import type { QuickPickState } from '../src/parts/QuickPickState/QuickPickState.ts'
+import * as Create2 from '../src/parts/Create2/Create2.ts'
 import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefaultState.ts'
 import * as ExtensionHostWorker from '../src/parts/ExtensionHostWorker/ExtensionHostWorker.ts'
 import * as GetPicksFile from '../src/parts/GetPicksFile/GetPicksFile.ts'
 import * as InputSource from '../src/parts/InputSource/InputSource.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
+import * as QuickPickPrefix from '../src/parts/QuickPickPrefix/QuickPickPrefix.ts'
 import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import * as SetValue from '../src/parts/SetValue/SetValue.ts'
 
@@ -334,6 +336,81 @@ test('preserves other state properties', async () => {
   expect(mockRpc.invocations.length).toBeGreaterThanOrEqual(0)
 })
 
+test('resets the virtual viewport when filtering shrinks the result set', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['match'],
+    'IconTheme.getFileIcon': () => 'icon',
+    'IconTheme.getFolderIcon': () => 'icon',
+    'QuickPickProvider.provide': () => [
+      {
+        description: '',
+        direntType: 1,
+        fileIcon: '',
+        icon: '',
+        label: 'match',
+        matches: [],
+        uri: '/match',
+      },
+    ],
+  })
+
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    icons: ['old-icon'],
+    items: Array.from({ length: 100 }, (_, index) => ({
+      description: '',
+      direntType: 1,
+      fileIcon: '',
+      icon: '',
+      label: `item-${index}`,
+      matches: [],
+      uri: `/item-${index}`,
+    })),
+    maxLineY: 60,
+    maxVisibleItems: 10,
+    minLineY: 50,
+    providerId: 0,
+    value: 'old',
+  }
+
+  const result = await SetValue.setValue(state, 'match')
+
+  expect(result.minLineY).toBe(0)
+  expect(result.maxLineY).toBe(1)
+  expect(result.focusedIndex).toBe(0)
+  expect(result.items).toHaveLength(1)
+  expect(result.icons).toHaveLength(1)
+  expect(result.deltaY).toBe(0)
+  expect(mockRpc.invocations).toEqual(expect.any(Array))
+})
+
+test('supports go-to-column before loadContent initializes the widget', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'GetActiveEditor.getActiveEditorId': () => 1,
+  })
+
+  using mockEditorRpc = EditorWorker.registerMockRpc({
+    'Editor.getLines2': (editorId: number) => {
+      if (editorId === 1) {
+        return ['abc', 'def']
+      }
+      throw new Error(`unexpected editorId ${editorId}`)
+    },
+  })
+
+  const uid = 999
+  Create2.create(uid, QuickPickEntryUri.EveryThing, 30, 0, 0, 0, 0, 0, [], false, '', '')
+  const { newState } = QuickPickStates.get(uid)
+
+  const result = await SetValue.setValue(newState, `${QuickPickPrefix.GoToColumn}2`)
+
+  expect(result.items).toHaveLength(1)
+  expect(result.items[0].label).toBe("Press 'Enter' to go to line 1 column 3")
+  expect(result.providerId).toBe(newState.providerId)
+  expect(mockRpc.invocations).toEqual([['GetActiveEditor.getActiveEditorId']])
+  expect(mockEditorRpc.invocations).toEqual([['Editor.getLines2', 1]])
+})
+
 test('keeps the newest value when provider requests finish out of order', async () => {
   const { promise: firstResult, resolve: resolveFirstResult } = Promise.withResolvers<readonly string[]>()
   const { promise: firstStarted, resolve: notifyFirstStarted } = Promise.withResolvers<void>()
@@ -453,4 +530,28 @@ test('ranks matching commands and focuses SSH Connect when typing ssh', async ()
   expect(mockRpc.invocations).toContainEqual(['Preferences.get', 'quickPick.cache'])
   expect(mockRpc.invocations).toContainEqual(['Layout.getAllQuickPickMenuEntries', undefined])
   expect(mockRpc.invocations).toContainEqual(['ExtensionHost.getCommands', '', 0, undefined, undefined])
+})
+
+test('setValueWithContext resets the scrolled viewport when filtering', async () => {
+  using mockRpc = RendererWorker.registerMockRpc({
+    'ColorTheme.getColorThemeNames': () => ['match'],
+  })
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    deltaY: 1500,
+    maxLineY: 60,
+    maxVisibleItems: 10,
+    minLineY: 50,
+    uid: 903,
+    value: 'old',
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const setValueCommand = QuickPickStates.wrapAsyncCommand(SetValue.setValueWithContext)
+  await setValueCommand(state.uid, 'match')
+  const { newState } = QuickPickStates.get(state.uid)
+  expect(newState.deltaY).toBe(0)
+  expect(newState.minLineY).toBe(0)
+  expect(newState.maxLineY).toBe(1)
+  expect(newState.items).toHaveLength(1)
+  expect(mockRpc.invocations).toHaveLength(1)
 })

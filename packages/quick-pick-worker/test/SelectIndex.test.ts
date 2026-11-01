@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, expect, test, jest } from '@jest/globals'
-import { RendererWorker } from '@lvce-editor/rpc-registry'
+import { ExtensionManagementWorker, RendererWorker } from '@lvce-editor/rpc-registry'
 
 const testState: { consoleWarnSpy?: ReturnType<typeof jest.spyOn> } = {}
 
@@ -16,6 +16,7 @@ import * as CreateDefaultState from '../src/parts/CreateDefaultState/CreateDefau
 import { state as customQuickPickState } from '../src/parts/QuickPickEntriesCustom/QuickPickEntriesCustomState.ts'
 import * as QuickPickEntryId from '../src/parts/QuickPickEntryId/QuickPickEntryId.ts'
 import * as QuickPickEntryUri from '../src/parts/QuickPickEntryUri/QuickPickEntryUri.ts'
+import * as QuickPickStates from '../src/parts/QuickPickStates/QuickPickStates.ts'
 import { selectIndex } from '../src/parts/SelectIndex/SelectIndex.ts'
 
 interface CommandItem extends ProtoVisibleItem {
@@ -360,4 +361,33 @@ test('extension commands keep their application after closing the command palett
     ['Viewlet.closeWidget', 123],
     ['Application.execute', 'source', 'ExtensionHost.executeCommand', 'eslint.showPerformanceTrace'],
   ])
+})
+
+test('opens language mode picks while the registry still contains the command picker', async () => {
+  using mockLanguages = ExtensionManagementWorker.registerMockRpc({
+    'Extensions.getLanguages': () => [{ id: 'xyz' }],
+  })
+  const item: CommandItem = {
+    description: '',
+    direntType: 0,
+    fileIcon: '',
+    icon: '',
+    id: 'QuickPick.changeLanguageMode',
+    label: 'Change Language Mode',
+    matches: [],
+    uri: '',
+  }
+  const state: QuickPickState = {
+    ...CreateDefaultState.createDefaultState(),
+    items: [item],
+    providerId: QuickPickEntryId.EveryThing,
+    uid: 904,
+    uri: QuickPickEntryUri.EveryThing,
+    value: '>Change Language Mode',
+  }
+  QuickPickStates.set(state.uid, state, state)
+  const result = await selectIndex(state, 0)
+  expect(result.providerId).toBe(QuickPickEntryId.LanguageMode)
+  expect(result.items.map((pick) => pick.label)).toEqual(['xyz'])
+  expect(mockLanguages.invocations).toHaveLength(1)
 })
