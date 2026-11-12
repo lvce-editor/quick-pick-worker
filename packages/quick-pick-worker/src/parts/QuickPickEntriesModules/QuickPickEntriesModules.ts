@@ -1,6 +1,7 @@
 import type { IGetPicks } from '../GetPicks/GetPicks.ts'
 import type { SelectPick } from '../SelectPick/SelectPick.ts'
 import * as GetPicksColorTheme from '../GetPicksColorTheme/GetPicksColorTheme.ts'
+import * as GetPicksChats from '../GetPicksChats/GetPicksChats.ts'
 import * as GetPicksCommand from '../GetPicksCommand/GetPicksCommand.ts'
 import * as GetPicksCustom from '../GetPicksCustom/GetPicksCustom.ts'
 import * as GetPicksEndOfLine from '../GetPicksEndOfLine/GetPicksEndOfLine.ts'
@@ -15,6 +16,7 @@ import * as GetPicksSymbol from '../GetPicksSymbol/GetPicksSymbol.ts'
 import * as GetPicksView from '../GetPicksView/GetPicksView.ts'
 import * as GetPicksWorkspaceSymbol from '../GetPicksWorkspaceSymbol/GetPicksWorkspaceSymbol.ts'
 import * as SelectPickColorTheme from '../SelectPickColorTheme/SelectPickColorTheme.ts'
+import * as SelectPickChats from '../SelectPickChats/SelectPickChats.ts'
 import * as SelectPickCommand from '../SelectPickCommand/SelectPickCommand.ts'
 import * as SelectPickCustom from '../SelectPickCustom/SelectPickCustom.ts'
 import * as SelectPickEndOfLine from '../SelectPickEndOfLine/SelectPickEndOfLine.ts'
@@ -44,6 +46,8 @@ export const selectPicks: readonly SelectPick[] = [
   SelectPickLanguageMode.selectPick,
   SelectPickEndOfLine.selectPick,
   SelectPickIndentation.selectPick,
+  undefined as unknown as SelectPick,
+  SelectPickChats.selectPick,
 ]
 
 export const getPicks: readonly IGetPicks[] = [
@@ -61,4 +65,6 @@ export const getPicks: readonly IGetPicks[] = [
   GetPicksLanguageMode.getPicks,
   GetPicksEndOfLine.getPicks,
   GetPicksIndentation.getPicks,
+  undefined as unknown as IGetPicks,
+  GetPicksChats.getPicks,
 ]

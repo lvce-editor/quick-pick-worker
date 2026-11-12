@@ -48,6 +48,26 @@ test('returns File when id is EveryThing and prefix is None', () => {
   expect(result).toBe(QuickPickEntryId.File)
 })
 
+test('keeps Chats for an unprefixed search', () => {
+  expect(GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.Chats, QuickPickPrefix.None)).toBe(QuickPickEntryId.Chats)
+})
+
+test('routes command prefixes from Chats to Commands', () => {
+  expect(GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.Chats, QuickPickPrefix.Command)).toBe(QuickPickEntryId.Commands)
+})
+
+test.each([
+  [QuickPickPrefix.GoToColumn, QuickPickEntryId.GoToColumn],
+  [QuickPickPrefix.GoToLine, QuickPickEntryId.GoToLine],
+  [QuickPickPrefix.Help, QuickPickEntryId.Help],
+  [QuickPickPrefix.Symbol, QuickPickEntryId.Symbol],
+  [QuickPickPrefix.View, QuickPickEntryId.View],
+  [QuickPickPrefix.WorkspaceSymbol, QuickPickEntryId.WorkspaceSymbol],
+  ['unknown-prefix', QuickPickEntryId.Chats],
+])('preserves %s routing from Chats', (prefix, expected) => {
+  expect(GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.Chats, prefix)).toBe(expected)
+})
+
 test('returns File when id is EveryThing and prefix is unknown', () => {
   const result = GetQuickPickSubProviderId.getQuickPickSubProviderId(QuickPickEntryId.EveryThing, 'unknown-prefix')
   expect(result).toBe(QuickPickEntryId.File)

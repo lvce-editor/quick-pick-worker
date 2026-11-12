@@ -6,6 +6,8 @@ export const File = 'quickPick://file'
 
 export const EveryThing = 'quickPick://everything'
 
+export const Chats = 'quickPick://chats'
+
 export const Recent = 'quickPick://recent'
 
 export const ColorTheme = 'quickPick://color-theme'

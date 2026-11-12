@@ -31,6 +31,10 @@ test('returns EveryThing when prefix is EveryThing', () => {
   expect(result).toBe(QuickPickEntryId.EveryThing)
 })
 
+test('returns Chats when prefix is Chats', () => {
+  expect(GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.Chats)).toBe(QuickPickEntryId.Chats)
+})
+
 test('returns EveryThing when prefix is GoToLine', () => {
   const result = GetQuickPickProviderId.getQuickPickProviderId(QuickPickEntryUri.GoToLine)
   expect(result).toBe(QuickPickEntryId.EveryThing)
