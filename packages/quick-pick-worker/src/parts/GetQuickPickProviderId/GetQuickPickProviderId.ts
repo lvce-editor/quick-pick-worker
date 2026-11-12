@@ -3,6 +3,8 @@ import * as QuickPickEntryUri from '../QuickPickEntryUri/QuickPickEntryUri.ts'
 
 export const getQuickPickProviderId = (prefix: string): number => {
   switch (prefix) {
+    case QuickPickEntryUri.Chats:
+      return QuickPickEntryId.Chats
     case QuickPickEntryUri.ColorTheme:
       return QuickPickEntryId.ColorTheme
     case QuickPickEntryUri.Commands:

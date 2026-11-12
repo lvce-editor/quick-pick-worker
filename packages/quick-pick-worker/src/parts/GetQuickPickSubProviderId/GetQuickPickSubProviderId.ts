@@ -6,6 +6,26 @@ export const getQuickPickSubProviderId = (id: number, prefix: string): number =>
     return prefix === QuickPickPrefix.Command ? QuickPickEntryId.Commands : QuickPickEntryId.File
   }
   if (id !== QuickPickEntryId.EveryThing) {
+    if (id === QuickPickEntryId.Chats) {
+      switch (prefix) {
+        case QuickPickPrefix.Command:
+          return QuickPickEntryId.Commands
+        case QuickPickPrefix.GoToColumn:
+          return QuickPickEntryId.GoToColumn
+        case QuickPickPrefix.GoToLine:
+          return QuickPickEntryId.GoToLine
+        case QuickPickPrefix.Help:
+          return QuickPickEntryId.Help
+        case QuickPickPrefix.Symbol:
+          return QuickPickEntryId.Symbol
+        case QuickPickPrefix.View:
+          return QuickPickEntryId.View
+        case QuickPickPrefix.WorkspaceSymbol:
+          return QuickPickEntryId.WorkspaceSymbol
+        default:
+          return QuickPickEntryId.Chats
+      }
+    }
     return id
   }
   switch (prefix) {

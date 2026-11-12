@@ -26,6 +26,8 @@ export const EndOfLine = 12
 
 export const Indentation = 13
 
+export const Chats = 15
+
 export const Noop = 14
 
 export const EveryThing = 100
