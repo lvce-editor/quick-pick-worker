@@ -25,26 +25,40 @@ const trimTrailingSeparators = (path: string): string => {
 
 const normalizePath = (path: string): string => path.replaceAll('\\', '/')
 
-const getWorkspaceDisplayPath = (workspace: string): { readonly path: string; readonly scheme?: string; readonly host?: string } => {
+interface WorkspaceDisplayPath {
+  readonly host?: string
+  readonly path: string
+  readonly scheme?: string
+  readonly uriPrefix?: string
+  readonly url?: URL
+}
+
+const getWorkspaceDisplayPath = (workspace: string): WorkspaceDisplayPath => {
   if (!hasUriScheme(workspace)) {
     return { path: normalizePath(workspace) }
   }
   const url = new URL(workspace)
+  const uriPrefix =
+    url.search || url.hash || !url.pathname.startsWith('/') ? undefined : `${url.protocol}//${url.host}${trimTrailingSeparators(url.pathname)}/`
   return {
     host: url.host,
     path: decodeURIComponent(url.pathname),
     scheme: url.protocol,
+    uriPrefix,
+    url,
   }
 }
 
-const getRelativeDirectory = (workspace: string, uri: string, dirName: string): string => {
-  const workspacePath = getWorkspaceDisplayPath(workspace)
-  if (hasUriScheme(uri)) {
+const isSafeRelativePath = (path: string): boolean =>
+  /^[a-z\d._~/-]+$/i.test(path) && path.split('/').every((segment) => segment !== '.' && segment !== '..')
+
+const getRelativeDirectory = (workspacePath: WorkspaceDisplayPath, uri: string, dirName: string, isWorkspaceRelative: boolean): string => {
+  if (!isWorkspaceRelative && hasUriScheme(uri)) {
     const url = new URL(uri)
     if (workspacePath.scheme !== url.protocol || workspacePath.host !== url.host) {
       return dirName
     }
-  } else if (workspacePath.scheme) {
+  } else if (!isWorkspaceRelative && workspacePath.scheme) {
     return dirName
   }
   const normalizedWorkspace = trimTrailingSeparators(workspacePath.path)
@@ -59,15 +73,18 @@ const getRelativeDirectory = (workspace: string, uri: string, dirName: string): 
   return normalizedDirectory.slice(prefix.length)
 }
 
-const resolveFileUri = (workspace: string, path: string): string => {
+const resolveFileUri = (workspace: string, path: string, workspacePath: WorkspaceDisplayPath): string => {
   if (hasUriScheme(path)) {
     return path
   }
-  if (hasUriScheme(workspace)) {
-    const workspaceUrl = new URL(workspace)
+  if (workspacePath.url) {
+    if (workspacePath.uriPrefix && !isAbsolutePath(path) && isSafeRelativePath(path)) {
+      return `${workspacePath.uriPrefix}${path}`
+    }
+    const workspaceUrl = new URL(workspacePath.url)
     const normalizedPath = path.replaceAll('\\', '/').replaceAll('%', '%25')
-    const workspacePath = trimTrailingSeparators(workspaceUrl.pathname)
-    workspaceUrl.pathname = normalizedPath.startsWith('/') ? normalizedPath : `${workspacePath}/${normalizedPath}`
+    const workspaceUrlPath = trimTrailingSeparators(workspaceUrl.pathname)
+    workspaceUrl.pathname = normalizedPath.startsWith('/') ? normalizedPath : `${workspaceUrlPath}/${normalizedPath}`
     return workspaceUrl.href
   }
   if (isAbsolutePath(path)) {
@@ -76,11 +93,17 @@ const resolveFileUri = (workspace: string, path: string): string => {
   return `${trimTrailingSeparators(workspace)}/${path}`
 }
 
-const convertToPick = (workspace: string, uri: string): ProtoVisibleItem => {
-  const displayPath = hasUriScheme(uri) ? decodeURIComponent(new URL(uri).pathname) : uri.replaceAll('\\', '/')
+const convertToPick = (workspacePath: WorkspaceDisplayPath, uri: string, path: string): ProtoVisibleItem => {
+  const isWorkspaceRelative = Boolean(workspacePath.uriPrefix && !isAbsolutePath(path) && !hasUriScheme(path) && isSafeRelativePath(path))
+  let displayPath = uri.replaceAll('\\', '/')
+  if (isWorkspaceRelative) {
+    displayPath = `${trimTrailingSeparators(workspacePath.path)}/${path}`
+  } else if (hasUriScheme(uri)) {
+    displayPath = decodeURIComponent(new URL(uri).pathname)
+  }
   const baseName = Workspace.pathBaseName(displayPath)
   const dirName = Workspace.pathDirName(displayPath)
-  const description = getRelativeDirectory(workspace, uri, dirName)
+  const description = getRelativeDirectory(workspacePath, uri, dirName, isWorkspaceRelative)
 
   return {
     description,
@@ -129,6 +152,10 @@ export const getPicks = async (searchValue: string): Promise<readonly ProtoVisib
       await QuickPickCache.set(workspace, { hash: response.hash, results: files })
     }
   }
-  const picks = files.map((path) => convertToPick(workspace, resolveFileUri(workspace, path)))
+  if (files.length === 0) {
+    return []
+  }
+  const workspacePath = getWorkspaceDisplayPath(workspace)
+  const picks = files.map((path) => convertToPick(workspacePath, resolveFileUri(workspace, path, workspacePath), path))
   return picks
 }

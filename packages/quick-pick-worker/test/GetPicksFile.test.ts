@@ -262,6 +262,39 @@ test('getPicks relativizes paths for matching qualified workspace schemes', asyn
   expect(mockRpc.invocations).toEqual([['Workspace.getUri'], ['Preferences.get', 'quickPick.cache']])
 })
 
+test('getPicks converts safe relative paths without changing qualified workspace URI details', async () => {
+  createMockFileSearchWorker(['src/main.ts', 'src/sub/file-name_2.ts'])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getUri': () => 'memfs://gateway/my%20workspace/',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result.map(({ description, label, uri }) => ({ description, label, uri }))).toEqual([
+    { description: 'src', label: 'main.ts', uri: 'memfs://gateway/my%20workspace/src/main.ts' },
+    { description: 'src/sub', label: 'file-name_2.ts', uri: 'memfs://gateway/my%20workspace/src/sub/file-name_2.ts' },
+  ])
+  expect(mockRpc.invocations).toContainEqual(['Workspace.getUri'])
+})
+
+test.each([
+  ['../outside.ts', 'memfs:///outside.ts', 'outside.ts', ''],
+  ['src/Ä 100%23 #?.txt', 'memfs:///workspace/src/%C3%84%20100%2523%20%23%3F.txt', 'Ä 100%23 #?.txt', 'src'],
+  ['/workspace/src/file.ts', 'memfs:///workspace/src/file.ts', 'file.ts', 'src'],
+])('uses URL handling for paths that are not safe relative paths: %s', async (path, expectedUri, expectedLabel, expectedDescription) => {
+  createMockFileSearchWorker([path])
+  using mockRpc = RendererWorker.registerMockRpc({
+    'Workspace.getUri': () => 'memfs:///workspace',
+  })
+
+  const result = await GetPicksFile.getPicks('file')
+
+  expect(result[0].uri).toBe(expectedUri)
+  expect(result[0].label).toBe(expectedLabel)
+  expect(result[0].description).toBe(expectedDescription)
+  expect(mockRpc.invocations).toContainEqual(['Workspace.getUri'])
+})
+
 test.each(['remote-server', 'remote-ssh'])('file search preserves the %s workspace identity', async (scheme) => {
   const workspace = `${scheme}://gateway.example/project`
   const search = createMockFileSearchWorker(['hello.txt'])
@@ -272,6 +305,38 @@ test.each(['remote-server', 'remote-ssh'])('file search preserves the %s workspa
   const picks = await GetPicksFile.getPicks('hello')
   expect(search.invocations).toEqual([['FileSearch.searchFile', workspace, 'hello', true, '']])
   expect(picks[0].uri).toBe(`${workspace}/hello.txt`)
+  expect(rpc.invocations).toContainEqual(['Workspace.getUri'])
+})
+
+test.each([
+  ['remote-ssh://gateway.example/project/src/file.ts', 'src'],
+  ['remote-ssh://other.example/project/src/file.ts', '/project/src'],
+  ['file:///project/src/file.ts', '/project/src'],
+])('file search preserves URI scheme and authority when describing %s', async (uri, description) => {
+  createMockFileSearchWorker([uri])
+  using rpc = RendererWorker.registerMockRpc({
+    'Preferences.get': () => false,
+    'Workspace.getUri': () => 'remote-ssh://gateway.example/project',
+  })
+
+  const picks = await GetPicksFile.getPicks('file')
+
+  expect(picks[0].uri).toBe(uri)
+  expect(picks[0].description).toBe(description)
+  expect(rpc.invocations).toContainEqual(['Workspace.getUri'])
+})
+
+test('file search preserves query and fragment when resolving a relative URI workspace result', async () => {
+  createMockFileSearchWorker(['src/file.ts'])
+  using rpc = RendererWorker.registerMockRpc({
+    'Preferences.get': () => false,
+    'Workspace.getUri': () => 'memfs:///workspace?view=files#root',
+  })
+
+  const picks = await GetPicksFile.getPicks('file')
+
+  expect(picks[0].uri).toBe('memfs:///workspace/src/file.ts?view=files#root')
+  expect(picks[0].description).toBe('src')
   expect(rpc.invocations).toContainEqual(['Workspace.getUri'])
 })
 
